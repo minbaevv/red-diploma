@@ -1,0 +1,294 @@
+[
+  {
+    "slug": "ml-torchvision-dataset",
+    "type": "theory",
+    "module": "data-ml",
+    "title": {
+      "ru": "Данные: скачать MNIST через torchvision",
+      "kg": "Маалымат: torchvision менен MNIST жүктөө"
+    },
+    "prompt": {
+      "ru": "Покажи, как скачать MNIST через `torchvision`, применить transforms, разделить train/val и проверить форму первого батча. Объясни ошибку `from torchvision import Image` и как правильно открыть картинку для инференса.",
+      "kg": "`torchvision` аркылуу MNISTди кантип жүктөө, transforms колдонуу, train/val бөлүү жана биринчи батчтын формасын текшерүү керектигин көрсөт. `from torchvision import Image` катасын жана инференс үчүн сүрөттү туура ачууну түшүндүр."
+    },
+    "difficulty": 4,
+    "points": 12,
+    "hints": [
+      {
+        "ru": "Импортируй `datasets` и `transforms` из `torchvision`.",
+        "kg": "`torchvision`ден `datasets` жана `transforms` импорттоо."
+      },
+      {
+        "ru": "`Image` берётся из `PIL`, а не из `torchvision`.",
+        "kg": "`Image` `torchvision`ден эмес, `PIL`ден алынат."
+      },
+      {
+        "ru": "Проверь `images.shape == (batch, 1, 28, 28)`.",
+        "kg": "`images.shape == (batch, 1, 28, 28)` экенин текшер."
+      },
+      {
+        "ru": "`download=True` скачивает датасет только если его нет.",
+        "kg": "`download=True` датасет жок болсо гана жүктөйт."
+      }
+    ],
+    "subquestions": [
+      {
+        "ru": "Почему `ToTensor()` обязателен для CNN?",
+        "kg": "CNN үчүн `ToTensor()` эмне үчүн милдеттүү?"
+      },
+      {
+        "ru": "Что произойдёт при повторном запуске с `download=True`?",
+        "kg": "`download=True` менен кайра иштетсе эмне болот?"
+      },
+      {
+        "ru": "Чем train transforms отличаются от val/test?",
+        "kg": "Train transforms val/testтен кандай айырмаланат?"
+      }
+    ],
+    "model_answer": {
+      "ru": "## 1. Импорты\n```python\nfrom torchvision import datasets, transforms\nfrom torch.utils.data import DataLoader, random_split\nimport torch\n```\n`Image` **не** импортируют из `torchvision`. Для загрузки картинки с диска нужен `from PIL import Image`; для чтения в тензор — `torchvision.io.read_image`.\n\n## 2. Transforms\n```python\ntrain_tf = transforms.Compose([\n    transforms.RandomRotation(10),\n    transforms.ToTensor(),\n    transforms.Normalize((0.1307,), (0.3081,)),\n])\n\nval_tf = transforms.Compose([\n    transforms.ToTensor(),\n    transforms.Normalize((0.1307,), (0.3081,)),\n])\n```\nАугментации применяй только к train. Validation/test должны быть детерминированными.\n\n## 3. Скачивание и split\n```python\nfull_train = datasets.MNIST(root='data', train=True, download=True, transform=train_tf)\ntest_ds = datasets.MNIST(root='data', train=False, download=True, transform=val_tf)\ntrain_ds, val_ds = random_split(\n    full_train,\n    [50000, 10000],\n    generator=torch.Generator().manual_seed(42),\n)\n```\n`download=True` идемпотентен: файлы скачиваются только если их нет в `root`.\n\n## 4. DataLoader и проверка\n```python\ntrain_loader = DataLoader(train_ds, batch_size=64, shuffle=True, num_workers=2)\nimages, labels = next(iter(train_loader))\nprint(images.shape)  # torch.Size([64, 1, 28, 28])\nprint(labels.shape)  # torch.Size([64])\nassert images.shape == (64, 1, 28, 28)\n```\n\n## 5. Открыть свою картинку\n```python\nfrom PIL import Image\nimg = Image.open('digit.png').convert('L')\ntensor = val_tf(img).unsqueeze(0)  # [1, 1, 28, 28]\n```\nКритерий готовности: датасет лежит в `data/MNIST/raw`, батч имеет форму `[64, 1, 28, 28]`, а `val_tf` не содержит случайных преобразований.",
+      "kg": "## 1. Импорттор\n```python\nfrom torchvision import datasets, transforms\nfrom torch.utils.data import DataLoader, random_split\nimport torch\n```\n`Image` **torchvision`дөн** импорттолбойт. Дисктен сүрөт жүктөө үчүн `from PIL import Image`; тензорго окуу үчүн `torchvision.io.read_image` керек.\n\n## 2. Transforms\n```python\ntrain_tf = transforms.Compose([\n    transforms.RandomRotation(10),\n    transforms.ToTensor(),\n    transforms.Normalize((0.1307,), (0.3081,)),\n])\n\nval_tf = transforms.Compose([\n    transforms.ToTensor(),\n    transforms.Normalize((0.1307,), (0.3081,)),\n])\n```\nАугментацияны trainге гана колдон. Validation/test детерминдүү болушу керек.\n\n## 3. Жүктөө жана split\n```python\nfull_train = datasets.MNIST(root='data', train=True, download=True, transform=train_tf)\ntest_ds = datasets.MNIST(root='data', train=False, download=True, transform=val_tf)\ntrain_ds, val_ds = random_split(\n    full_train,\n    [50000, 10000],\n    generator=torch.Generator().manual_seed(42),\n)\n```\n`download=True` идемпотенттүү: файлдар `root`то жок болсо гана жүктөлөт.\n\n## 4. DataLoader жана текшерүү\n```python\ntrain_loader = DataLoader(train_ds, batch_size=64, shuffle=True, num_workers=2)\nimages, labels = next(iter(train_loader))\nprint(images.shape)  # torch.Size([64, 1, 28, 28])\nprint(labels.shape)  # torch.Size([64])\nassert images.shape == (64, 1, 28, 28)\n```\n\n## 5. Өз сүрөтүңдү ачуу\n```python\nfrom PIL import Image\nimg = Image.open('digit.png').convert('L')\ntensor = val_tf(img).unsqueeze(0)  # [1, 1, 28, 28]\n```\nДаярдык критерийи: датасет `data/MNIST/raw`то, батч формасы `[64, 1, 28, 28]`, `val_tf`те кокустук преобразованиелер жок."
+    },
+    "walkthrough": [
+      {
+        "ru": "1. Выбери transforms отдельно для train и val.",
+        "kg": "1. Train жана val үчүн өзүнчө transforms танда."
+      },
+      {
+        "ru": "2. Скачай датасет с `download=True`.",
+        "kg": "2. Датасетти `download=True` менен жүктө."
+      },
+      {
+        "ru": "3. Раздели train на train/val с seed.",
+        "kg": "3. Trainди seed менен train/valге бөл."
+      },
+      {
+        "ru": "4. Проверь форму первого батча.",
+        "kg": "4. Биринчи батчтын формасын текшер."
+      }
+    ],
+    "pitfalls": {
+      "ru": "Главная ошибка новичка — `from torchvision import Image`. Такого символа там нет. Картинку открывает `PIL.Image`, а transforms превращают её в тензор.",
+      "kg": "Жаңы баштагандардын негизги катасы — `from torchvision import Image`. Андай символ жок. Сүрөттү `PIL.Image` ачат, transforms аны тензорго айландырат."
+    },
+    "exam_tip": {
+      "ru": "На защите назови цепочку: download → transform → split → DataLoader → batch shape → train.",
+      "kg": "Коргоодо чынжырды ата: download → transform → split → DataLoader → batch shape → train."
+    }
+  },
+  {
+    "slug": "ml-image-inference",
+    "type": "theory",
+    "module": "data-ml",
+    "title": {
+      "ru": "Инференс: PIL → transforms → модель",
+      "kg": "Инференс: PIL → transforms → модель"
+    },
+    "prompt": {
+      "ru": "Напиши функцию `predict_image(path, model, device)`, которая открывает картинку, приводит её к формату MNIST и возвращает класс и confidence. Объясни `model.eval()`, `inference_mode` и `unsqueeze(0)`.",
+      "kg": "`predict_image(path, model, device)` функциясын жаз: сүрөттү ачып, MNIST форматына келтирип, класс жана confidence кайтарат. `model.eval()`, `inference_mode` жана `unsqueeze(0)` түшүндүр."
+    },
+    "difficulty": 4,
+    "points": 10,
+    "hints": [
+      {
+        "ru": "Открывай картинку через `PIL.Image.open` и `convert('L')`.",
+        "kg": "Сүрөттү `PIL.Image.open` жана `convert('L')` аркылуу ач."
+      },
+      {
+        "ru": "`ToTensor()` добавляет измерение канала, `unsqueeze(0)` — batch.",
+        "kg": "`ToTensor()` канал өлчөмүн, `unsqueeze(0)` батчты кошот."
+      },
+      {
+        "ru": "Используй `torch.inference_mode()`.",
+        "kg": "`torch.inference_mode()` колдон."
+      }
+    ],
+    "subquestions": [
+      {
+        "ru": "Почему нельзя забывать `model.eval()`?",
+        "kg": "Эмне үчүн `model.eval()` унутууга болбойт?"
+      },
+      {
+        "ru": "Что делает `softmax(dim=1)`?",
+        "kg": "`softmax(dim=1)` эмне кылат?"
+      },
+      {
+        "ru": "Почему модель получает `[1, 1, 28, 28]`, а не `[1, 28, 28]`?",
+        "kg": "Эмне үчүн модель `[1, 1, 28, 28]` алат, `[1, 28, 28]` эмес?"
+      }
+    ],
+    "model_answer": {
+      "ru": "```python\nimport torch\nfrom PIL import Image\nfrom torchvision import transforms\n\ntf = transforms.Compose([\n    transforms.Resize((28, 28)),\n    transforms.ToTensor(),\n    transforms.Normalize((0.1307,), (0.3081,)),\n])\n\ndef predict_image(path, model, device):\n    model.eval()\n    image = Image.open(path).convert('L')\n    tensor = tf(image).unsqueeze(0).to(device)\n    with torch.inference_mode():\n        probabilities = model(tensor).softmax(dim=1)\n        confidence, predicted = probabilities.max(dim=1)\n    return predicted.item(), round(confidence.item(), 4)\n```\nПорядок: `eval()` убирает dropout и переводит BatchNorm в inference-режим; `inference_mode()` отключает графы; `unsqueeze(0)` добавляет batch dimension; `softmax` превращает логиты в вероятности.",
+      "kg": "```python\nimport torch\nfrom PIL import Image\nfrom torchvision import transforms\n\ntf = transforms.Compose([\n    transforms.Resize((28, 28)),\n    transforms.ToTensor(),\n    transforms.Normalize((0.1307,), (0.3081,)),\n])\n\ndef predict_image(path, model, device):\n    model.eval()\n    image = Image.open(path).convert('L')\n    tensor = tf(image).unsqueeze(0).to(device)\n    with torch.inference_mode():\n        probabilities = model(tensor).softmax(dim=1)\n        confidence, predicted = probabilities.max(dim=1)\n    return predicted.item(), round(confidence.item(), 4)\n```\nТартип: `eval()` dropoutту өчүрүп, BatchNormду inference режимине которот; `inference_mode()` графты өчүрөт; `unsqueeze(0)` batch dimension кошот; `softmax` логиттерди ыктымалдыкка айландырат."
+    },
+    "walkthrough": [
+      {
+        "ru": "1. Переведи модель в eval.",
+        "kg": "1. Моделди eval режимине котор."
+      },
+      {
+        "ru": "2. Открой изображение и приведи к одному каналу.",
+        "kg": "2. Сүрөттү ачып, бир каналга келтир."
+      },
+      {
+        "ru": "3. Примени transforms и добавь batch.",
+        "kg": "3. Transforms колдонуп, батч кош."
+      },
+      {
+        "ru": "4. Сделай forward без градиентов.",
+        "kg": "4. Градиентсиз forward жаса."
+      }
+    ],
+    "pitfalls": {
+      "ru": "Не подавай в модель путь к файлу или PIL-объект — только тензор. И не забудь `.to(device)`.",
+      "kg": "Моделге файл жолун же PIL объектин бербе — тензор гана. `.to(device)` унутпа."
+    },
+    "exam_tip": {
+      "ru": "Формула ответа: `eval → open → convert → transform → unsqueeze → inference → softmax → argmax`.",
+      "kg": "Жооп формуласы: `eval → open → convert → transform → unsqueeze → inference → softmax → argmax`."
+    }
+  },
+  {
+    "slug": "ml-data-augmentation",
+    "type": "theory",
+    "module": "data-ml",
+    "title": {
+      "ru": "Данные: аугментация без утечки",
+      "kg": "Маалымат: leakage жок аугментация"
+    },
+    "prompt": {
+      "ru": "Объясни, зачем нужна аугментация, какие transforms безопасны для MNIST/CV и почему нельзя применять случайные transforms к validation. Приведи код train/val pipeline.",
+      "kg": "Аугментация эмне үчүн керек, MNIST/CV үчүн кайсы transforms коопсуз жана эмне үчүн validation'го кокустук transforms колдонбош керек экенин түшүндүр. Train/val pipeline кодун келтир."
+    },
+    "difficulty": 4,
+    "points": 10,
+    "hints": [
+      {
+        "ru": "Разделяй train_tf и val_tf.",
+        "kg": "`train_tf` жана `val_tf`ти бөл."
+      },
+      {
+        "ru": "Для цифр осторожно с поворотами и crop.",
+        "kg": "Цифралар үчүн бурулуу жана crop менен этият бол."
+      },
+      {
+        "ru": "Validation должен быть детерминированным.",
+        "kg": "Validation детерминдүү болушу керек."
+      }
+    ],
+    "subquestions": [
+      {
+        "ru": "Когда аугментация вредит?",
+        "kg": "Аугментация качан зыян келтирет?"
+      },
+      {
+        "ru": "Почему нельзя аугментировать test?",
+        "kg": "Эмне үчүн testти аугментациялоого болбойт?"
+      },
+      {
+        "ru": "Чем `RandomRotation` отличается от `RandomAffine`?",
+        "kg": "`RandomRotation` `RandomAffine`ден кандай айырмаланат?"
+      }
+    ],
+    "model_answer": {
+      "ru": "Аугментация расширяет train-выборку искусственными вариантами и снижает переобучение. Для MNIST безопасны небольшие повороты, сдвиги и лёгкий scale. Слишком сильные искажения превращают цифру в другой класс.\n\n```python\nfrom torchvision import transforms\n\ntrain_tf = transforms.Compose([\n    transforms.RandomAffine(degrees=10, translate=(0.08, 0.08), scale=(0.95, 1.05)),\n    transforms.ToTensor(),\n    transforms.Normalize((0.1307,), (0.3081,)),\n])\n\nval_tf = transforms.Compose([\n    transforms.ToTensor(),\n    transforms.Normalize((0.1307,), (0.3081,)),\n])\n```\nValidation и test — это экзамен модели. Если каждый раз показывать разные случайные картинки, метрика перестаёт быть сравнимой. Поэтому случайные transforms только в train.\n\nКритерий: один и тот же test-пример даёт одинаковый тензор при каждом запуске.",
+      "kg": "Аугментация train тандоосун жасалма варианттар менен кеңейтип, переобучениени азайтат. MNIST үчүн кичине бурулуулар, жылышуулар жана жеңил scale коопсуз. Өтө күчтүү бурмалоо цифраны башка класска айландырат.\n\n```python\nfrom torchvision import transforms\n\ntrain_tf = transforms.Compose([\n    transforms.RandomAffine(degrees=10, translate=(0.08, 0.08), scale=(0.95, 1.05)),\n    transforms.ToTensor(),\n    transforms.Normalize((0.1307,), (0.3081,)),\n])\n\nval_tf = transforms.Compose([\n    transforms.ToTensor(),\n    transforms.Normalize((0.1307,), (0.3081,)),\n])\n```\nValidation жана test — модельдин экзамени. Эгер ар жолу башка кокустук сүрөттөр көрсөтүлсө, метрика салыштырууга жараксыз болот. Ошондуктан кокустук transforms trainде гана.\n\nКритерий: бир эле test-мисал ар бир иштетүүдө бирдей тензор берет."
+    },
+    "walkthrough": [
+      {
+        "ru": "1. Оставь случайные transforms только в train.",
+        "kg": "1. Кокустук transforms trainде гана калтыр."
+      },
+      {
+        "ru": "2. Для val/test используй ToTensor и Normalize.",
+        "kg": "2. Val/test үчүн ToTensor жана Normalize колдон."
+      },
+      {
+        "ru": "3. Проверь, что test-тензор детерминирован.",
+        "kg": "3. Test-тензор детерминдүү экенин текшер."
+      }
+    ],
+    "pitfalls": {
+      "ru": "Случайный `Resize`/`Crop` на validation делает метрику нестабильной. Не сравнивай эпохи на разных искажённых версиях val.",
+      "kg": "Validation'догу кокустук `Resize`/`Crop` метриканы туруксуз кылат. Эпохаларды val'дын ар башка бурмаланган версияларында салыштырба."
+    },
+    "exam_tip": {
+      "ru": "Фраза для защиты: «аугментация — только train, validation/test — детерминированный экзамен».",
+      "kg": "Коргоо үчүн сүйлөм: «аугментация — trainде гана, validation/test — детерминдүү экзамен»."
+    }
+  },
+  {
+    "slug": "ml-capstone-runbook",
+    "type": "theory",
+    "module": "data-ml",
+    "title": {
+      "ru": "Capstone runbook: данные → API → UI → GitHub",
+      "kg": "Capstone runbook: маалымат → API → UI → GitHub"
+    },
+    "prompt": {
+      "ru": "Собери пошаговый runbook capstone-проекта: скачать MNIST, обучить и сохранить модель, поднять FastAPI, подключить Streamlit, проверить всё и опубликовать на GitHub. Укажи команды, структуру проекта, checkpoints и типичные ошибки.",
+      "kg": "Capstone долбоорунун кадам-кадам runbook'ун түз: MNIST жүктөө, модель окутуп сактоо, FastAPI көтөрүү, Streamlit кошуу, баарын текшерүү жана GitHub'га жарыялоо. Буйруктарды, долбоор түзүмүн, checkpoint'терди жана кеңири кездешүүчү каталарды көрсөт."
+    },
+    "difficulty": 5,
+    "points": 12,
+    "hints": [
+      {
+        "ru": "Раздели проект на train.py, app.py, streamlit_app.py.",
+        "kg": "Долбоорду train.py, app.py, streamlit_app.py деп бөл."
+      },
+      {
+        "ru": "Сначала проверь API через curl, потом UI.",
+        "kg": "Алгач APIни curl менен, анан UIди текшер."
+      },
+      {
+        "ru": "Модель и датасет не коммить в Git.",
+        "kg": "Модель жана датасетти Gitке коммиттебе."
+      }
+    ],
+    "subquestions": [
+      {
+        "ru": "Почему модель загружают на старте API?",
+        "kg": "Эмне үчүн модель API стартында жүктөлөт?"
+      },
+      {
+        "ru": "Что делать, если Streamlit не видит API?",
+        "kg": "Streamlit APIни көрбөсө эмне кылуу керек?"
+      },
+      {
+        "ru": "Где хранить веса модели на GitHub?",
+        "kg": "GitHub'да модель салмактарын кайда сактоо керек?"
+      }
+    ],
+    "model_answer": {
+      "ru": "## Структура\n```text\nml-digit-service/\n  train.py\n  app.py\n  streamlit_app.py\n  requirements.txt\n  README.md\n  .gitignore\n  artifacts/model.pth\n  artifacts/metrics.json\n```\n`artifacts/` добавь в `.gitignore`, если веса не публикуются. Для публикации используй Git LFS или GitHub Release.\n\n## 1. Данные и обучение\n```bash\npython train.py\n```\nВ `train.py`: `torchvision.datasets.MNIST(root='data', download=True)`, `train/val split`, `DataLoader`, цикл обучения, `test accuracy`, `torch.save(model.state_dict(), 'artifacts/model.pth')`, `metrics.json`.\n\nCheckpoint: файл модели существует, accuracy записана, повторный запуск воспроизводим.\n\n## 2. FastAPI\n```python\n# app.py\nfrom fastapi import FastAPI, File, UploadFile, HTTPException\nimport torch\n\napp = FastAPI()\nmodel = ...  # создай архитектуру и загрузи state_dict один раз\nmodel.eval()\n\n@app.get('/health')\ndef health():\n    return {'status': 'ok'}\n\n@app.post('/predict')\nasync def predict(file: UploadFile = File(...)):\n    data = await file.read()\n    if not data:\n        raise HTTPException(status_code=404, detail='empty file')\n    return {'result': predict_image(data, model, device)}\n```\n```bash\nuvicorn app:app --port 8000\ncurl http://127.0.0.1:8000/health\ncurl -F \"file=@digit.png\" http://127.0.0.1:8000/predict\n```\nCheckpoint: `/health` отвечает 200, `/predict` возвращает класс и confidence, пустой файл даёт 404.\n\n## 3. Streamlit\n```python\nimport requests\nimport streamlit as st\n\nuploaded = st.file_uploader('Digit image', type=['png', 'jpg', 'jpeg'])\nif uploaded and st.button('Predict'):\n    response = requests.post(\n        'http://127.0.0.1:8000/predict',\n        files={'file': (uploaded.name, uploaded.getvalue(), uploaded.type)},\n        timeout=10,\n    )\n    response.raise_for_status()\n    st.success(response.json()['result'])\n```\n```bash\nstreamlit run streamlit_app.py\n```\nCheckpoint: загрузка картинки показывает предсказание; ошибка API видна пользователю.\n\n## 4. GitHub\n```bash\ngit init\ngit add .\ngit commit -m \"ML digit service: train, API, Streamlit\"\ngit remote add origin git@github.com:USER/REPO.git\ngit push -u origin main\n```\nВ README: команды запуска, метрики, ограничения, пример запроса. В `.gitignore`: `.venv/`, `data/`, `*.pth`, `.env`. Секреты не коммить.\n\n## Типичные ошибки\n- `from torchvision import Image` — неправильно, `Image` из `PIL`.\n- Модель загружается на каждый запрос — медленно.\n- Забыли `model.eval()` — нестабильные предсказания.\n- Streamlit обращается к `localhost`, а API в другом контейнере — используй имя сервиса.\n- Веса и датасет попали в Git — проверь `git status`.",
+      "kg": "## Түзүм\n```text\nml-digit-service/\n  train.py\n  app.py\n  streamlit_app.py\n  requirements.txt\n  README.md\n  .gitignore\n  artifacts/model.pth\n  artifacts/metrics.json\n```\nЭгер салмактар жарыяланбаса, `artifacts/`ти `.gitignore`го кош. Жарыялоо үчүн Git LFS же GitHub Release колдон.\n\n## 1. Маалымат жана окутуу\n```bash\npython train.py\n```\n`train.py` ичинде: `torchvision.datasets.MNIST(root='data', download=True)`, `train/val split`, `DataLoader`, окутуу цикли, `test accuracy`, `torch.save(model.state_dict(), 'artifacts/model.pth')`, `metrics.json`.\n\nCheckpoint: модель файлы бар, accuracy жазылган, кайра иштетүү кайталанат.\n\n## 2. FastAPI\n```python\n# app.py\nfrom fastapi import FastAPI, File, UploadFile, HTTPException\nimport torch\n\napp = FastAPI()\nmodel = ...  # архитектураны түзүп, state_dictти бир жолу жүктө\nmodel.eval()\n\n@app.get('/health')\ndef health():\n    return {'status': 'ok'}\n\n@app.post('/predict')\nasync def predict(file: UploadFile = File(...)):\n    data = await file.read()\n    if not data:\n        raise HTTPException(status_code=404, detail='empty file')\n    return {'result': predict_image(data, model, device)}\n```\n```bash\nuvicorn app:app --port 8000\ncurl http://127.0.0.1:8000/health\ncurl -F \"file=@digit.png\" http://127.0.0.1:8000/predict\n```\nCheckpoint: `/health` 200 кайтарат, `/predict` класс жана confidence берет, бош файл 404 берет.\n\n## 3. Streamlit\n```python\nimport requests\nimport streamlit as st\n\nuploaded = st.file_uploader('Digit image', type=['png', 'jpg', 'jpeg'])\nif uploaded and st.button('Predict'):\n    response = requests.post(\n        'http://127.0.0.1:8000/predict',\n        files={'file': (uploaded.name, uploaded.getvalue(), uploaded.type)},\n        timeout=10,\n    )\n    response.raise_for_status()\n    st.success(response.json()['result'])\n```\n```bash\nstreamlit run streamlit_app.py\n```\nCheckpoint: сүрөт жүктөө предсказаниени көрсөтөт; API катасы колдонуучуга көрүнөт.\n\n## 4. GitHub\n```bash\ngit init\ngit add .\ngit commit -m \"ML digit service: train, API, Streamlit\"\ngit remote add origin git@github.com:USER/REPO.git\ngit push -u origin main\n```\nREADMEде: иштетүү буйруктары, метрикалар, чектөөлөр, сурам примеери. `.gitignore`до: `.venv/`, `data/`, `*.pth`, `.env`. Секреттерди коммиттебе.\n\n## Кеңири каталар\n- `from torchvision import Image` — туура эмес, `Image` `PIL`ден.\n- Модель ар бир сурамда жүктөлөт — жай.\n- `model.eval()` унутулду — туруксуз предсказание.\n- Streamlit `localhost`ко кайрылат, API башка контейнерде — сервис атын колдон.\n- Салмактар жана датасет Gitке түштү — `git status`ти текшер."
+    },
+    "walkthrough": [
+      {
+        "ru": "1. Обучи модель и сохрани артефакты.",
+        "kg": "1. Моделди окутуп, артефактыларды сакта."
+      },
+      {
+        "ru": "2. Подними FastAPI и проверь curl.",
+        "kg": "2. FastAPI көтөрүп, curl менен текшер."
+      },
+      {
+        "ru": "3. Подключи Streamlit к API.",
+        "kg": "3. Streamlitти APIге туташтыр."
+      },
+      {
+        "ru": "4. Опубликуй код и артефакты.",
+        "kg": "4. Кодду жана артефактыларды жарыяла."
+      }
+    ],
+    "pitfalls": {
+      "ru": "Не переходи к Streamlit, пока `/predict` не проверен через curl. Иначе будешь искать ошибку не в том слое.",
+      "kg": "`/predict` curl менен текшелбейинче Streamlitке өтпө. Болбосо катаны туура эмес катмардан издешесиң."
+    },
+    "exam_tip": {
+      "ru": "Рассказывай цепочку как историю: данные → модель → метрика → API → UI → публикация → ограничения.",
+      "kg": "Чынжырды окуя катары айт: маалымат → модель → метрика → API → UI → жарыялоо → чектөөлөр."
+    }
+  }
+]

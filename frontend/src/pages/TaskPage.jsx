@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams, useSearchParams } from 'react-router-dom'
 import {
   ArrowLeft,
   CheckCircle2,
@@ -19,6 +19,8 @@ import {
 import { api } from '../api'
 import { useApp, useBi } from '../state/AppContext'
 import { isDone, pick, pluralRu, progressIndex } from '../lib/format'
+import { pathContext } from '../lib/path'
+import PathNext from '../components/PathNext'
 import { Badge, CodeEditor, HintList, Markdown } from '../components/ui'
 
 function value(value) {
@@ -63,6 +65,7 @@ function StudyNotes({ task }) {
 
 export default function TaskPage() {
   const { slug } = useParams()
+  const [params] = useSearchParams()
   const { data, refresh, lang } = useApp()
   const bi = useBi()
   const [task, setTask] = useState(null)
@@ -77,6 +80,7 @@ export default function TaskPage() {
   const [runError, setRunError] = useState('')
   const index = progressIndex(data?.progress)
   const done = isDone(index, 'task', slug)
+  const pathInfo = pathContext(data, params, 'task', slug)
   const module = useMemo(
     () => data?.modules.find((item) => item.slug === task?.module),
     [data?.modules, task?.module],
@@ -155,9 +159,18 @@ export default function TaskPage() {
 
   return (
     <div className="page task-page">
-      <Link className="back-link" to="/practice">
-        <ArrowLeft size={16} /> {bi('К практике', 'Практикага')}
+      <Link className="back-link" to={pathInfo ? '/start' : '/practice'}>
+        <ArrowLeft size={16} /> {pathInfo ? bi('К маршруту', 'Маршрутка') : bi('К практике', 'Практикага')}
       </Link>
+
+      {pathInfo && (
+        <div className="path-banner">
+          <Route size={15} />
+          <strong>{pick(pathInfo.path.title, lang)}</strong>
+          <span>{bi('Шаг', 'Кадам')} {pathInfo.index + 1} / {pathInfo.steps.length}</span>
+          <Link to="/start">{bi('Весь маршрут', 'Бүт маршрут')}</Link>
+        </div>
+      )}
 
       <header className="task-head">
         <div>
@@ -175,6 +188,8 @@ export default function TaskPage() {
           <span>{bi(pluralRu(task.points, 'балл', 'балла', 'баллов'), 'балл')}</span>
         </div>
       </header>
+
+      {done && pathInfo && <PathNext pathInfo={pathInfo} />}
 
       <div className="task-layout">
         <div className="task-main">

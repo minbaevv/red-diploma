@@ -5,7 +5,8 @@ Bilingual (RU/KG) exam cockpit for the Motion Web backend + AI final exam. It co
 ## What is inside
 
 - **13 modules**: Python core, functions, SQL, Linux/Git, backend/API, ML/data, computer vision, LLM/RAG/Streamlit, FastAPI/Pydantic, databases/ORM, automation/LLM, DevOps/security, exam tactics.
-- **133 tasks**: 39 code tasks checked by tests and 94 theory tasks with model answers, follow-up questions, walkthroughs, pitfalls, and exam tips. The capstone path covers `def` functions, ML training, model compression, FastAPI serving, Streamlit UI, MediaPipe gestures, and GitHub artifacts.
+- **140 tasks**: 42 code tasks checked by tests and 98 theory tasks with model answers, follow-up questions, walkthroughs, pitfalls, and exam tips. The capstone path covers `def` functions, ML training, model compression, FastAPI serving, Streamlit UI, MediaPipe gestures, and GitHub artifacts.
+- **Guided start**: `/start` shows a 20-step `ml-capstone` route from Python to a deployed ML service. Every completed lesson or task shows a **Continue** button that opens the next step with `?path=ml-capstone&step=N`.
 - **3 exams**: stage 1 (20 points), stage 2 (30 points), stage 3 (50 points). A total of 80+ is the red-diploma target.
 - **Bilingual UI and content** with RU/KG switching.
 - **Local progress** in SQLite: completed lessons/tasks, attempts, best exam scores, notes, settings.
@@ -45,6 +46,18 @@ npm run build
 ```
 
 Then start the backend normally. FastAPI serves `frontend/dist` and supports client-side routes.
+
+## Guided start
+
+Open `/start` (or **Старт** in the sidebar) to follow the `ml-capstone` route:
+
+1. Python basics and `def` practice.
+2. MNIST download with `torchvision`, batching, augmentation, training, metrics, compression.
+3. FastAPI `/health` and `/predict`.
+4. Streamlit uploader that calls the API.
+5. GitHub artifacts, README, and a final runbook.
+
+The route is stored in `backend/content/paths.json` and returned by `/api/bootstrap`. The current step is highlighted, and lesson/task pages show a **Continue** card after completion. The URL keeps the route context in `?path=ml-capstone&step=N`, so the next button works without going back to the task list.
 
 ## Capstone path: model → API → UI
 
@@ -87,8 +100,11 @@ Content is split across `backend/content/`:
 - `tasks-code-extra-functions.json` — beginner `def` practice: defaults, loops, recursion, binary search, memoization
 - `tasks-code-extra-api-ui.json` — FastAPI, Pydantic, UploadFile, and Streamlit client helpers
 - `tasks-code-extra-ml-cv.json` — train/val split, accuracy, min-max, MediaPipe landmarks, RPS gesture, nearest resize
+- `tasks-code-extra-ml-data.json` — DataLoader batch planning, confusion matrix, precision/recall
 - `tasks-theory-extra-ml-training.json` — Colab MNIST training and model compression
 - `tasks-theory-extra-ml-serving.json` — FastAPI serving, Streamlit client, MediaPipe RPS pipeline, Git/GitHub artifacts
+- `tasks-theory-extra-ml-capstone.json` — torchvision dataset download, PIL inference, safe augmentation, full capstone runbook
+- `paths.json` — guided learning routes and their ordered lesson/task steps
 - `tasks-theory-extra-exam.json` — exam tactics theory
 - `exams.json` — staged exams
 

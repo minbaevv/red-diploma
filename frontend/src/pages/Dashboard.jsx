@@ -8,6 +8,7 @@ import {
   Clock,
   Code2,
   Flame,
+  Route,
   Target,
 } from 'lucide-react'
 import { useApp, useBi } from '../state/AppContext'
@@ -24,6 +25,7 @@ import {
 } from '../lib/format'
 import ModuleCard from '../components/ModuleCard'
 import { Badge, PageHeader, ProgressRing, SectionTitle, StatCard } from '../components/ui'
+import { pathStats, stepTitle, stepUrl } from '../lib/path'
 
 export default function Dashboard() {
   const { data, lang, settings, stats } = useApp()
@@ -36,6 +38,9 @@ export default function Dashboard() {
 
   const taskMap = new Map((data.tasks || []).map((task) => [task.slug, task]))
   const examMap = new Map(exams.map((exam) => [exam.slug, exam]))
+  const learningPath = (data.paths || [])[0]
+  const route = learningPath ? pathStats(learningPath, index) : null
+  const guidedStep = route?.current
   let nextStep = null
   for (const module of modules) {
     const lesson = (module.lessons || []).find((item) => !isDone(index, 'lesson', item.slug))
@@ -49,6 +54,26 @@ export default function Dashboard() {
       break
     }
   }
+
+  const nextType = guidedStep?.type || nextStep?.type || 'exam'
+  const nextLink = guidedStep
+    ? stepUrl(guidedStep, learningPath.slug)
+    : nextStep
+      ? nextStep.type === 'lesson'
+        ? `/lesson/${nextStep.lesson.slug}`
+        : `/task/${nextStep.task.slug}`
+      : '/exams'
+  const nextTitle = guidedStep
+    ? stepTitle(guidedStep, data, lang)
+    : nextStep
+      ? nextStep.type === 'lesson'
+        ? nextStep.lesson.title?.[lang]
+        : nextStep.task?.title?.[lang]
+      : bi('Финальный экзамен', 'Финалдык экзамен')
+  const nextMeta = guidedStep
+    ? `${bi('Шаг', 'Кадам')} ${route.done + 1} / ${route.total} · ${pick(guidedStep.sectionTitle, lang)}`
+    : nextStep?.module.title?.[lang] || bi('Проверь себя на всех этапах', 'Бардык этаптарда өзүңдү текшер')
+  const started = (route?.done || 0) > 0
 
   const readiness = stats.readiness || 0
   const red = (stats.exam_points || 0) >= 80
@@ -84,25 +109,23 @@ export default function Dashboard() {
           </h2>
           <p>
             {bi(
-              'План на 80+ уже внутри: короткие уроки, задачи с тестами и три этапа по 20 + 30 + 50 баллов.',
-              '80+ планы даяр: кыска сабактар, тесттери бар тапшырмалар жана 20 + 30 + 50 баллдык үч этап.',
+              'Один маршрут «Python → ML-сервис»: короткие уроки, практика с тестами и кнопка «Продолжить» после каждого шага.',
+              'Бир маршрут «Python → ML-сервис»: кыска сабактар, тесттери бар практика жана ар бир кадамдан кийин «Улантуу» баскычы.',
             )}
           </p>
           <div className="hero-actions">
-            {nextStep ? (
-              <Link
-                className="btn btn-primary"
-                to={nextStep.type === 'lesson' ? `/lesson/${nextStep.lesson.slug}` : `/task/${nextStep.task.slug}`}
-              >
-                {bi('Продолжить', 'Улантуу')} <ArrowRight size={17} />
-              </Link>
-            ) : (
-              <Link className="btn btn-primary" to="/exams">
-                {bi('К финальному экзамену', 'Финалдык экзаменге')} <ArrowRight size={17} />
-              </Link>
-            )}
-            <Link className="btn btn-ghost" to="/exams">
-              {bi('Пробный экзамен', 'Сынак экзамени')}
+            <Link className="btn btn-primary" to={nextLink}>
+              {guidedStep
+                ? started
+                  ? bi('Продолжить обучение', 'Окууну улантуу')
+                  : bi('Начать обучение', 'Окууну баштоо')
+                : nextStep
+                  ? bi('Продолжить', 'Улантуу')
+                  : bi('К финальному экзамену', 'Финалдык экзаменге')}
+              <ArrowRight size={17} />
+            </Link>
+            <Link className="btn btn-ghost" to="/start">
+              {bi('Весь маршрут', 'Бүт маршрут')}
             </Link>
           </div>
         </div>
@@ -148,28 +171,31 @@ export default function Dashboard() {
         />
       </div>
 
-      {nextStep && (
-        <section className="next-step">
-          <div className="next-step-icon">
-            {nextStep.type === 'lesson' ? <BookOpen size={20} /> : <Code2 size={20} />}
-          </div>
-          <div className="next-step-copy">
-            <span>{bi('Следующий шаг', 'Кийинки кадам')}</span>
-            <strong>
-              {nextStep.type === 'lesson'
-                ? nextStep.lesson.title?.[lang]
-                : nextStep.task?.title?.[lang]}
-            </strong>
-            <small>{nextStep.module.title?.[lang]}</small>
-          </div>
-          <Link
-            className="next-step-link"
-            to={nextStep.type === 'lesson' ? `/lesson/${nextStep.lesson.slug}` : `/task/${nextStep.task.slug}`}
-          >
-            <ArrowRight size={18} />
-          </Link>
-        </section>
-      )}
+      <section className="next-step">
+        <div className="next-step-icon">
+          {guidedStep ? (
+            <Route size={20} />
+          ) : nextType === 'lesson' ? (
+            <BookOpen size={20} />
+          ) : nextType === 'task' ? (
+            <Code2 size={20} />
+          ) : (
+            <Target size={20} />
+          )}
+        </div>
+        <div className="next-step-copy">
+          <span>
+            {guidedStep
+              ? `${bi('Следующий шаг', 'Кийинки кадам')} · ${route.percent}%`
+              : bi('Следующий шаг', 'Кийинки кадам')}
+          </span>
+          <strong>{nextTitle}</strong>
+          <small>{nextMeta}</small>
+        </div>
+        <Link className="next-step-link" to={nextLink}>
+          <ArrowRight size={18} />
+        </Link>
+      </section>
 
       <section className="dashboard-section">
         <SectionTitle
@@ -206,7 +232,10 @@ export default function Dashboard() {
       <section className="dashboard-section">
         <SectionTitle
           title={bi('Карта знаний', 'Билим картасы')}
-          subtitle={bi('9 модулей. Каждый закрывает свой кусок экзамена.', '9 модуль. Ар бири экзамендин бөлүгүн жабат.')}
+          subtitle={bi(
+            `${modules.length} ${pluralRu(modules.length, 'модуль', 'модуля', 'модулей')}. Каждый закрывает свой кусок экзамена.`,
+            `${modules.length} модуль. Ар бири экзамендин бөлүгүн жабат.`,
+          )}
           action={<Link className="text-link" to="/learn">{bi('Открыть обучение', 'Окууну ачуу')} <ArrowRight size={15} /></Link>}
         />
         <div className="module-grid">

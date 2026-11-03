@@ -1,6 +1,7 @@
 import { Route, Routes } from 'react-router-dom'
 import Shell from './components/Shell'
 import Dashboard from './pages/Dashboard'
+import StartPage from './pages/StartPage'
 import Learn from './pages/Learn'
 import ModulePage from './pages/ModulePage'
 import LessonPage from './pages/LessonPage'
@@ -16,6 +17,7 @@ export default function App() {
     <Routes>
       <Route element={<Shell />}>
         <Route index element={<Dashboard />} />
+        <Route path="start" element={<StartPage />} />
         <Route path="learn" element={<Learn />} />
         <Route path="learn/:slug" element={<ModulePage />} />
         <Route path="lesson/:slug" element={<LessonPage />} />

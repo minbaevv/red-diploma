@@ -4,6 +4,7 @@ import {
   AlertTriangle,
   BookOpen,
   CalendarDays,
+  Compass,
   Dumbbell,
   GraduationCap,
   LayoutDashboard,
@@ -18,6 +19,7 @@ import { daysLeft, daysWord, formatDate } from '../lib/format'
 
 const nav = [
   { to: '/', end: true, icon: LayoutDashboard, ru: 'Обзор', kg: 'Көрүнүш' },
+  { to: '/start', icon: Compass, ru: 'Старт', kg: 'Старт' },
   { to: '/learn', icon: BookOpen, ru: 'Обучение', kg: 'Окуу' },
   { to: '/practice', icon: Dumbbell, ru: 'Практика', kg: 'Практика' },
   { to: '/exams', icon: Trophy, ru: 'Экзамены', kg: 'Экзамендер' },
@@ -26,6 +28,7 @@ const nav = [
 
 const titles = {
   '/': { ru: 'Обзор', kg: 'Көрүнүш' },
+  '/start': { ru: 'Старт', kg: 'Старт' },
   '/learn': { ru: 'Обучение', kg: 'Окуу' },
   '/practice': { ru: 'Практика', kg: 'Практика' },
   '/exams': { ru: 'Экзамены', kg: 'Экзамендер' },
