@@ -1,0 +1,260 @@
+[
+  {
+    "slug": "pytorch-tensors",
+    "type": "theory",
+    "module": "computer-vision",
+    "title": { "ru": "PyTorch: тензоры, устройства и автоград", "kg": "PyTorch: тензорлор, түзмөктөр жана автоград" },
+    "prompt": {
+      "ru": "Объясни тензоры PyTorch: shape/dtype/device, операции, `requires_grad`, autograd, `.backward()` и переход CPU/GPU.",
+      "kg": "PyTorch тензорлорун түшүндүр: shape/dtype/device, операциялар, `requires_grad`, autograd, `.backward()` жана CPU/GPU өтүү."
+    },
+    "difficulty": 2,
+    "points": 10,
+    "hints": [
+      { "ru": "Тензор — многомерный массив с устройством и градиентом.", "kg": "Тензор — түзмөк жана градиент менен көп өлчөмдүү массив." },
+      { "ru": "`requires_grad=True` включает запись операций для autograd.", "kg": "`requires_grad=True` autograd үчүн операцияларды жазууну иштетет." },
+      { "ru": "Все тензоры операции должны быть на одном device.", "kg": "Операциядагы бардык тензорлор бир deviceдо болушу керек." }
+    ],
+    "subquestions": [
+      { "ru": "Почему нельзя смешивать CPU и CUDA-тензоры?", "kg": "Эмне үчүн CPU жана CUDA тензорлорун аралаштырса болбойт?" },
+      { "ru": "Что делает `optimizer.zero_grad()`?", "kg": "`optimizer.zero_grad()` эмне кылат?" },
+      { "ru": "Зачем `.detach()`?", "kg": "`.detach()` эмне үчүн керек?" }
+    ],
+    "model_answer": {
+      "ru": "`torch.tensor([1.,2.])` создаёт тензор; важны `shape`, `dtype` (`float32` для обучения) и `device` (`cpu`/`cuda`). Операции векторизованы: `x @ W`, `x.mean()`, `x.view(...)`. Если `x.requires_grad=True`, PyTorch строит граф вычислений; `loss.backward()` считает градиенты в `.grad`. Перед шагом оптимизатора вызывают `optimizer.zero_grad()`, иначе градиенты накопятся. `with torch.no_grad():` отключает граф на inference. Модель и вход переносят на одно устройство: `model.to(device)`, `x.to(device)`. `.detach()` отрезает тензор от графа, например для логирования или метрик.",
+      "kg": "`torch.tensor([1.,2.])` тензор түзөт; `shape`, `dtype` (үйрөтүү үчүн `float32`) жана `device` (`cpu`/`cuda`) маанилүү. Операциялар векторлошкон: `x @ W`, `x.mean()`, `x.view(...)`. `x.requires_grad=True` болсо, PyTorch эсептөө графын курат; `loss.backward()` `.grad` ичинде градиенттерди эсептейт. Оптимизатор кадамынын алдында `optimizer.zero_grad()` чакырылат, болбосо градиенттер топтолот. `with torch.no_grad():` inference учурунда графты өчүрөт. Модель жана кирүү бир түзмөккө көчүрүлөт: `model.to(device)`, `x.to(device)`. `.detach()` тензорду графтан ажыратат, мисалы логирование же метрика үчүн."
+    },
+    "explanation": {
+      "ru": "Autograd — причина, по которой PyTorch называют динамическим: граф строится на каждом forward-проходе.",
+      "kg": "Autograd — PyTorch динамикалык деп аталышынын себеби: граф ар бир forward өтүүдө курулат."
+    },
+    "walkthrough": [
+      { "ru": "1. Создай тензор и проверь shape/dtype/device.", "kg": "1. Тензор түзүп, shape/dtype/device текшер." },
+      { "ru": "2. Включи `requires_grad` и посчитай loss.", "kg": "2. `requires_grad` иштетип, loss эсепте." },
+      { "ru": "3. Вызови `backward`, обнули градиенты, сделай шаг.", "kg": "3. `backward` чакырып, градиенттерди нөлдөп, кадам жаса." }
+    ],
+    "pitfalls": {
+      "ru": "Не забывай `zero_grad`. Не делай `.item()` внутри графа без необходимости. Не смешивай float64 и float32 без причины.",
+      "kg": "`zero_grad` унутпа. Граф ичинде зарылдыксыз `.item()` жасаба. Float64 жана float32ни себепсиз аралаштырба."
+    },
+    "exam_tip": {
+      "ru": "Скажи: «tensor = data + shape + device + grad; backward → zero_grad → step».",
+      "kg": "Айт: «tensor = data + shape + device + grad; backward → zero_grad → step»."
+    }
+  },
+  {
+    "slug": "pytorch-data",
+    "type": "theory",
+    "module": "computer-vision",
+    "title": { "ru": "PyTorch: Dataset, DataLoader и аугментации", "kg": "PyTorch: Dataset, DataLoader жана аугментациялар" },
+    "prompt": {
+      "ru": "Как организовать загрузку данных в PyTorch? Объясни `Dataset`, `DataLoader`, batch, shuffle, `num_workers`, collate и аугментации.",
+      "kg": "PyTorchто маалымат жүктөөнү кантип уюштуруу керек? `Dataset`, `DataLoader`, batch, shuffle, `num_workers`, collate жана аугментацияларды түшүндүр."
+    },
+    "difficulty": 3,
+    "points": 10,
+    "hints": [
+      { "ru": "`Dataset` отвечает за один пример, `DataLoader` — за батчи.", "kg": "`Dataset` бир мисал үчүн, `DataLoader` батчтар үчүн жооптуу." },
+      { "ru": "`shuffle=True` нужен для train, но не для validation.", "kg": "`shuffle=True` train үчүн керек, validation үчүн эмес." },
+      { "ru": "Аугментации применяй только к train.", "kg": "Аугментацияларды trainге гана колдон." }
+    ],
+    "subquestions": [
+      { "ru": "Что должен вернуть `__getitem__`?", "kg": "`__getitem__` эмне кайтарышы керек?" },
+      { "ru": "Зачем `num_workers` и `pin_memory`?", "kg": "`num_workers` жана `pin_memory` эмне үчүн керек?" },
+      { "ru": "Почему аугментации на validation искажают метрики?", "kg": "Эмне үчүн validationдагы аугментациялар метрикаларды бузат?" }
+    ],
+    "model_answer": {
+      "ru": "Класс `Dataset` реализует `__len__` и `__getitem__`: получает индекс, читает изображение, применяет transform и возвращает `(image, label)`. `DataLoader(dataset, batch_size=32, shuffle=True, num_workers=4)` собирает батчи, перемешивает train, параллельно грузит данные. `collate_fn` объединяет примеры в батч, по умолчанию стекует тензоры. Для train используют аугментации (`RandomResizedCrop`, `RandomHorizontalFlip`, `ColorJitter`), для validation/test — только deterministic resize/normalize. `pin_memory=True` ускоряет копирование на GPU. Нормализацию считают по train-статистике (`mean/std`), а не по всему датасету.",
+      "kg": "`Dataset` классы `__len__` жана `__getitem__` ишке ашырат: индекс алып, сүрөттү окуп, transform колдонуп, `(image, label)` кайтарат. `DataLoader(dataset, batch_size=32, shuffle=True, num_workers=4)` батчтарды курап, traindi аралаштырып, маалыматты параллель жүктөйт. `collate_fn` мисалдарды батчка бириктирет, демейде тензорлорду стектейт. Train үчүн аугментациялар (`RandomResizedCrop`, `RandomHorizontalFlip`, `ColorJitter`), validation/test үчүн детерминдүү resize/normalize гана колдонулат. `pin_memory=True` GPUга көчүрүүнү тездетет. Нормализация traindin статистикасы (`mean/std`) боюнча эсептелет, бүт датасет боюнча эмес."
+    },
+    "explanation": {
+      "ru": "Правильный DataLoader важнее сложной модели на маленьком датасете: он определяет, что модель реально видит.",
+      "kg": "Туура DataLoader кичине датасетте татаал моделден маанилүү: модель эмнени чындап көрөрүн ал аныктайт."
+    },
+    "walkthrough": [
+      { "ru": "1. Опиши `Dataset` с чтением файла.", "kg": "1. Файл окуган `Dataset` жаз." },
+      { "ru": "2. Раздели transforms на train и eval.", "kg": "2. Transformдорду train жана eval болуп бөл." },
+      { "ru": "3. Проверь один батч: shape, dtype, диапазон.", "kg": "3. Бир батчты текшер: shape, dtype, диапазон." }
+    ],
+    "pitfalls": {
+      "ru": "Не применяй random-аугментации к validation. Не допускай утечки test в train. Не ставь `num_workers` больше ядер без необходимости.",
+      "kg": "Validationга random аугментация колдонбо. Testтин trainge агып кетишине жол бербе. Зарылдыксыз `num_workers`ти ядродон көп кылба."
+    },
+    "exam_tip": {
+      "ru": "Скажи: «Dataset — пример, DataLoader — батч; train аугментируется, eval — нет».",
+      "kg": "Айт: «Dataset — мисал, DataLoader — батч; train аугментацияланат, eval — жок»."
+    }
+  },
+  {
+    "slug": "pytorch-training",
+    "type": "theory",
+    "module": "computer-vision",
+    "title": { "ru": "Цикл обучения PyTorch: loss, optimizer, epochs", "kg": "PyTorch үйрөтүү цикли: loss, optimizer, epochs" },
+    "prompt": {
+      "ru": "Опиши цикл обучения: forward, loss, backward, optimizer step, train/eval режимы, early stopping и сохранение модели.",
+      "kg": "Үйрөтүү циклисин жаз: forward, loss, backward, optimizer step, train/eval режимдери, early stopping жана модель сактоо."
+    },
+    "difficulty": 3,
+    "points": 10,
+    "hints": [
+      { "ru": "Стандартный шаг: `zero_grad → forward → loss → backward → step`.", "kg": "Стандарт кадам: `zero_grad → forward → loss → backward → step`." },
+      { "ru": "`model.train()` и `model.eval()` переключают Dropout/BatchNorm.", "kg": "`model.train()` жана `model.eval()` Dropout/BatchNormду которот." },
+      { "ru": "Validation — под `torch.no_grad()`.", "kg": "Validation — `torch.no_grad()` астында." }
+    ],
+    "subquestions": [
+      { "ru": "Почему validation loss может расти при падении train loss?", "kg": "Эмне үчүн train loss төмөндөгөндө validation loss өсүшү мүмкүн?" },
+      { "ru": "Что сохранять в checkpoint?", "kg": "Checkpointке эмнени сактоо керек?" },
+      { "ru": "Зачем нужен learning rate scheduler?", "kg": "Learning rate scheduler эмне үчүн керек?" }
+    ],
+    "model_answer": {
+      "ru": "В epoch: `model.train()`, затем для каждого батча `optimizer.zero_grad()`, `outputs = model(x)`, `loss = criterion(outputs, y)`, `loss.backward()`, `optimizer.step()`. На validation: `model.eval()` и `with torch.no_grad():`, считают loss и метрики без обновления весов. `train()`/`eval()` важны для Dropout и BatchNorm. Переобучение видно по росту validation loss при падении train loss; помогают early stopping, регуляризация, аугментации и меньшая модель. Checkpoint сохраняет `model.state_dict()`, `optimizer.state_dict()`, epoch и лучшую метрику; загружают с `map_location`. Scheduler снижает learning rate, когда метрика выходит на плато.",
+      "kg": "Epoch ичинде: `model.train()`, анан ар бир батч үчүн `optimizer.zero_grad()`, `outputs = model(x)`, `loss = criterion(outputs, y)`, `loss.backward()`, `optimizer.step()`. Validationда: `model.eval()` жана `with torch.no_grad():`, салмактарды жаңыртпай loss жана метрикалар эсептелет. `train()`/`eval()` Dropout жана BatchNorm үчүн маанилүү. Переобучение train loss төмөндөгөндө validation loss өсүшүнөн көрүнөт; early stopping, регуляризация, аугментация жана кичине модель жардам берет. Checkpoint `model.state_dict()`, `optimizer.state_dict()`, epoch жана эң жакшы метриканы сактайт; `map_location` менен жүктөлөт. Scheduler метрика платого чыкканда learning rateди төмөндөтөт."
+    },
+    "explanation": {
+      "ru": "Обучение — это контроль цикла и метрик, а не только `loss.backward()`. Логируй train и validation отдельно.",
+      "kg": "Үйрөтүү — цикл жана метрикаларды көзөмөлдөө, `loss.backward()` гана эмес. Train жана validationды өзүнчө логдоп жүр."
+    },
+    "walkthrough": [
+      { "ru": "1. Напиши train-epoch с optimizer шагом.", "kg": "1. Optimizer кадамы менен train-epoch жаз." },
+      { "ru": "2. Напиши eval-epoch без градиентов.", "kg": "2. Градиентсиз eval-epoch жаз." },
+      { "ru": "3. Сохрани лучший checkpoint по validation-метрике.", "kg": "3. Validation метрикасы боюнча эң жакшы checkpoint сакта." }
+    ],
+    "pitfalls": {
+      "ru": "Не забудь `model.eval()` на validation. Не обновляй веса на validation. Не сохраняй только последнюю модель, если метрика скачет.",
+      "kg": "Validationда `model.eval()` унутпа. Validationда салмактарды жаңыртпа. Метрика секирсе, акыркы моделди гана сактаба."
+    },
+    "exam_tip": {
+      "ru": "Скажи: «zero_grad → forward → loss → backward → step; eval без градиентов».",
+      "kg": "Айт: «zero_grad → forward → loss → backward → step; eval градиентсиз»."
+    }
+  },
+  {
+    "slug": "torchvision-transfer",
+    "type": "theory",
+    "module": "computer-vision",
+    "title": { "ru": "torchvision: transfer learning и YOLO", "kg": "torchvision: transfer learning жана YOLO" },
+    "prompt": {
+      "ru": "Как применить transfer learning для изображений? Объясни pretrained-модели, заморозку слоёв, замену head и отличие классификации от детекции YOLO.",
+      "kg": "Сүрөттөр үчүн transfer learningди кантип колдонуу керек? Pretrained моделдер, катмарларды тоңдуруу, head алмаштыруу жана классификациянын YOLO детекциясынан айырмасын түшүндүр."
+    },
+    "difficulty": 4,
+    "points": 10,
+    "hints": [
+      { "ru": "Pretrained-модель уже выучила общие признаки на ImageNet.", "kg": "Pretrained модель ImageNetте жалпы белгилерди үйрөнүп алган." },
+      { "ru": "Заморозь backbone и обучай новый classifier head.", "kg": "Backboneду тоңдуруп, жаңы classifier head үйрөт." },
+      { "ru": "YOLO предсказывает bounding boxes и классы, а не одно изображение целиком.", "kg": "YOLO bounding box жана класстарды болжолдойт, бүт сүрөттү эмес." }
+    ],
+    "subquestions": [
+      { "ru": "Когда fine-tuning всей модели лучше заморозки?", "kg": "Качан бүт моделди fine-tuning кылуу тоңдуруудан жакшы?" },
+      { "ru": "Что такое IoU и mAP в детекции?", "kg": "Детекцияда IoU жана mAP деген эмне?" },
+      { "ru": "Почему нельзя менять preprocessing pretrained-модели произвольно?", "kg": "Эмне үчүн pretrained моделдин preprocessingин өз каалаганча өзгөртсө болбойт?" }
+    ],
+    "model_answer": {
+      "ru": "`torchvision.models.resnet18(weights=IMAGENET1K_V1)` даёт backbone, обученный на ImageNet. Для нового датасета заменяют последний слой: `model.fc = nn.Linear(in_features, num_classes)`. Сначала замораживают backbone (`requires_grad=False`), обучают head; затем при необходимости размораживают часть слоёв с маленьким learning rate. Используют те же transforms, что и при pretraining (`Resize`, `CenterCrop`, `Normalize` с ImageNet mean/std). Классификация отвечает «что на изображении», детекция YOLO — «что и где»: она предсказывает bounding boxes, confidence и классы; метрики — IoU, precision/recall, mAP. Для детекции нужен формат разметки boxes и другой loss.",
+      "kg": "`torchvision.models.resnet18(weights=IMAGENET1K_V1)` ImageNetте үйрөтүлгөн backbone берет. Жаңы датасет үчүн акыркы катмар алмаштырылат: `model.fc = nn.Linear(in_features, num_classes)`. Адегенде backbone тоңдурулат (`requires_grad=False`), head үйрөтүлөт; анан керек болсо катмарлар кичине learning rate менен ачылат. Pretrainingдегидей transform колдонулат (`Resize`, `CenterCrop`, ImageNet mean/std менен `Normalize`). Классификация «сүрөттө эмне бар» десе, YOLO детекциясы «эмне жана кайда»: bounding box, confidence жана класстарды болжолдойт; метрикалар — IoU, precision/recall, mAP. Детекция үчүн box разметкасы жана башка loss керек."
+    },
+    "explanation": {
+      "ru": "Transfer learning экономит данные и время. Детекция YOLO — отдельная задача с другой разметкой и метриками.",
+      "kg": "Transfer learning маалымат жана убакытты үнөмдөйт. YOLO детекциясы — башка разметка жана метрикалар менен өзүнчө тапшырма."
+    },
+    "walkthrough": [
+      { "ru": "1. Возьми pretrained-модель и замени head.", "kg": "1. Pretrained модель алып, head алмаштыр." },
+      { "ru": "2. Заморозь backbone и обучи head.", "kg": "2. Backboneду тоңдуруп, head үйрөт." },
+      { "ru": "3. Сравни классификацию и детекцию по задаче.", "kg": "3. Классификация менен детекцияны тапшырма боюнча салыштыр." }
+    ],
+    "pitfalls": {
+      "ru": "Не обучай pretrained-модель с нуля на маленьком датасете без причины. Не используй чужие mean/std. Не путай classification accuracy и mAP детекции.",
+      "kg": "Pretrained моделди кичине датасетте себепсиз нөлдөн үйрөтпө. Башкалардын mean/std колдонбо. Классификация accuracy менен детекция mAPду алмаштырба."
+    },
+    "exam_tip": {
+      "ru": "Скажи: «pretrained backbone → новый head → заморозка → fine-tuning; YOLO = boxes + mAP».",
+      "kg": "Айт: «pretrained backbone → жаңы head → тоңдуруу → fine-tuning; YOLO = boxes + mAP»."
+    }
+  },
+  {
+    "slug": "torchaudio-torchtext",
+    "type": "theory",
+    "module": "computer-vision",
+    "title": { "ru": "torchaudio и torchtext: звук и текст", "kg": "torchaudio жана torchtext: үн жана текст" },
+    "prompt": {
+      "ru": "Как готовить аудио и текст для PyTorch? Объясни waveform, sample rate, mel-spectrogram, `torchaudio.transforms`, токенизацию и `torchtext`.",
+      "kg": "PyTorch үчүн аудио жана текстти кантип даярдоо керек? Waveform, sample rate, mel-spectrogram, `torchaudio.transforms`, токенизация жана `torchtext` түшүндүр."
+    },
+    "difficulty": 3,
+    "points": 10,
+    "hints": [
+      { "ru": "Аудио — waveform + sample rate; для моделей часто нужен spectrogram.", "kg": "Аудио — waveform + sample rate; моделдер үчүн көбүнчө spectrogram керек." },
+      { "ru": "MelSpectrogram переводит звук в time-frequency представление.", "kg": "MelSpectrogram үндү time-frequency көрүнүшүнө которот." },
+      { "ru": "Текст сначала токенизируют, потом индексируют словарём.", "kg": "Текст адегенде токенизацияланып, анан сөздүк менен индекстелет." }
+    ],
+    "subquestions": [
+      { "ru": "Почему sample rate важен при смешивании датасетов?", "kg": "Датасеттерди аралаштырганда sample rate эмне үчүн маанилүү?" },
+      { "ru": "Зачем padding и attention mask в тексте?", "kg": "Текстте padding жана attention mask эмне үчүн керек?" },
+      { "ru": "Когда лучше использовать готовый tokenizer, а не свой?", "kg": "Качан даяр tokenizer өзүңдүкүнөн жакшы?" }
+    ],
+    "model_answer": {
+      "ru": "Аудио загружают как waveform `(channels, time)` и `sample_rate`; при смешивании датасетов приводят к одному rate (`torchaudio.transforms.Resample`). Модели часто работают не с сырым сигналом, а с `MelSpectrogram`/`MFCC`; параметры (`n_fft`, `hop_length`, `n_mels`) фиксируют. Для текста строят словарь или берут pretrained tokenizer, кодируют в индексы, добавляют special tokens, делают padding до batch и `attention_mask`, чтобы модель игнорировала паддинг. `torchtext` даёт Dataset/Field-подобные утилиты и vocab, но в современных проектах чаще используют Hugging Face tokenizers. Важно не допускать утечки vocabulary: словарь строят на train.",
+      "kg": "Аудио waveform `(channels, time)` жана `sample_rate` катары жүктөлөт; датасеттерди аралаштырганда бир rateke келтирилет (`torchaudio.transforms.Resample`). Моделдер көбүнчө чийки сигнал менен эмес, `MelSpectrogram`/`MFCC` менен иштейт; параметрлер (`n_fft`, `hop_length`, `n_mels`) фиксацияланат. Текст үчүн сөздүк курулат же pretrained tokenizer алынат, индекстерге коддолот, special token кошулат, batchке чейин padding жана модель paddingди этибарга албашы үчүн `attention_mask` жасалат. `torchtext` Dataset/Field сыяктуу утилиталарды жана vocab берет, бирок азыркы долбоорлордо көбүнчө Hugging Face tokenizers колдонулат. Vocabulary leakage болбошу маанилүү: сөздүк trainde курулат."
+    },
+    "explanation": {
+      "ru": "Аудио и текст — тоже тензоры, но с собственным preprocessing. Ошибки sample rate и tokenizer дороже, чем кажется.",
+      "kg": "Аудио жана текст да тензорлор, бирок өз preprocessingи менен. Sample rate жана tokenizer каталары ойлогондон кымбат."
+    },
+    "walkthrough": [
+      { "ru": "1. Приведи аудио к одному sample rate.", "kg": "1. Аудиону бир sample rateke келтир." },
+      { "ru": "2. Построй mel-spectrogram и проверь shape.", "kg": "2. Mel-spectrogram куруп, shape текшер." },
+      { "ru": "3. Токенизируй текст и собери batch с mask.", "kg": "3. Текстти токенизациялап, mask менен батч кура." }
+    ],
+    "pitfalls": {
+      "ru": "Не смешивай 44.1 kHz и 16 kHz без resampling. Не строй vocab на test. Не забывай mask при padding.",
+      "kg": "44.1 kHz жана 16 kHzти resamplingсиз аралаштырба. Testте vocab курба. Paddingде mask унутпа."
+    },
+    "exam_tip": {
+      "ru": "Скажи: «audio → resample → mel; text → tokens → ids → padding + mask».",
+      "kg": "Айт: «audio → resample → mel; text → tokens → ids → padding + mask»."
+    }
+  },
+  {
+    "slug": "opencv-pipeline",
+    "type": "theory",
+    "module": "computer-vision",
+    "title": { "ru": "OpenCV и MediaPipe: практический pipeline", "kg": "OpenCV жана MediaPipe: практикалык pipeline" },
+    "prompt": {
+      "ru": "Опиши CV-pipeline: чтение кадра, цветовые пространства, resize, фильтрация, детекция контуров, MediaPipe landmarks и сохранение результата.",
+      "kg": "CV pipeline жаз: кадрды окуу, түс мейкиндиктери, resize, фильтрация, контурларды детекциялоо, MediaPipe landmarks жана натыйжаны сактоо."
+    },
+    "difficulty": 3,
+    "points": 10,
+    "hints": [
+      { "ru": "OpenCV читает BGR, а не RGB.", "kg": "OpenCV RGB эмес, BGR окуйт." },
+      { "ru": "MediaPipe возвращает landmarks в нормализованных координатах.", "kg": "MediaPipe landmarks нормалдаштырылган координаталарда кайтарат." },
+      { "ru": "Всегда проверяй `cap.isOpened()` и освобождай ресурсы.", "kg": "Ар дайым `cap.isOpened()` текшерип, ресурстарды бошот." }
+    ],
+    "subquestions": [
+      { "ru": "Почему BGR/RGB путаница ломает цвета?", "kg": "Эмне үчүн BGR/RGB алмашуу түстөрдү бузат?" },
+      { "ru": "Что делать, если лицо не найдено?", "kg": "Бет табылбаса эмне кылуу керек?" },
+      { "ru": "Как ускорить обработку видео?", "kg": "Видео иштетүүнү кантип тездетүү керек?" }
+    ],
+    "model_answer": {
+      "ru": "Пайплайн: `cap = cv2.VideoCapture(source)`, проверка `isOpened`, цикл `ret, frame = cap.read()`. OpenCV использует BGR; для MediaPipe/Matplotlib конвертируют `cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)`. Кадр уменьшают (`cv2.resize`) для скорости, фильтруют (`GaussianBlur`), при необходимости переводят в grayscale/HSV, ищут контуры (`Canny`, `findContours`) или landmarks (`mp.solutions.face_mesh`). Результат рисуют (`cv2.circle`, `putText`), показывают и сохраняют; в конце `cap.release()`, `cv2.destroyAllWindows()`. Для видео обработка каждого N-го кадра и resize дают основной прирост скорости.",
+      "kg": "Pipeline: `cap = cv2.VideoCapture(source)`, `isOpened` текшерүү, цикл `ret, frame = cap.read()`. OpenCV BGR колдонот; MediaPipe/Matplotlib үчүн `cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)` менен которулат. Кадр тездик үчүн кичирейтилет (`cv2.resize`), фильтрленет (`GaussianBlur`), керек болсо grayscale/HSVге өткөрүлөт, контурлар (`Canny`, `findContours`) же landmarks (`mp.solutions.face_mesh`) изделет. Натыйжа чийилет (`cv2.circle`, `putText`), көрсөтүлөт жана сакталат; аягында `cap.release()`, `cv2.destroyAllWindows()`. Видео үчүн ар N-чи кадрды иштетүү жана resize негизги тездик өсүшүн берет."
+    },
+    "explanation": {
+      "ru": "CV-pipeline — это последовательность проверяемых шагов. Ошибка на одном шаге (цвет, размер, координаты) ломает весь результат.",
+      "kg": "CV pipeline — текшерилүүчү кадамдардын ырааттуулугу. Бир кадамдагы ката (түс, өлчөм, координаталар) бүт натыйжаны бузат."
+    },
+    "walkthrough": [
+      { "ru": "1. Прочитай один кадр и проверь размер.", "kg": "1. Бир кадрды окуп, өлчөмүн текшер." },
+      { "ru": "2. Конвертируй цвет и найди landmarks.", "kg": "2. Түстү которуп, landmarks тап." },
+      { "ru": "3. Нарисуй результат и освободи ресурсы.", "kg": "3. Натыйжаны чийип, ресурстарды бошот." }
+    ],
+    "pitfalls": {
+      "ru": "Не forget `release()`. Не рисуй по нормализованным координатам без масштабирования. Не предполагай, что каждый кадр прочитан успешно.",
+      "kg": "`release()` унутпа. Нормалдаштырылган координаталар боюнча масштабдабай чийбе. Ар бир кадр ийгиликтүү окулду деп ойлобо."
+    },
+    "exam_tip": {
+      "ru": "Скажи: «capture → BGR→RGB → resize/filter → landmarks/contours → draw → release».",
+      "kg": "Айт: «capture → BGR→RGB → resize/filter → landmarks/contours → draw → release»."
+    }
+  }
+]

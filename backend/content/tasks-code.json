@@ -1,0 +1,289 @@
+[
+  {
+    "slug": "sum-even",
+    "type": "code",
+    "module": "python-core",
+    "title": { "ru": "Сумма чётных", "kg": "Жуп сандардын суммасы" },
+    "prompt": {
+      "ru": "Напиши функцию `sum_even(nums)`, которая возвращает сумму чётных чисел. Пустой список → `0`.",
+      "kg": "`sum_even(nums)` функциясын жаз: жуп сандардын суммасын кайтарат. Бош тизме → `0`."
+    },
+    "difficulty": 1,
+    "points": 6,
+    "starter_code": "def sum_even(nums):\n    # твой код\n    pass",
+    "tests": [
+      { "input": "sum_even([1, 2, 3, 4, 5, 6])", "expected": 12 },
+      { "input": "sum_even([])", "expected": 0 },
+      { "input": "sum_even([1, 3, 5])", "expected": 0 },
+      { "input": "sum_even([-2, 2, 7])", "expected": 0 }
+    ],
+    "hints": [
+      { "ru": "Пройди по списку циклом `for`.", "kg": "Тизмени `for` циклы менен айлан." },
+      { "ru": "Проверь остаток: `n % 2 == 0`.", "kg": "Калдыкты текшер: `n % 2 == 0`." },
+      { "ru": "Заведи `total = 0` и прибавляй чётные.", "kg": "`total = 0` ачып, жуп сандарды кош." }
+    ],
+    "solution": "def sum_even(nums):\n    total = 0\n    for n in nums:\n        if n % 2 == 0:\n            total += n\n    return total",
+    "explanation": {
+      "ru": "Сумма чётных — базовый цикл + условие. Не забудь пустой список.",
+      "kg": "Жуп сандардын суммасы — цикл жана шарт. Бош тизмени унутпа."
+    }
+  },
+  {
+    "slug": "dedupe-list",
+    "type": "code",
+    "module": "python-core",
+    "title": { "ru": "Удалить дубликаты", "kg": "Дубликаттарды өчүрүү" },
+    "prompt": {
+      "ru": "Верни новый список без дубликатов, сохранив исходный порядок.",
+      "kg": "Дубликатсыз жаңы тизме кайтар, баштапкы тартипти сакта."
+    },
+    "difficulty": 1,
+    "points": 8,
+    "starter_code": "def remove_duplicates(items):\n    # твой код\n    pass",
+    "tests": [
+      { "input": "remove_duplicates([1, 2, 1, 3, 2])", "expected": [1, 2, 3] },
+      { "input": "remove_duplicates([])", "expected": [] },
+      { "input": "remove_duplicates(['a', 'b', 'a'])", "expected": ["a", "b"] },
+      { "input": "remove_duplicates([1, 1, 1])", "expected": [1] }
+    ],
+    "hints": [
+      { "ru": "`set` быстро проверяет, видели ли мы элемент.", "kg": "`set` элементти көрдүңбү текшерет." },
+      { "ru": "Результат должен быть списком в исходном порядке.", "kg": "Натыйжа баштапкы тартиптеги тизме болушу керек." },
+      { "ru": "Заведи `seen` и `result`.", "kg": "`seen` жана `result` ач." }
+    ],
+    "solution": "def remove_duplicates(items):\n    seen = set()\n    result = []\n    for item in items:\n        if item not in seen:\n            seen.add(item)\n            result.append(item)\n    return result",
+    "explanation": {
+      "ru": "Главное — не `list(set(items))`, потому что set не сохраняет порядок.",
+      "kg": "`list(set(items))` жарабайт, себеби set тартипти сактабайт."
+    }
+  },
+  {
+    "slug": "count-digits",
+    "type": "code",
+    "module": "python-core",
+    "title": { "ru": "Количество цифр", "kg": "Цифралардын саны" },
+    "prompt": {
+      "ru": "Верни количество цифр в целом числе. Учти `0` и отрицательные числа.",
+      "kg": "Бүтүн сандагы цифралардын санын кайтар. `0` жана терс сандарды эсепке ал."
+    },
+    "difficulty": 1,
+    "points": 6,
+    "starter_code": "def count_digits(n):\n    # твой код\n    pass",
+    "tests": [
+      { "input": "count_digits(12345)", "expected": 5 },
+      { "input": "count_digits(0)", "expected": 1 },
+      { "input": "count_digits(-123)", "expected": 3 },
+      { "input": "count_digits(1000)", "expected": 4 }
+    ],
+    "hints": [
+      { "ru": "Минус не должен считаться цифрой.", "kg": "Минус цифра эмес." },
+      { "ru": "`abs(n)` убирает знак.", "kg": "`abs(n)` белгини алып салат." },
+      { "ru": "`len(str(...))` даёт количество символов.", "kg": "`len(str(...))` символдордун санын берет." }
+    ],
+    "solution": "def count_digits(n):\n    return len(str(abs(n)))",
+    "explanation": {
+      "ru": "Крайний случай — `0`: строка `'0'` имеет длину 1.",
+      "kg": "Четки учур — `0`: `'0'` узундугу 1."
+    }
+  },
+  {
+    "slug": "fizzbuzz",
+    "type": "code",
+    "module": "python-core",
+    "title": { "ru": "FizzBuzz", "kg": "FizzBuzz" },
+    "prompt": {
+      "ru": "Верни список от `1` до `n`: кратные 3 → `Fizz`, кратные 5 → `Buzz`, кратные 15 → `FizzBuzz`, иначе строку с числом.",
+      "kg": "`1`ден `n`ге чейин тизме кайтар: 3кө бөлүнсө `Fizz`, 5ке `Buzz`, 15ке `FizzBuzz`, болбосо сандын сапы."
+    },
+    "difficulty": 2,
+    "points": 6,
+    "starter_code": "def fizzbuzz(n):\n    # твой код\n    pass",
+    "tests": [
+      { "input": "fizzbuzz(5)", "expected": ["1", "2", "Fizz", "4", "Buzz"] },
+      { "input": "fizzbuzz(3)", "expected": ["1", "2", "Fizz"] },
+      { "input": "fizzbuzz(15)", "expected": ["1", "2", "Fizz", "4", "Buzz", "Fizz", "7", "8", "Fizz", "Buzz", "11", "Fizz", "13", "14", "FizzBuzz"] }
+    ],
+    "hints": [
+      { "ru": "Сначала проверяй кратность 15.", "kg": "Адегенде 15ке бөлүнүүнү текшер." },
+      { "ru": "Потом 3 и 5.", "kg": "Анан 3 жана 5." },
+      { "ru": "Иначе добавляй `str(i)`.", "kg": "Болбосо `str(i)` кош." }
+    ],
+    "solution": "def fizzbuzz(n):\n    result = []\n    for i in range(1, n + 1):\n        if i % 15 == 0:\n            result.append('FizzBuzz')\n        elif i % 3 == 0:\n            result.append('Fizz')\n        elif i % 5 == 0:\n            result.append('Buzz')\n        else:\n            result.append(str(i))\n    return result",
+    "explanation": {
+      "ru": "Порядок условий — классическая ловушка: `15` проверяется раньше `3` и `5`.",
+      "kg": "Шарттардын тартиби — классикалык тузак: `15` эрте текшерилет."
+    }
+  },
+  {
+    "slug": "second-largest",
+    "type": "code",
+    "module": "python-functions",
+    "title": { "ru": "Второй максимум", "kg": "Экинчи максимум" },
+    "prompt": {
+      "ru": "Верни второе по величине уникальное число. Если его нет → `None`.",
+      "kg": "Экинчи чоң уникалдуу санды кайтар. Жок болсо → `None`."
+    },
+    "difficulty": 2,
+    "points": 10,
+    "starter_code": "def second_largest(nums):\n    # твой код\n    pass",
+    "tests": [
+      { "input": "second_largest([10, 5, 10, 8])", "expected": 8 },
+      { "input": "second_largest([1, 1])", "expected": null },
+      { "input": "second_largest([5])", "expected": null },
+      { "input": "second_largest([-1, -2, -3])", "expected": -2 }
+    ],
+    "hints": [
+      { "ru": "Убери дубликаты через `set`.", "kg": "`set` аркылуу дубликаттарды ал." },
+      { "ru": "Отсортируй по убыванию.", "kg": "Кемүү тартибинде сортто." },
+      { "ru": "Проверь, что уникальных чисел хотя бы два.", "kg": "Уникалдуу сандар кеминде эки экенин текшер." }
+    ],
+    "solution": "def second_largest(nums):\n    unique = sorted(set(nums), reverse=True)\n    return unique[1] if len(unique) >= 2 else None",
+    "explanation": {
+      "ru": "Сортировка + set — короткий безопасный вариант. `None` — важный крайний случай.",
+      "kg": "Сорттоо + set — кыска коопсуз вариант. `None` маанилүү."
+    }
+  },
+  {
+    "slug": "group-by-length",
+    "type": "code",
+    "module": "python-functions",
+    "title": { "ru": "Группировка по длине", "kg": "Узундук боюнча топтоо" },
+    "prompt": {
+      "ru": "Сгруппируй слова по длине: `{длина: [слова]}`. Порядок слов сохрани.",
+      "kg": "Сөздөрдү узундугу боюнча топто: `{узундук: [сөздөр]}`. Тартипти сакта."
+    },
+    "difficulty": 2,
+    "points": 10,
+    "starter_code": "def group_by_length(words):\n    # твой код\n    pass",
+    "tests": [
+      { "input": "group_by_length(['hi', 'sun', 'cat', 'dog'])", "expected": { "2": ["hi"], "3": ["sun", "cat", "dog"] } },
+      { "input": "group_by_length([])", "expected": {} },
+      { "input": "group_by_length(['a', 'bb'])", "expected": { "1": ["a"], "2": ["bb"] } }
+    ],
+    "hints": [
+      { "ru": "Заведи пустой словарь.", "kg": "Бош сөздүк ач." },
+      { "ru": "Ключ — `len(word)`.", "kg": "Ключ — `len(word)`." },
+      { "ru": "`setdefault` создаёт список, если ключа ещё нет.", "kg": "`setdefault` ключ жок болсо тизме түзөт." }
+    ],
+    "solution": "def group_by_length(words):\n    result = {}\n    for word in words:\n        result.setdefault(len(word), []).append(word)\n    return result",
+    "explanation": {
+      "ru": "Тесты сравнивают JSON, поэтому числовые ключи нормально сравниваются со строками.",
+      "kg": "Тесттер JSON салыштырат, сан ключтар саптар менен салышат."
+    }
+  },
+  {
+    "slug": "merge-stock",
+    "type": "code",
+    "module": "python-functions",
+    "title": { "ru": "Слияние складов", "kg": "Кампаларды бириктирүү" },
+    "prompt": {
+      "ru": "Слей два словаря остатков: одинаковые ключи суммируются.",
+      "kg": "Эки калдык сөздүгүн бириктир: бирдей ключтар кошулат."
+    },
+    "difficulty": 2,
+    "points": 10,
+    "starter_code": "def merge_stock(a, b):\n    # твой код\n    pass",
+    "tests": [
+      { "input": "merge_stock({'apple': 3}, {'apple': 2, 'pear': 1})", "expected": { "apple": 5, "pear": 1 } },
+      { "input": "merge_stock({}, {'x': 4})", "expected": { "x": 4 } },
+      { "input": "merge_stock({'a': 1}, {})", "expected": { "a": 1 } }
+    ],
+    "hints": [
+      { "ru": "Сделай копию первого словаря.", "kg": "Биринчи сөздүктүн көчүрмөсүн жаса." },
+      { "ru": "Пройди по `b.items()`.", "kg": "`b.items()` боюнча айлан." },
+      { "ru": "Суммируй через `get(key, 0)`.", "kg": "`get(key, 0)` аркылуу кош." }
+    ],
+    "solution": "def merge_stock(a, b):\n    result = dict(a)\n    for key, value in b.items():\n        result[key] = result.get(key, 0) + value\n    return result",
+    "explanation": {
+      "ru": "`dict(a)` не мутирует исходный словарь — хорошая привычка.",
+      "kg": "`dict(a)` баштапкы сөздүктү өзгөртпөйт."
+    }
+  },
+  {
+    "slug": "sort-products",
+    "type": "code",
+    "module": "python-functions",
+    "title": { "ru": "Сортировка товаров", "kg": "Товарларды сорттоо" },
+    "prompt": {
+      "ru": "Отсортируй товары по цене по убыванию. При равной цене — по имени по возрастанию.",
+      "kg": "Товарларды баасы боюнча кемүү тартипте сортто. Баа тең болсо — аты боюнча өсүү тартибинде."
+    },
+    "difficulty": 2,
+    "points": 10,
+    "starter_code": "def sort_products(products):\n    # твой код\n    pass",
+    "tests": [
+      {
+        "input": "sort_products([{'name': 'B', 'price': 10}, {'name': 'A', 'price': 10}, {'name': 'C', 'price': 5}])",
+        "expected": [{ "name": "A", "price": 10 }, { "name": "B", "price": 10 }, { "name": "C", "price": 5 }]
+      },
+      { "input": "sort_products([])", "expected": [] }
+    ],
+    "hints": [
+      { "ru": "`sorted` принимает `key`.", "kg": "`sorted` `key` кабыл алат." },
+      { "ru": "Для убывания цены используй `-p['price']`.", "kg": "Баанын кемүүсү үчүн `-p['price']`." },
+      { "ru": "Верни кортеж `(-price, name)`.", "kg": "`(-price, name)` кортежин кайтар." }
+    ],
+    "solution": "def sort_products(products):\n    return sorted(products, key=lambda p: (-p['price'], p['name']))",
+    "explanation": {
+      "ru": "Кортеж в `key` — стандартный способ сортировки по двум полям.",
+      "kg": "`key` ичиндеги кортеж эки талаа боюнча сорттоонун стандарты."
+    }
+  },
+  {
+    "slug": "first-unique-char",
+    "type": "code",
+    "module": "python-functions",
+    "title": { "ru": "Первый уникальный символ", "kg": "Биринчи уникалдуу символ" },
+    "prompt": {
+      "ru": "Верни индекс первого символа, который встречается один раз. Если такого нет → `-1`.",
+      "kg": "Бир жолу кездешкен биринчи символдун индексин кайтар. Жок болсо → `-1`."
+    },
+    "difficulty": 3,
+    "points": 10,
+    "starter_code": "def first_unique_char(text):\n    # твой код\n    pass",
+    "tests": [
+      { "input": "first_unique_char('aabbc')", "expected": 4 },
+      { "input": "first_unique_char('aabb')", "expected": -1 },
+      { "input": "first_unique_char('loveleetcode')", "expected": 2 },
+      { "input": "first_unique_char('')", "expected": -1 }
+    ],
+    "hints": [
+      { "ru": "Сначала посчитай частоты.", "kg": "Адегенде жыштыктарды сана." },
+      { "ru": "Потом пройди по строке с `enumerate`.", "kg": "Анан `enumerate` менен сап боюнча айлан." },
+      { "ru": "Верни индекс, где частота равна 1.", "kg": "Жыштыгы 1 болгон индексти кайтар." }
+    ],
+    "solution": "def first_unique_char(text):\n    counts = {}\n    for ch in text:\n        counts[ch] = counts.get(ch, 0) + 1\n    for index, ch in enumerate(text):\n        if counts[ch] == 1:\n            return index\n    return -1",
+    "explanation": {
+      "ru": "Два прохода: подсчёт и поиск. Это O(n), а не O(n²).",
+      "kg": "Эки өтүү: саноо жана издөө. Бул O(n)."
+    }
+  },
+  {
+    "slug": "move-zeros",
+    "type": "code",
+    "module": "python-functions",
+    "title": { "ru": "Нули в конец", "kg": "Нөлдөрдү аягына" },
+    "prompt": {
+      "ru": "Перемести все нули в конец, сохранив порядок остальных элементов.",
+      "kg": "Бардык нөлдөрдү аягына жылдыр, калган элементтердин тартибин сакта."
+    },
+    "difficulty": 2,
+    "points": 10,
+    "starter_code": "def move_zeros(nums):\n    # твой код\n    pass",
+    "tests": [
+      { "input": "move_zeros([0, 1, 0, 3, 12])", "expected": [1, 3, 12, 0, 0] },
+      { "input": "move_zeros([0, 0])", "expected": [0, 0] },
+      { "input": "move_zeros([])", "expected": [] }
+    ],
+    "hints": [
+      { "ru": "Собери все ненулевые элементы.", "kg": "Бардык нөл эмес элементтерди жыйна." },
+      { "ru": "Посчитай, сколько нулей было.", "kg": "Канча нөл болгонун сана." },
+      { "ru": "Добавь нужное число нулей в конец.", "kg": "Аягына керектүү сандагы нөлдү кош." }
+    ],
+    "solution": "def move_zeros(nums):\n    result = [n for n in nums if n != 0]\n    return result + [0] * (len(nums) - len(result))",
+    "explanation": {
+      "ru": "Сохранение порядка — ключ. Нельзя просто отсортировать.",
+      "kg": "Тартипти сактоо маанилүү. Жөн гана сорттоп болбойт."
+    }
+  }
+]
