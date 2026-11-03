@@ -1,0 +1,246 @@
+[
+  {
+    "slug": "ml-capstone",
+    "title": {
+      "ru": "Старт: от Python до ML-сервиса",
+      "kg": "Старт: Python'дон ML-сервиске"
+    },
+    "subtitle": {
+      "ru": "Один последовательный маршрут: Python → данные → обучение → FastAPI → Streamlit → GitHub.",
+      "kg": "Бир ырааттуу маршрут: Python → маалымат → окутуу → FastAPI → Streamlit → GitHub."
+    },
+    "description": {
+      "ru": "Проходи шаги по порядку. После каждого урока или задачи нажимай «Продолжить» — откроется следующий шаг. В конце у тебя будет обученная модель, API, Streamlit-интерфейс и репозиторий.",
+      "kg": "Кадамдарды ирети менен өт. Ар бир сабак же тапшырмадан кийин «Улантуу»ну бас — кийинки кадам ачылат. Аягында окутулган модель, API, Streamlit интерфейси жана репозиторий болот."
+    },
+    "level": "beginner",
+    "icon": "spark",
+    "sections": [
+      {
+        "id": "python",
+        "title": {
+          "ru": "1. Python и функции",
+          "kg": "1. Python жана функциялар"
+        },
+        "goal": {
+          "ru": "База, без которой не читается ML-код.",
+          "kg": "ML кодун окуу үчүн негиз."
+        },
+        "steps": [
+          {
+            "type": "lesson",
+            "slug": "python-core-lesson",
+            "note": {
+              "ru": "Переменные, списки, циклы и словари.",
+              "kg": "Өзгөрмөлөр, тизмелер, циклдар жана сөздүктөр."
+            }
+          },
+          {
+            "type": "task",
+            "slug": "sum-even",
+            "note": {
+              "ru": "Первая задача: сумма чётных чисел.",
+              "kg": "Биринчи тапшырма: жуп сандардын суммасы."
+            }
+          },
+          {
+            "type": "lesson",
+            "slug": "def-functions-from-zero",
+            "note": {
+              "ru": "От `def add(a, b)` до бинарного поиска.",
+              "kg": "`def add(a, b)`ден бинардык издөөгө чейин."
+            }
+          },
+          {
+            "type": "task",
+            "slug": "def-add",
+            "note": {
+              "ru": "Закрепи синтаксис функции.",
+              "kg": "Функция синтаксисин бекемде."
+            }
+          },
+          {
+            "type": "task",
+            "slug": "def-binary-search",
+            "note": {
+              "ru": "Алгоритм, который спросят на экзамене.",
+              "kg": "Экзаменде сурала турган алгоритм."
+            }
+          }
+        ]
+      },
+      {
+        "id": "data",
+        "title": {
+          "ru": "2. Данные и обучение",
+          "kg": "2. Маалымат жана окутуу"
+        },
+        "goal": {
+          "ru": "Скачать датасет, проверить батч, обучить и оценить модель.",
+          "kg": "Датасетти жүктөп, батчты текшерип, моделди окутуп баалоо."
+        },
+        "steps": [
+          {
+            "type": "task",
+            "slug": "ml-torchvision-dataset",
+            "note": {
+              "ru": "Первый код: `torchvision`, transforms и проверка формы батча.",
+              "kg": "Биринчи код: `torchvision`, transforms жана батч формасын текшерүү."
+            }
+          },
+          {
+            "type": "task",
+            "slug": "ml-batch-plan",
+            "note": {
+              "ru": "Пойми, как DataLoader режет датасет.",
+              "kg": "DataLoader датасетти кантип бөлөрүн түшүн."
+            }
+          },
+          {
+            "type": "task",
+            "slug": "ml-data-augmentation",
+            "note": {
+              "ru": "Аугментация только для train.",
+              "kg": "Аугментация train үчүн гана."
+            }
+          },
+          {
+            "type": "task",
+            "slug": "ml-training-pipeline",
+            "note": {
+              "ru": "Полный цикл обучения и сохранение `model.pth`.",
+              "kg": "Толук окутуу цикли жана `model.pth` сактоо."
+            }
+          },
+          {
+            "type": "task",
+            "slug": "ml-confusion-matrix",
+            "note": {
+              "ru": "Считаем ошибки модели вручную.",
+              "kg": "Моделдин каталарын кол менен эсептейбиз."
+            }
+          },
+          {
+            "type": "task",
+            "slug": "ml-model-compression",
+            "note": {
+              "ru": "Quantization, TorchScript или ONNX.",
+              "kg": "Quantization, TorchScript же ONNX."
+            }
+          }
+        ]
+      },
+      {
+        "id": "api",
+        "title": {
+          "ru": "3. FastAPI-сервис",
+          "kg": "3. FastAPI-сервис"
+        },
+        "goal": {
+          "ru": "Загрузить модель один раз и отдать `/health` и `/predict`.",
+          "kg": "Моделди бир жолу жүктөп, `/health` жана `/predict` берүү."
+        },
+        "steps": [
+          {
+            "type": "lesson",
+            "slug": "fastapi-ml-practice",
+            "note": {
+              "ru": "Health, Pydantic, UploadFile и модель.",
+              "kg": "Health, Pydantic, UploadFile жана модель."
+            }
+          },
+          {
+            "type": "task",
+            "slug": "fastapi-health",
+            "note": {
+              "ru": "Первый эндпоинт и тест.",
+              "kg": "Биринчи эндпоинт жана тест."
+            }
+          },
+          {
+            "type": "task",
+            "slug": "fastapi-upload-predict",
+            "note": {
+              "ru": "Загрузка файла и предсказание без PyTorch в тесте.",
+              "kg": "Файл жүктөө жана тестте PyTorchсуз предсказание."
+            }
+          },
+          {
+            "type": "task",
+            "slug": "fastapi-ml-serving",
+            "note": {
+              "ru": "Свяжи модель с API и проверь curl.",
+              "kg": "Моделди APIге туташтырып, curl менен текшер."
+            }
+          }
+        ]
+      },
+      {
+        "id": "ui",
+        "title": {
+          "ru": "4. Streamlit-интерфейс",
+          "kg": "4. Streamlit-интерфейси"
+        },
+        "goal": {
+          "ru": "Сделать загрузку картинки и показать ответ API.",
+          "kg": "Сүрөт жүктөөнү жасап, API жообун көрсөтүү."
+        },
+        "steps": [
+          {
+            "type": "lesson",
+            "slug": "streamlit-ml-practice",
+            "note": {
+              "ru": "Файл, кнопка, `requests`, `session_state`.",
+              "kg": "Файл, баскыч, `requests`, `session_state`."
+            }
+          },
+          {
+            "type": "task",
+            "slug": "streamlit-build-files",
+            "note": {
+              "ru": "Подготовь файл для `requests.post`.",
+              "kg": "`requests.post` үчүн файл даярда."
+            }
+          },
+          {
+            "type": "task",
+            "slug": "streamlit-ml-client",
+            "note": {
+              "ru": "Полный клиент к FastAPI.",
+              "kg": "FastAPIге толук клиент."
+            }
+          }
+        ]
+      },
+      {
+        "id": "publish",
+        "title": {
+          "ru": "5. GitHub и защита",
+          "kg": "5. GitHub жана коргоо"
+        },
+        "goal": {
+          "ru": "Опубликовать код, артефакты и инструкцию запуска.",
+          "kg": "Кодду, артефактыларды жана иштетүү нускамасын жарыялоо."
+        },
+        "steps": [
+          {
+            "type": "task",
+            "slug": "model-artifacts-git",
+            "note": {
+              "ru": "LFS или Release, `.gitignore`, секреты.",
+              "kg": "LFS же Release, `.gitignore`, секреттер."
+            }
+          },
+          {
+            "type": "task",
+            "slug": "ml-capstone-runbook",
+            "note": {
+              "ru": "Финальный чек-лист всего проекта.",
+              "kg": "Бүт долбоордун финалдык чек-листи."
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

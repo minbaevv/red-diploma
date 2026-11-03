@@ -399,7 +399,7 @@
       "ru": "Pandas, train/test, переобучение и метрики.",
       "kg": "Pandas, train/test, переобучение жана метрикалар."
     },
-    "estimated_minutes": 140,
+    "estimated_minutes": 220,
     "task_slugs": [
       "pandas-drills",
       "ml-metrics",
@@ -415,7 +415,14 @@
       "ml-accuracy",
       "ml-minmax",
       "ml-training-pipeline",
-      "ml-model-compression"
+      "ml-model-compression",
+      "ml-batch-plan",
+      "ml-confusion-matrix",
+      "ml-precision-recall",
+      "ml-torchvision-dataset",
+      "ml-image-inference",
+      "ml-data-augmentation",
+      "ml-capstone-runbook"
     ],
     "lessons": [
       {
@@ -463,10 +470,10 @@
           "kg": "Capstone: окутту → кысты → FastAPI → Streamlit → GitHub"
         },
         "summary": {
-          "ru": "Полный путь новичка: данные, обучение, метрики, сжатие, API, UI и публикация артефакта.",
-          "kg": "Новичоктун толук жолу: маалымат, окутуу, метрикалар, кысуу, API, UI жана артефактты жарыялоо."
+          "ru": "Полный путь новичка: данные, обучение, метрики, сжатие, API, UI и публикация артефакта. Внутри — кнопки «Продолжить» и точные checkpoints.",
+          "kg": "Новичоктун толук жолу: маалымат, окутуу, метрикалар, кысуу, API, UI жана артефактты жарыялоо. Ичинде «Улантуу» баскычтары жана так checkpoint'тер."
         },
-        "minutes": 90,
+        "minutes": 150,
         "task_slugs": [
           "ml-train-val-split",
           "ml-accuracy",
@@ -481,7 +488,14 @@
           "mediapipe-finger-count",
           "mediapipe-rps",
           "mediapipe-gesture-pipeline",
-          "model-artifacts-git"
+          "model-artifacts-git",
+          "ml-batch-plan",
+          "ml-confusion-matrix",
+          "ml-precision-recall",
+          "ml-torchvision-dataset",
+          "ml-image-inference",
+          "ml-data-augmentation",
+          "ml-capstone-runbook"
         ],
         "content": {
           "ru": [

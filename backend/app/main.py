@@ -175,6 +175,7 @@ def bootstrap() -> dict[str, Any]:
         "modules": modules,
         "tasks": tasks,
         "exams": exam_summaries,
+        "paths": content.paths(),
         "progress": list(progress.values()),
         "attempts": list_attempts(30),
         "notes": list_notes(),

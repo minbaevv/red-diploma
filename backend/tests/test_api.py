@@ -35,7 +35,8 @@ def client():
 
 def test_curriculum_totals():
     assert len(content.modules()) == 13
-    assert len(content.tasks()) == 133
+    assert len(content.tasks()) == 140
+    assert len(content.module_by_slug("data-ml")["task_slugs"]) == 22
     assert [(exam["stage"], exam["points"]) for exam in content.exams()] == [
         (1, 20),
         (2, 30),
@@ -45,7 +46,7 @@ def test_curriculum_totals():
 
 def test_every_code_solution_passes():
     code_tasks = [task for task in content.tasks() if task["type"] == "code"]
-    assert len(code_tasks) == 39
+    assert len(code_tasks) == 42
     for task in code_tasks:
         result = run_code(task["solution"], task["tests"])
         assert result["passed"], task["slug"]
@@ -59,6 +60,30 @@ def test_bootstrap_hides_tests_and_solutions(client: TestClient):
     for task in payload["tasks"]:
         assert "tests" not in task
         assert "solution" not in task
+
+
+def test_bootstrap_includes_valid_guided_path(client: TestClient):
+    payload = client.get("/api/bootstrap").json()
+    path = next(item for item in payload["paths"] if item["slug"] == "ml-capstone")
+    steps = [step for section in path["sections"] for step in section["steps"]]
+    assert len(steps) == 20
+    assert steps[0] == {
+        "type": "lesson",
+        "slug": "python-core-lesson",
+        "note": {
+            "ru": "Переменные, списки, циклы и словари.",
+            "kg": "Өзгөрмөлөр, тизмелер, циклдар жана сөздүктөр.",
+        },
+    }
+    known_lessons = {
+        lesson["slug"]
+        for module in payload["modules"]
+        for lesson in module["lessons"]
+    }
+    known_tasks = {task["slug"] for task in payload["tasks"]}
+    for step in steps:
+        target = known_lessons if step["type"] == "lesson" else known_tasks
+        assert step["slug"] in target
 
 
 def test_task_run_marks_progress(client: TestClient):

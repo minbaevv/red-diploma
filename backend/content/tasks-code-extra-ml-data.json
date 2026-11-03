@@ -1,0 +1,293 @@
+[
+  {
+    "slug": "ml-batch-plan",
+    "type": "code",
+    "module": "data-ml",
+    "title": {
+      "ru": "ML: размеры батчей DataLoader",
+      "kg": "ML: DataLoader батчтарынын өлчөмү"
+    },
+    "prompt": {
+      "ru": "Напиши `batch_plan(size, batch_size)`: верни список размеров батчей, которые получит DataLoader. Последний батч может быть меньше. Если `size <= 0` или `batch_size <= 0` — верни `[]`.",
+      "kg": "`batch_plan(size, batch_size)` жаз: DataLoader ала турган батчтардын өлчөмдөрүнүн тизмесин кайтар. Акыркы батч кичине болушу мүмкүн. `size <= 0` же `batch_size <= 0` болсо — `[]` кайтар."
+    },
+    "difficulty": 2,
+    "points": 6,
+    "starter_code": "def batch_plan(size, batch_size):\n    # твой код\n    pass",
+    "tests": [
+      {
+        "input": "batch_plan(10, 4)",
+        "expected": [
+          4,
+          4,
+          2
+        ]
+      },
+      {
+        "input": "batch_plan(8, 4)",
+        "expected": [
+          4,
+          4
+        ]
+      },
+      {
+        "input": "batch_plan(0, 4)",
+        "expected": []
+      },
+      {
+        "input": "batch_plan(3, 10)",
+        "expected": [
+          3
+        ]
+      }
+    ],
+    "hints": [
+      {
+        "ru": "Сначала проверь некорректные размеры.",
+        "kg": "Алгач туура эмес өлчөмдөрдү текшер."
+      },
+      {
+        "ru": "`divmod(size, batch_size)` даёт полные батчи и остаток.",
+        "kg": "`divmod(size, batch_size)` толук батчтарды жана калдыкты берет."
+      },
+      {
+        "ru": "Остаток добавляй только если он больше нуля.",
+        "kg": "Калдыкты нөлдөн чоң болсо гана кош."
+      }
+    ],
+    "subquestions": [
+      {
+        "ru": "Почему последний батч может быть меньше?",
+        "kg": "Эмне үчүн акыркы батч кичине болушу мүмкүн?"
+      },
+      {
+        "ru": "Что делает `drop_last=True` в DataLoader?",
+        "kg": "DataLoader'догу `drop_last=True` эмне кылат?"
+      }
+    ],
+    "solution": "def batch_plan(size, batch_size):\n    if size <= 0 or batch_size <= 0:\n        return []\n    full, rest = divmod(size, batch_size)\n    return [batch_size] * full + ([rest] if rest else [])",
+    "explanation": {
+      "ru": "DataLoader режет датасет на батчи. Неполный последний батч — нормальная ситуация; `drop_last=True` его выбрасывает, чтобы форма всех батчей была одинаковой.",
+      "kg": "DataLoader датасетти батчтарга бөлөт. Акыркы толук эмес батч кадимки көрүнүш; `drop_last=True` аны ыргытып, бардык батчтардын формасын бирдей кылат."
+    },
+    "walkthrough": [
+      {
+        "ru": "1. Отсекаем нулевые и отрицательные значения.",
+        "kg": "1. Нөл жана терс маанилерди алып салабыз."
+      },
+      {
+        "ru": "2. `divmod` возвращает число полных батчей и остаток.",
+        "kg": "2. `divmod` толук батчтардын санын жана калдыкты кайтарат."
+      },
+      {
+        "ru": "3. Собираем список и добавляем остаток.",
+        "kg": "3. Тизмени түзүп, калдыкты кошобуз."
+      }
+    ],
+    "pitfalls": {
+      "ru": "Не добавляй нулевой остаток в конец списка — иначе появится лишний пустой батч.",
+      "kg": "Тизменин аягына нөл калдыкты кошпо — болбосо ашыкча бош батч пайда болот."
+    },
+    "exam_tip": {
+      "ru": "На экзамене свяжи батчи с формой тензора: `[B, C, H, W]`, где `B` — размер последнего батча.",
+      "kg": "Экзаменде батчтарды тензор формасы менен байланыштыр: `[B, C, H, W]`, мында `B` — акыркы батчтын өлчөмү."
+    }
+  },
+  {
+    "slug": "ml-confusion-matrix",
+    "type": "code",
+    "module": "data-ml",
+    "title": {
+      "ru": "ML: confusion matrix без библиотек",
+      "kg": "ML: confusion matrix китепканасыз"
+    },
+    "prompt": {
+      "ru": "Напиши `confusion_counts(y_true, y_pred)` для бинарной классификации. Верни словарь `{'tp': ..., 'tn': ..., 'fp': ..., 'fn': ...}`. Метки — `0` и `1`.",
+      "kg": "Бинардык классификация үчүн `confusion_counts(y_true, y_pred)` жаз. `{'tp': ..., 'tn': ..., 'fp': ..., 'fn': ...}` сөздүгүн кайтар. Белгилер — `0` жана `1`."
+    },
+    "difficulty": 3,
+    "points": 8,
+    "starter_code": "def confusion_counts(y_true, y_pred):\n    # твой код\n    pass",
+    "tests": [
+      {
+        "input": "confusion_counts([1, 1, 0, 0], [1, 0, 0, 1])",
+        "expected": {
+          "tp": 1,
+          "tn": 1,
+          "fp": 1,
+          "fn": 1
+        }
+      },
+      {
+        "input": "confusion_counts([1, 1, 1], [1, 1, 1])",
+        "expected": {
+          "tp": 3,
+          "tn": 0,
+          "fp": 0,
+          "fn": 0
+        }
+      },
+      {
+        "input": "confusion_counts([0, 0], [1, 1])",
+        "expected": {
+          "tp": 0,
+          "tn": 0,
+          "fp": 2,
+          "fn": 0
+        }
+      }
+    ],
+    "hints": [
+      {
+        "ru": "Сравнивай пары `actual, predicted`.",
+        "kg": "`actual, predicted` жуптарын салыштыр."
+      },
+      {
+        "ru": "TP: 1 и 1. TN: 0 и 0. FP: 0 и 1. FN: 1 и 0.",
+        "kg": "TP: 1 жана 1. TN: 0 жана 0. FP: 0 жана 1. FN: 1 жана 0."
+      },
+      {
+        "ru": "Начни с четырёх счётчиков, равных нулю.",
+        "kg": "Нөлгө барабар төрт эсептегичтен башта."
+      }
+    ],
+    "subquestions": [
+      {
+        "ru": "Чем FP опасен в медицинской диагностике?",
+        "kg": "Медициналык диагностикада FP эмне үчүн коркунучтуу?"
+      },
+      {
+        "ru": "Почему accuracy недостаточна при дисбалансе?",
+        "kg": "Баланс эмес учурда accuracy эмне үчүн жетишсиз?"
+      }
+    ],
+    "solution": "def confusion_counts(y_true, y_pred):\n    counts = {'tp': 0, 'tn': 0, 'fp': 0, 'fn': 0}\n    for actual, predicted in zip(y_true, y_pred):\n        if actual == 1 and predicted == 1:\n            counts['tp'] += 1\n        elif actual == 0 and predicted == 0:\n            counts['tn'] += 1\n        elif actual == 0 and predicted == 1:\n            counts['fp'] += 1\n        elif actual == 1 and predicted == 0:\n            counts['fn'] += 1\n    return counts",
+    "explanation": {
+      "ru": "Confusion matrix показывает не только число ошибок, но и их тип. FP — ложная тревога, FN — пропущенный положительный объект. Дальше из этих четырёх чисел считают precision, recall и F1.",
+      "kg": "Confusion matrix каталардын санын гана эмес, түрүн да көрсөтөт. FP — жалган тынчсыздануу, FN — өткөрүп жиберилген оң объект. Анан ушул төрт сандан precision, recall жана F1 эсептелет."
+    },
+    "walkthrough": [
+      {
+        "ru": "1. Создаём четыре счётчика.",
+        "kg": "1. Төрт эсептегич түзөбүз."
+      },
+      {
+        "ru": "2. Проходим по парам предсказание/истина.",
+        "kg": "2. Болжол/чыныгылык жуптары боюнча өтөбүз."
+      },
+      {
+        "ru": "3. Увеличиваем нужный счётчик.",
+        "kg": "3. Керектүү эсептегичти көбөйтөбүз."
+      }
+    ],
+    "pitfalls": {
+      "ru": "Не путай FP и FN: FP — модель сказала «1», а истина «0»; FN — модель сказала «0», а истина «1».",
+      "kg": "FP менен FNди аралаштырба: FP — модель «1» деди, чындык «0»; FN — модель «0» деди, чындык «1»."
+    },
+    "exam_tip": {
+      "ru": "Нарисуй матрицу 2×2 на бумаге — это быстрее, чем вспоминать названия под давлением.",
+      "kg": "2×2 матрицаны кагазга чий — басым астында аттарды эстөөдөн тез."
+    }
+  },
+  {
+    "slug": "ml-precision-recall",
+    "type": "code",
+    "module": "data-ml",
+    "title": {
+      "ru": "ML: precision и recall",
+      "kg": "ML: precision жана recall"
+    },
+    "prompt": {
+      "ru": "Напиши `precision_recall(y_true, y_pred)`: верни кортеж `(precision, recall)`. Если знаменатель равен нулю, соответствующая метрика равна `0.0`.",
+      "kg": "`precision_recall(y_true, y_pred)` жаз: `(precision, recall)` кортежин кайтар. Бөлүүчү нөлгө барабар болсо, тиешелүү метрика `0.0` болот."
+    },
+    "difficulty": 3,
+    "points": 8,
+    "starter_code": "def precision_recall(y_true, y_pred):\n    # твой код\n    pass",
+    "tests": [
+      {
+        "input": "precision_recall([1, 1, 0, 0], [1, 0, 0, 1])",
+        "expected": [
+          0.5,
+          0.5
+        ]
+      },
+      {
+        "input": "precision_recall([1, 1], [1, 1])",
+        "expected": [
+          1.0,
+          1.0
+        ]
+      },
+      {
+        "input": "precision_recall([0, 0], [0, 0])",
+        "expected": [
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "input": "precision_recall([1, 0], [0, 1])",
+        "expected": [
+          0.0,
+          0.0
+        ]
+      }
+    ],
+    "hints": [
+      {
+        "ru": "Сначала посчитай TP, FP и FN.",
+        "kg": "Алгач TP, FP жана FNди эсепте."
+      },
+      {
+        "ru": "Precision = TP / (TP + FP).",
+        "kg": "Precision = TP / (TP + FP)."
+      },
+      {
+        "ru": "Recall = TP / (TP + FN).",
+        "kg": "Recall = TP / (TP + FN)."
+      },
+      {
+        "ru": "Проверяй деление на ноль.",
+        "kg": "Нөлгө бөлүүнү текшер."
+      }
+    ],
+    "subquestions": [
+      {
+        "ru": "Когда важнее recall, а когда precision?",
+        "kg": "Кайсы учурда recall, кайсында precision маанилүү?"
+      },
+      {
+        "ru": "Что такое F1 и зачем он нужен?",
+        "kg": "F1 деген эмне жана эмне үчүн керек?"
+      }
+    ],
+    "solution": "def precision_recall(y_true, y_pred):\n    tp = sum(1 for actual, predicted in zip(y_true, y_pred) if actual == 1 and predicted == 1)\n    fp = sum(1 for actual, predicted in zip(y_true, y_pred) if actual == 0 and predicted == 1)\n    fn = sum(1 for actual, predicted in zip(y_true, y_pred) if actual == 1 and predicted == 0)\n    precision = tp / (tp + fp) if tp + fp else 0.0\n    recall = tp / (tp + fn) if tp + fn else 0.0\n    return precision, recall",
+    "explanation": {
+      "ru": "Precision отвечает: «если модель сказала 1, насколько ей можно верить?». Recall отвечает: «сколько реальных 1 модель нашла?». При поиске рака важнее recall, при антиспаме — precision.",
+      "kg": "Precision: «модель 1 десе, ага канчалык ишенсе болот?». Recall: «канча чыныгы 1ди модель тапты?». Ракты издөөдө recall, антиспамда precision маанилүү."
+    },
+    "walkthrough": [
+      {
+        "ru": "1. Считаем TP, FP и FN одним проходом.",
+        "kg": "1. TP, FP жана FNди бир өтүүдө эсептейбиз."
+      },
+      {
+        "ru": "2. Делим с защитой от нуля.",
+        "kg": "2. Нөлдөн коргоп бөлөбүз."
+      },
+      {
+        "ru": "3. Возвращаем кортеж.",
+        "kg": "3. Кортеж кайтарабыз."
+      }
+    ],
+    "pitfalls": {
+      "ru": "Не округляй значения — тесты ждут точные `0.5`, `1.0` и `0.0`.",
+      "kg": "Маанилерди тегеректебе — тесттер так `0.5`, `1.0` жана `0.0` күтөт."
+    },
+    "exam_tip": {
+      "ru": "Запомни мнемонику: precision — про предсказания, recall — про реальные положительные объекты.",
+      "kg": "Мнемониканы эсте: precision — болжолдор жөнүндө, recall — чыныгы оң объектилер жөнүндө."
+    }
+  }
+]

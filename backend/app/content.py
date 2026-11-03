@@ -30,6 +30,7 @@ def load_content() -> dict[str, Any]:
         *_read("tasks-code-extra-functions.json"),
         *_read("tasks-code-extra-api-ui.json"),
         *_read("tasks-code-extra-ml-cv.json"),
+        *_read("tasks-code-extra-ml-data.json"),
     ]
     extra_theory = [
         *_read("tasks-theory-extra-python.json"),
@@ -45,14 +46,17 @@ def load_content() -> dict[str, Any]:
         *_read("tasks-theory-extra-vision.json"),
         *_read("tasks-theory-extra-ml-training.json"),
         *_read("tasks-theory-extra-ml-serving.json"),
+        *_read("tasks-theory-extra-ml-capstone.json"),
         *_read("tasks-theory-extra-exam.json"),
     ]
     exams = _read("exams.json")
+    paths = _read("paths.json")
     data = {
         "meta": _read("meta.json"),
         "modules": modules,
         "tasks": [*code_tasks, *theory_tasks, *extra_code, *extra_theory],
         "exams": exams,
+        "paths": paths,
     }
     _validate(data)
     return data
@@ -62,12 +66,15 @@ def _validate(data: dict[str, Any]) -> None:
     modules = data.get("modules")
     tasks = data.get("tasks")
     exams = data.get("exams")
+    paths = data.get("paths")
     if not isinstance(modules, list) or not modules:
         raise ContentError("modules must be a non-empty list")
     if not isinstance(tasks, list):
         raise ContentError("tasks must be a list")
     if not isinstance(exams, list):
         raise ContentError("exams must be a list")
+    if not isinstance(paths, list):
+        raise ContentError("paths must be a list")
 
     module_slugs = [module["slug"] for module in modules]
     if len(module_slugs) != len(set(module_slugs)):
@@ -78,6 +85,12 @@ def _validate(data: dict[str, Any]) -> None:
         raise ContentError("duplicate task slugs")
 
     known_tasks = set(task_slugs)
+    lesson_slugs = [
+        lesson["slug"] for module in modules for lesson in module.get("lessons", [])
+    ]
+    if len(lesson_slugs) != len(set(lesson_slugs)):
+        raise ContentError("duplicate lesson slugs")
+    known_lessons = set(lesson_slugs)
     for module in modules:
         for lesson in module.get("lessons", []):
             for task_slug in lesson.get("task_slugs", []):
@@ -94,6 +107,43 @@ def _validate(data: dict[str, Any]) -> None:
                         f"exam {exam['slug']} references unknown task {question['task_slug']}"
                     )
 
+    path_slugs = [path["slug"] for path in paths]
+    if len(path_slugs) != len(set(path_slugs)):
+        raise ContentError("duplicate path slugs")
+
+    for path in paths:
+        sections = path.get("sections")
+        if not isinstance(sections, list) or not sections:
+            raise ContentError(f"path {path['slug']} must have sections")
+        section_ids = [section.get("id") for section in sections]
+        if len(section_ids) != len(set(section_ids)):
+            raise ContentError(f"path {path['slug']} has duplicate section ids")
+        step_keys = []
+        for section in sections:
+            steps = section.get("steps")
+            if not isinstance(steps, list) or not steps:
+                raise ContentError(
+                    f"path {path['slug']} section {section.get('id')} must have steps"
+                )
+            for step in steps:
+                step_type = step.get("type")
+                step_slug = step.get("slug")
+                if step_type == "lesson" and step_slug not in known_lessons:
+                    raise ContentError(
+                        f"path {path['slug']} references unknown lesson {step_slug}"
+                    )
+                if step_type == "task" and step_slug not in known_tasks:
+                    raise ContentError(
+                        f"path {path['slug']} references unknown task {step_slug}"
+                    )
+                if step_type not in {"lesson", "task"}:
+                    raise ContentError(
+                        f"path {path['slug']} has unsupported step type {step_type}"
+                    )
+                step_keys.append(f"{step_type}:{step_slug}")
+        if len(step_keys) != len(set(step_keys)):
+            raise ContentError(f"path {path['slug']} has duplicate steps")
+
 
 def modules() -> list[dict[str, Any]]:
     return load_content()["modules"]
@@ -105,6 +155,10 @@ def tasks() -> list[dict[str, Any]]:
 
 def exams() -> list[dict[str, Any]]:
     return load_content()["exams"]
+
+
+def paths() -> list[dict[str, Any]]:
+    return load_content()["paths"]
 
 
 def meta() -> dict[str, Any]:
@@ -121,6 +175,10 @@ def task_by_slug(slug: str) -> dict[str, Any] | None:
 
 def exam_by_slug(slug: str) -> dict[str, Any] | None:
     return next((exam for exam in exams() if exam["slug"] == slug), None)
+
+
+def path_by_slug(slug: str) -> dict[str, Any] | None:
+    return next((path for path in paths() if path["slug"] == slug), None)
 
 
 def lesson_by_slug(slug: str) -> tuple[dict[str, Any], dict[str, Any]] | None:

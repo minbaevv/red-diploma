@@ -1,20 +1,24 @@
 import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
-import { ArrowLeft, ArrowRight, CheckCircle2, Clock } from 'lucide-react'
+import { Link, useParams, useSearchParams } from 'react-router-dom'
+import { ArrowLeft, ArrowRight, CheckCircle2, Clock, Route } from 'lucide-react'
 import { api } from '../api'
 import { useApp, useBi } from '../state/AppContext'
 import { isDone, pick, progressIndex } from '../lib/format'
+import { pathContext } from '../lib/path'
+import PathNext from '../components/PathNext'
 import TaskCard from '../components/TaskCard'
 import { Badge, Markdown, SectionTitle } from '../components/ui'
 
 export default function LessonPage() {
   const { slug } = useParams()
+  const [params] = useSearchParams()
   const { data, refresh, lang } = useApp()
   const bi = useBi()
   const [payload, setPayload] = useState(null)
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
   const index = progressIndex(data?.progress)
+  const pathInfo = pathContext(data, params, 'lesson', slug)
 
   useEffect(() => {
     let active = true
@@ -50,6 +54,15 @@ export default function LessonPage() {
       <Link className="back-link" to={`/learn/${module.slug}`}>
         <ArrowLeft size={16} /> {pick(module.title, lang)}
       </Link>
+
+      {pathInfo && (
+        <div className="path-banner">
+          <Route size={15} />
+          <strong>{pick(pathInfo.path.title, lang)}</strong>
+          <span>{bi('Шаг', 'Кадам')} {pathInfo.index + 1} / {pathInfo.steps.length}</span>
+          <Link to="/start">{bi('Весь маршрут', 'Бүт маршрут')}</Link>
+        </div>
+      )}
 
       <div className="lesson-layout">
         <article className="lesson-article">
@@ -102,6 +115,8 @@ export default function LessonPage() {
           </div>
         </aside>
       </div>
+
+      {complete && pathInfo && <PathNext pathInfo={pathInfo} />}
 
       <section className="dashboard-section">
         <SectionTitle title={bi('Задачи урока', 'Сабактын тапшырмалары')} />
