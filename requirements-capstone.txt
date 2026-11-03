@@ -1,0 +1,9 @@
+# Optional dependencies for the ML capstone path.
+# Use Python 3.11 or 3.12 for the best MediaPipe/PyTorch wheel support.
+torch>=2.5,<3
+torchvision>=0.20,<1
+streamlit>=1.40,<2
+Pillow>=11,<12
+requests>=2.32,<3
+opencv-python>=4.10,<5
+mediapipe>=0.10.20,<1

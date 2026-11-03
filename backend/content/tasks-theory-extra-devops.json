@@ -1,0 +1,217 @@
+[
+  {
+    "slug": "dockerfile-best-practices",
+    "type": "theory",
+    "module": "devops-security",
+    "title": { "ru": "Dockerfile: слои, cache и non-root", "kg": "Dockerfile: катмарлар, cache жана non-root" },
+    "prompt": {
+      "ru": "Как писать production Dockerfile для Python-сервиса? Объясни слои, кэш зависимостей, multi-stage, non-root пользователя и `.dockerignore`.",
+      "kg": "Python сервиси үчүн production Dockerfile кантип жазуу керек? Катмарлар, көз карандылыктар кэши, multi-stage, non-root колдонуучу жана `.dockerignore` түшүндүр."
+    },
+    "difficulty": 3,
+    "points": 10,
+    "hints": [
+      { "ru": "Сначала копируй `requirements.txt` и ставь зависимости, потом код.", "kg": "Адегенде `requirements.txt` көчүрүп, көз карандылыктарды орнот, анан кодду." },
+      { "ru": "Multi-stage уменьшает финальный образ, оставляя компиляторы в builder.", "kg": "Multi-stage компиляторлорду builderде калтырып, акыркы образды кичирейтет." },
+      { "ru": "Контейнер не должен работать от root без необходимости.", "kg": "Контейнер зарылдыксыз rootдон иштебеши керек." }
+    ],
+    "subquestions": [
+      { "ru": "Почему `COPY . .` до установки зависимостей ломает кэш?", "kg": "Эмне үчүн `COPY . .` көз карандылыктарды орнотуудан мурун кэшти бузат?" },
+      { "ru": "Зачем нужен `.dockerignore`?", "kg": "`.dockerignore` эмне үчүн керек?" },
+      { "ru": "Чем `CMD` отличается от `ENTRYPOINT`?", "kg": "`CMD` `ENTRYPOINT`тен эмнеси менен айырмаланат?" }
+    ],
+    "model_answer": {
+      "ru": "Docker строит образ слоями, и слой переиспользуется, пока не изменилась инструкция и её вход. Поэтому сначала `COPY requirements.txt .`, затем `RUN pip install -r requirements.txt`, и только потом `COPY . .`: код меняется часто, зависимости — редко. Multi-stage (`FROM python:3.12 AS builder`) позволяет собрать wheel в builder и скопировать только результат в slim-образ. `.dockerignore` исключает `.venv`, `.git`, тесты и секреты из контекста сборки. `RUN useradd` и `USER app` убирают root. `ENV PYTHONDONTWRITEBYTECODE=1`, `PYTHONUNBUFFERED=1` помогают логам и файлам. `CMD` задаёт команду по умолчанию, `ENTRYPOINT` — исполняемый файл; аргументы `docker run` дополняют CMD.",
+      "kg": "Docker образды катмарлар менен курат, инструкция жана анын кириши өзгөрмөйүнчө катмар кайра колдонулат. Ошондуктан адегенде `COPY requirements.txt .`, анан `RUN pip install -r requirements.txt`, акырында `COPY . .`: код тез-тез, көз карандылыктар сейрек өзгөрөт. Multi-stage (`FROM python:3.12 AS builder`) wheelди builderде куруп, натыйжаны гана slim образга көчүрөт. `.dockerignore` `.venv`, `.git`, тесттер жана сырларды куруу контекстинен чыгарат. `RUN useradd` жана `USER app` rootду алып салат. `ENV PYTHONDONTWRITEBYTECODE=1`, `PYTHONUNBUFFERED=1` логдор жана файлдар үчүн жардам берет. `CMD` демейки команданы, `ENTRYPOINT` аткарылуучу файлды берет; `docker run` аргументтери CMDни толуктайт."
+    },
+    "explanation": {
+      "ru": "Хороший Dockerfile — это воспроизводимая сборка, маленький образ и минимальные права. Скорость сборки важна не меньше запуска.",
+      "kg": "Жакшы Dockerfile — кайталануучу куруу, кичине образ жана минималдуу укуктар. Куруу ылдамдыгы иштетүүдөн кем эмес."
+    },
+    "walkthrough": [
+      { "ru": "1. Вынеси зависимости в отдельный слой.", "kg": "1. Көз карандылыктарды өзүнчө катмарга чыгар." },
+      { "ru": "2. Добавь multi-stage и non-root пользователя.", "kg": "2. Multi-stage жана non-root колдонуучу кош." },
+      { "ru": "3. Проверь размер образа, `.dockerignore` и логи.", "kg": "3. Образдын өлчөмүн, `.dockerignore` жана логдорду текшер." }
+    ],
+    "pitfalls": {
+      "ru": "Не копируй `.env` и `.git` в образ. Не запускай сервис от root. Не ставь зависимости без фиксации версий.",
+      "kg": "`.env` жана `.git` образга көчүрбө. Сервисти rootдон иштетпе. Версиясыз көз карандылыктарды орнотпо."
+    },
+    "exam_tip": {
+      "ru": "Скажи: «cache слоёв → slim/multi-stage → non-root → dockerignore».",
+      "kg": "Айт: «катмарлар cache → slim/multi-stage → non-root → dockerignore»."
+    }
+  },
+  {
+    "slug": "docker-compose",
+    "type": "theory",
+    "module": "devops-security",
+    "title": { "ru": "Docker Compose: сервисы и сети", "kg": "Docker Compose: сервистер жана тармактар" },
+    "prompt": {
+      "ru": "Как описать backend, PostgreSQL и Redis в Docker Compose? Объясни `services`, env, volumes, networks, `depends_on` и healthcheck.",
+      "kg": "Docker Composeдо backend, PostgreSQL жана Redis кантип сүрөттөлөт? `services`, env, volumes, networks, `depends_on` жана healthcheck түшүндүр."
+    },
+    "difficulty": 3,
+    "points": 10,
+    "hints": [
+      { "ru": "Сервисы общаются по имени сервиса внутри compose-сети.", "kg": "Сервистер compose тармагынын ичинде сервис аты боюнча байланышат." },
+      { "ru": "`depends_on` не ждёт готовности БД без healthcheck.", "kg": "`depends_on` healthcheck жок БДнин даярдыгын күтпөйт." },
+      { "ru": "Volumes сохраняют данные БД между перезапусками.", "kg": "Volumes БД маалыматын кайра иштетүүлөрдүн ортосунда сактайт." }
+    ],
+    "subquestions": [
+      { "ru": "Почему `localhost` внутри контейнера не указывает на PostgreSQL?", "kg": "Эмне үчүн контейнердин ичиндеги `localhost` PostgreSQLди көрсөтпөйт?" },
+      { "ru": "Зачем нужен healthcheck?", "kg": "Healthcheck эмне үчүн керек?" },
+      { "ru": "Когда использовать volume, а когда bind mount?", "kg": "Качан volume, качан bind mount колдонуу керек?" }
+    ],
+    "model_answer": {
+      "ru": "В `docker-compose.yml` каждый сервис имеет `build`/`image`, `ports`, `environment`, `volumes`, `networks`. Backend подключается к БД по хосту `db` (имя сервиса), а не `localhost`: контейнеры — отдельные сетевые namespace. `depends_on` задаёт порядок запуска, но не готовность; с `healthcheck` и `condition: service_healthy` можно дождаться БД. Volume `postgres_data:/var/lib/postgresql/data` сохраняет данные; bind mount удобен для разработки, но может скрыть файлы образа. Секреты передают через `.env`/secrets, а не в репозиторий. В production compose используют для небольших deployments; для оркестрации — Kubernetes/ECS.",
+      "kg": "`docker-compose.yml`де ар бир сервистин `build`/`image`, `ports`, `environment`, `volumes`, `networks` бар. Backend БДге `localhost` эмес, `db` (сервис аты) хостунда туташат: контейнерлер өзүнчө тармак namespace. `depends_on` иштөө тартибин берет, бирок даярдыкты эмес; `healthcheck` жана `condition: service_healthy` менен БДни күтүүгө болот. `postgres_data:/var/lib/postgresql/data` volume маалыматты сактайт; bind mount иштеп чыгууга ыңгайлуу, бирок образдагы файлдарды жашырышы мүмкүн. Сырлар `.env`/secrets аркылуу берилет, репозиторийге эмес. Productionдо compose чакан deployment үчүн; оркестрация үчүн Kubernetes/ECS."
+    },
+    "explanation": {
+      "ru": "Compose описывает локальную топологию приложения. Главные ошибки — сеть, готовность БД и хранение данных.",
+      "kg": "Compose тиркеменин локалдык топологиясын сүрөттөйт. Негизги каталар — тармак, БДнин даярдыгы жана маалыматты сактоо."
+    },
+    "walkthrough": [
+      { "ru": "1. Опиши сервисы и имена хостов.", "kg": "1. Сервистерди жана хост аттарын жаз." },
+      { "ru": "2. Добавь volume и healthcheck для БД.", "kg": "2. БД үчүн volume жана healthcheck кош." },
+      { "ru": "3. Проверь сеть, переменные и перезапуск без потери данных.", "kg": "3. Тармакты, өзгөрмөлөрдү жана маалымат жоготпой кайра иштетүүнү текшер." }
+    ],
+    "pitfalls": {
+      "ru": "Не используй `localhost` для соседнего контейнера. Не полагайся только на `depends_on`. Не храни данные БД в контейнере без volume.",
+      "kg": "Кошуна контейнер үчүн `localhost` колдонбо. `depends_on`га гана таянба. БД маалыматын volumeсуз контейнерде сактаба."
+    },
+    "exam_tip": {
+      "ru": "Формула: «service name = host; healthcheck = readiness; volume = persistence».",
+      "kg": "Формула: «service name = host; healthcheck = readiness; volume = persistence»."
+    }
+  },
+  {
+    "slug": "nginx-reverse-proxy",
+    "type": "theory",
+    "module": "devops-security",
+    "title": { "ru": "Nginx: reverse proxy и TLS", "kg": "Nginx: reverse proxy жана TLS" },
+    "prompt": {
+      "ru": "Как Nginx работает перед FastAPI/Gunicorn? Объясни `proxy_pass`, заголовки, статику, TLS, лимиты и upstream.",
+      "kg": "Nginx FastAPI/Gunicornдун алдында кантип иштейт? `proxy_pass`, заголовоктор, статика, TLS, лимиттер жана upstream түшүндүр."
+    },
+    "difficulty": 3,
+    "points": 10,
+    "hints": [
+      { "ru": "Nginx принимает HTTPS и проксирует запрос на внутренний порт приложения.", "kg": "Nginx HTTPS кабыл алып, сурамды тиркеменин ички портуна проксилейт." },
+      { "ru": "`X-Forwarded-*` передают реальный IP и схему приложению.", "kg": "`X-Forwarded-*` тиркемеге чыныгы IP жана схеманы берет." },
+      { "ru": "Статику лучше отдавать Nginx, а не Python-приложению.", "kg": "Статиканы Python тиркемесине эмес, Nginxке берген жакшы." }
+    ],
+    "subquestions": [
+      { "ru": "Зачем нужен reverse proxy перед uvicorn?", "kg": "Uvicornдун алдында reverse proxy эмне үчүн керек?" },
+      { "ru": "Почему приложение должно доверять `X-Forwarded-For` осторожно?", "kg": "Эмне үчүн тиркеме `X-Forwarded-For`га этият ишениши керек?" },
+      { "ru": "Что настраивают в `client_max_body_size`?", "kg": "`client_max_body_size`да эмне жөндөлөт?" }
+    ],
+    "model_answer": {
+      "ru": "Nginx стоит на 80/443, терминирует TLS и проксирует запросы на `127.0.0.1:8000` через `proxy_pass http://backend;`. Он добавляет `Host`, `X-Real-IP`, `X-Forwarded-For`, `X-Forwarded-Proto`, чтобы FastAPI знал реального клиента и схему; доверять этим заголовкам можно только от известного прокси. Статику (`/static/`) отдают напрямую с `root`/`alias`, а не через Python. `upstream` распределяет нагрузку между несколькими инстансами, `client_max_body_size` ограничивает загрузки, `proxy_read_timeout` — долгие запросы. TLS-сертификаты обновляют автоматически (certbot). WebSocket требуют `Upgrade`/`Connection` заголовков. Nginx также может делать rate limiting и базовую авторизацию, но бизнес-логику оставляют приложению.",
+      "kg": "Nginx 80/443тө туруп, TLSди бүтүрүп, сурамдарды `proxy_pass http://backend;` аркылуу `127.0.0.1:8000`ге проксилейт. Ал `Host`, `X-Real-IP`, `X-Forwarded-For`, `X-Forwarded-Proto` кошот, FastAPI чыныгы кардарды жана схеманы билиши үчүн; бул заголовокторго белгилүү проксиден гана ишенүүгө болот. Статиканы (`/static/`) Python аркылуу эмес, `root`/`alias` менен түз берет. `upstream` жүктү бир нече инстанска бөлөт, `client_max_body_size` жүктөөлөрдү, `proxy_read_timeout` узак сурамдарды чектейт. TLS сертификаттары автоматтык жаңыртылат (certbot). WebSocket `Upgrade`/`Connection` заголовокторун талап кылат. Nginx rate limiting жана базалык авторизация жасай алат, бирок бизнес-логика тиркемеде калат."
+    },
+    "explanation": {
+      "ru": "Nginx — граница между интернетом и приложением. Он отвечает за TLS, статику, лимиты и передачу реальных заголовков.",
+      "kg": "Nginx — интернет менен тиркеменин ортосундагы чек ара. Ал TLS, статика, лимиттер жана чыныгы заголовокторду берүү үчүн жооптуу."
+    },
+    "walkthrough": [
+      { "ru": "1. Настрой server block и `proxy_pass`.", "kg": "1. Server block жана `proxy_pass` жөндө." },
+      { "ru": "2. Передай `X-Forwarded-*` и настрой TLS.", "kg": "2. `X-Forwarded-*` бер жана TLS жөндө." },
+      { "ru": "3. Вынеси статику и проверь лимиты/таймауты.", "kg": "3. Статиканы чыгарып, лимиттер/таймауттарды текшер." }
+    ],
+    "pitfalls": {
+      "ru": "Не отдавай статику через Django/FastAPI без необходимости. Не доверяй `X-Forwarded-For` от любого клиента. Не забывай про WebSocket-заголовки.",
+      "kg": "Статиканы зарылдыксыз Django/FastAPI аркылуу бербе. Каалаган кардардан келген `X-Forwarded-For`га ишенбе. WebSocket заголовокторун унутпа."
+    },
+    "exam_tip": {
+      "ru": "Скажи: «Nginx = TLS + static + proxy headers + limits; app = бизнес-логика».",
+      "kg": "Айт: «Nginx = TLS + static + proxy headers + limits; app = бизнес-логика»."
+    }
+  },
+  {
+    "slug": "aws-basics",
+    "type": "theory",
+    "module": "devops-security",
+    "title": { "ru": "AWS: EC2, S3, IAM и безопасный деплой", "kg": "AWS: EC2, S3, IAM жана коопсуз деплой" },
+    "prompt": {
+      "ru": "Какие базовые AWS-сервисы нужны для backend-приложения? Объясни EC2, S3, IAM, security groups, секреты и least privilege.",
+      "kg": "Backend тиркеме үчүн кайсы базалык AWS сервистери керек? EC2, S3, IAM, security groups, сырлар жана least privilege түшүндүр."
+    },
+    "difficulty": 3,
+    "points": 10,
+    "hints": [
+      { "ru": "EC2 — виртуальный сервер, S3 — объектное хранилище, IAM — права.", "kg": "EC2 — виртуалдык сервер, S3 — объекттик сактоо, IAM — укуктар." },
+      { "ru": "Security group — сетевой firewall на уровне инстанса.", "kg": "Security group — инстанс деңгээлиндеги тармактык firewall." },
+      { "ru": "Приложению нужны минимальные IAM-права, а не root-ключ.", "kg": "Тиркемеге root ачкыч эмес, минималдуу IAM укуктары керек." }
+    ],
+    "subquestions": [
+      { "ru": "Почему нельзя хранить AWS access key в коде?", "kg": "Эмне үчүн AWS access key коддо сактоого болбойт?" },
+      { "ru": "Чем security group отличается от NACL?", "kg": "Security group NACLден эмнеси менен айырмаланат?" },
+      { "ru": "Когда S3 лучше локального диска?", "kg": "S3 локалдык дисктен качан жакшы?" }
+    ],
+    "model_answer": {
+      "ru": "EC2 — виртуальная машина, на которой запускают Docker/uvicorn/nginx; S3 — объектное хранилище для файлов и бэкапов; IAM — пользователи, роли и политики. Security group разрешает только нужные порты (443, SSH с доверенного IP) и работает как stateful firewall. Приложение получает временные креды через IAM role, а не хранит долгоживущий ключ. Секреты — в SSM Parameter Store/Secrets Manager, переменные окружения — в systemd/ECS task definition. S3-бакет делают приватным, доступ выдают через presigned URL или CloudFront. Для production нужны бэкапы, мониторинг, патчи и минимальные права; root-аккаунт защищают MFA.",
+      "kg": "EC2 — Docker/uvicorn/nginx иштетилүүчү виртуалдык машина; S3 — файлдар жана бэкаптар үчүн объекттик сактоо; IAM — колдонуучулар, ролдор жана саясаттар. Security group керектүү портторду гана (443, ишенимдүү IPден SSH) ачат жана stateful firewall катары иштейт. Тиркеме узак жашаган ачкычты сактабай, IAM role аркылуу убактылуу креденциалдарды алат. Сырлар SSM Parameter Store/Secrets Managerде, айлана-чөйрө өзгөрмөлөрү systemd/ECS task definitionдо. S3 бакети приватдуу, жетүү presigned URL же CloudFront аркылуу. Production үчүн бэкап, мониторинг, патч жана минималдуу укуктар керек; root аккаунт MFA менен корголот."
+    },
+    "explanation": {
+      "ru": "AWS — это не только сервер, а набор границ безопасности. Ошибка в IAM или S3 часто опаснее ошибки в коде.",
+      "kg": "AWS — сервер гана эмес, коопсуздук чек араларынын жыйындысы. IAM же S3 катасы коддогу катадан көп учурда коркунучтуу."
+    },
+    "walkthrough": [
+      { "ru": "1. Раздели compute, storage и права.", "kg": "1. Compute, storage жана укуктарды бөл." },
+      { "ru": "2. Закрой security group и выдай IAM role.", "kg": "2. Security groupду жаап, IAM role бер." },
+      { "ru": "3. Вынеси секреты и настрой бэкап/мониторинг.", "kg": "3. Сырларды чыгарып, бэкап/мониторинг жөндө." }
+    ],
+    "pitfalls": {
+      "ru": "Не открывай SSH на `0.0.0.0/0`. Не делай S3 bucket публичным. Не используй root-ключа для приложения.",
+      "kg": "SSHди `0.0.0.0/0`го ачпа. S3 бакетин коомдук кылба. Тиркеме үчүн root ачкычын колдонбо."
+    },
+    "exam_tip": {
+      "ru": "Скажи: «EC2 — compute, S3 — objects, IAM — least privilege, SG — ports».",
+      "kg": "Айт: «EC2 — compute, S3 — objects, IAM — least privilege, SG — ports»."
+    }
+  },
+  {
+    "slug": "pythonanywhere-deploy",
+    "type": "theory",
+    "module": "devops-security",
+    "title": { "ru": "PythonAnywhere: деплой WSGI-приложения", "kg": "PythonAnywhere: WSGI тиркемесин деплой кылуу" },
+    "prompt": {
+      "ru": "Как развернуть Django/FastAPI на PythonAnywhere? Объясни WSGI, virtualenv, static files, переменные окружения и ограничения платформы.",
+      "kg": "PythonAnywhereде Django/FastAPI кантип жайгаштырылат? WSGI, virtualenv, static files, айлана-чөйрө өзгөрмөлөрү жана платформанын чектөөлөрүн түшүндүр."
+    },
+    "difficulty": 2,
+    "points": 10,
+    "hints": [
+      { "ru": "PythonAnywhere запускает приложение через WSGI-файл.", "kg": "PythonAnywhere тиркемени WSGI файлы аркылуу иштетет." },
+      { "ru": "Зависимости ставят в virtualenv, указанный в Web-вкладке.", "kg": "Көз карандылыктар Web-вкладкада көрсөтүлгөн virtualenvке орнотулат." },
+      { "ru": "Статику настраивают отдельно через Static files mapping.", "kg": "Статика Static files mapping аркылуу өзүнчө жөндөлөт." }
+    ],
+    "subquestions": [
+      { "ru": "Почему FastAPI на PythonAnywhere требует ASGI-адаптер?", "kg": "Эмне үчүн PythonAnywhereде FastAPI ASGI адаптерди талап кылат?" },
+      { "ru": "Где хранить секреты на платформе?", "kg": "Платформада сырларды кайда сактоо керек?" },
+      { "ru": "Какие ограничения важны для production?", "kg": "Production үчүн кайсы чектөөлөр маанилүү?" }
+    ],
+    "model_answer": {
+      "ru": "PythonAnywhere — managed-хостинг с Web-вкладкой, где указывают исходники, virtualenv и WSGI-файл. Для Django WSGI-файл импортирует `application`; для FastAPI нужен ASGI-адаптер (например, `a2wsgi`) или WSGI-совместимая обёртка, потому что платформа исторически WSGI. Зависимости ставят в virtualenv командой `pip install --user` или через консоль платформы. Статику отдают через Static files mapping, а не через Python. Секреты хранят в переменных окружения или `.env` вне репозитория. Ограничения: нет Docker, ограниченные исходящие соединения/CPU, меньше контроля над версиями и фоновыми задачами; для тяжёлого production лучше VPS/контейнеры.",
+      "kg": "PythonAnywhere — Web-вкладкасында булактар, virtualenv жана WSGI файлы көрсөтүлгөн managed хостинг. Django үчүн WSGI файлы `application` импорттойт; FastAPI үчүн ASGI адаптер (мисалы, `a2wsgi`) же WSGIге шайкеш каптама керек, анткени платформа тарыхый WSGI. Көз карандылыктар virtualenvке `pip install --user` же платформа консолу аркылуу орнотулат. Статика Static files mapping аркылуу, Python аркылуу эмес берилет. Сырлар айлана-чөйрө өзгөрмөлөрүндө же репозиторийден тышкаркы `.env`да. Чектөөлөр: Docker жок, чектелген чыгуучу байланыш/CPU, версиялар жана фондук тапшырмалар аз көзөмөлдөнөт; оор production үчүн VPS/контейнер жакшы."
+    },
+    "explanation": {
+      "ru": "Managed-хостинг упрощает деплой, но навязывает WSGI и ограничивает инфраструктуру. Это компромисс между простотой и контролем.",
+      "kg": "Managed хостинг деплойду жеңилдетет, бирок WSGIди таңуулап, инфраструктураны чектейт. Бул жөнөкөйлүк менен көзөмөлдүн ортосундагы компромисс."
+    },
+    "walkthrough": [
+      { "ru": "1. Создай virtualenv и установи зависимости.", "kg": "1. Virtualenv түзүп, көз карандылыктарды орнот." },
+      { "ru": "2. Настрой WSGI/ASGI-файл и пути.", "kg": "2. WSGI/ASGI файлын жана жолдорду жөндө." },
+      { "ru": "3. Подключи static mapping, env и проверь логи.", "kg": "3. Static mapping, env туташтырып, логдорду текшер." }
+    ],
+    "pitfalls": {
+      "ru": "Не рассчитывай на Docker. Не отдавай статику через Python. Не коммить `.env`.",
+      "kg": "Dockerге таянба. Статиканы Python аркылуу бербе. `.env`ду commit кылба."
+    },
+    "exam_tip": {
+      "ru": "Скажи: «PythonAnywhere = WSGI + virtualenv + static mapping + ограничения».",
+      "kg": "Айт: «PythonAnywhere = WSGI + virtualenv + static mapping + чектөөлөр»."
+    }
+  }
+]

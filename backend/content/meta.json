@@ -1,0 +1,39 @@
+{
+  "title": {
+    "ru": "Красный диплом",
+    "kg": "Кызыл диплом"
+  },
+  "subtitle": {
+    "ru": "Экзамен-кокпит по backend и AI. Учись, решай, проверяй себя.",
+    "kg": "Backend жана AI боюнча экзамен-кокпит. Үйрөн, чеч, өзүңдү текшер."
+  },
+  "exam_date": "2026-12-01",
+  "red_threshold": 80,
+  "blue_threshold": 70,
+  "stages": [
+    {
+      "stage": 1,
+      "label": {
+        "ru": "Python core",
+        "kg": "Python негиздери"
+      },
+      "points": 20
+    },
+    {
+      "stage": 2,
+      "label": {
+        "ru": "SQL + Git + задачи",
+        "kg": "SQL + Git + тапшырмалар"
+      },
+      "points": 30
+    },
+    {
+      "stage": 3,
+      "label": {
+        "ru": "Backend + AI + код",
+        "kg": "Backend + AI + код"
+      },
+      "points": 50
+    }
+  ]
+}

@@ -1,0 +1,1055 @@
+[
+  {
+    "slug": "python-core",
+    "order": 1,
+    "track": "python",
+    "icon": "code",
+    "accent": "#8B5CF6",
+    "title": {
+      "ru": "Python: база без воды",
+      "kg": "Python: негиздер"
+    },
+    "subtitle": {
+      "ru": "Типы, коллекции, циклы — первый блок экзамена.",
+      "kg": "Типтер, коллекциялар, циклдер — экзамендин биринчи блогу."
+    },
+    "estimated_minutes": 90,
+    "task_slugs": [
+      "sum-even",
+      "dedupe-list",
+      "count-digits",
+      "fizzbuzz",
+      "py-mutable-immutable",
+      "py-comprehensions",
+      "py-exceptions",
+      "py-def-parameters",
+      "count-vowels",
+      "sum-positive"
+    ],
+    "lessons": [
+      {
+        "slug": "python-core-lesson",
+        "title": {
+          "ru": "Переменные, коллекции, циклы",
+          "kg": "Өзгөрмөлөр, коллекциялар, циклдер"
+        },
+        "summary": {
+          "ru": "Изменяемость, list/tuple/set/dict, range, enumerate, break/continue.",
+          "kg": "Өзгөрүүчүлүк, list/tuple/set/dict, range, enumerate, break/continue."
+        },
+        "minutes": 25,
+        "task_slugs": [
+          "sum-even",
+          "dedupe-list",
+          "count-digits",
+          "fizzbuzz",
+          "py-mutable-immutable",
+          "py-comprehensions",
+          "py-exceptions",
+          "py-def-parameters",
+          "count-vowels",
+          "sum-positive"
+        ],
+        "content": {
+          "ru": [
+            "## Что нужно понять\nPython держится на типах и коллекциях. На экзамене проверяют, что изменяемо, что вернёт `range`, чем `list` отличается от `tuple` и `set`.",
+            "## Коллекции\n- `list` — порядок, индексы, изменяемый.\n- `tuple` — порядок, неизменяемый.\n- `set` — уникальные элементы, без порядка.\n- `dict` — ключ → значение.\n\n```python\nnums = [1, 2, 3]\nnums.append(4)\n```",
+            "## Циклы\n`range(2, 10, 3)` → `2, 5, 8`. `enumerate` даёт индекс и значение. `break` выходит из цикла, `continue` идёт к следующей итерации.",
+            "## Что спросят\n1. Чем `list` отличается от `tuple`?\n2. Что вернёт `len({1, 1, 2})`?\n3. Что вернёт функция без `return`?\n4. Что такое `None`?"
+          ],
+          "kg": [
+            "## Эмнени түшүнүү керек\nPython типтер жана коллекцияларга таянат. Экзаменде эмне өзгөрүүчү, `range` эмне кайтарары, `list` `tuple` жана `set`тен эмнеси менен айырмаланары текшерилет.",
+            "## Коллекциялар\n- `list` — тартип, индекстер, өзгөрүүчү.\n- `tuple` — тартип, өзгөрбөөчү.\n- `set` — уникалдуу элементтер, тартипсиз.\n- `dict` — ключ → маани.",
+            "## Циклдер\n`range(2, 10, 3)` → `2, 5, 8`. `enumerate` индекс жана маани берет. `break` циклден чыгат, `continue` кийинки итерацияга өтөт.",
+            "## Эмне сурашат\n1. `list` жана `tuple` айырмасы?\n2. `len({1, 1, 2})` канча?\n3. `return` жок функция эмне кайтарат?"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "slug": "python-functions",
+    "order": 2,
+    "track": "python",
+    "icon": "function",
+    "accent": "#22D3EE",
+    "title": {
+      "ru": "Функции и алгоритмы",
+      "kg": "Функциялар жана алгоритмдер"
+    },
+    "subtitle": {
+      "ru": "def, lambda, args/kwargs и задачи, похожие на экзаменационные.",
+      "kg": "def, lambda, args/kwargs жана экзаменге окшош тапшырмалар."
+    },
+    "estimated_minutes": 190,
+    "task_slugs": [
+      "def-add",
+      "def-greet",
+      "def-rect-area",
+      "def-count-positive",
+      "def-find-max",
+      "def-binary-search",
+      "def-recursive-sum",
+      "def-memo-fib",
+      "second-largest",
+      "group-by-length",
+      "merge-stock",
+      "sort-products",
+      "first-unique-char",
+      "move-zeros",
+      "py-mutable-default",
+      "py-args-kwargs",
+      "py-recursion",
+      "flatten-once",
+      "safe-divide",
+      "apply-discount",
+      "word-frequency",
+      "is-palindrome",
+      "chunk-list",
+      "normalize-scores",
+      "find-missing"
+    ],
+    "lessons": [
+      {
+        "slug": "def-functions-from-zero",
+        "title": {
+          "ru": "def-функции: от первой функции до бинарного поиска",
+          "kg": "def-функциялар: биринчи функциядан бинардык издөөгө чейин"
+        },
+        "summary": {
+          "ru": "Контракт функции, параметры, return, область видимости, рекурсия, бинарный поиск и мемоизация — в стиле Grokking Algorithms.",
+          "kg": "Функция контракты, параметрлер, return, көрүнүү аймагы, рекурсия, бинардык издөө жана мемоизация — Grokking Algorithms стилинде."
+        },
+        "minutes": 60,
+        "task_slugs": [
+          "def-add",
+          "def-greet",
+          "def-rect-area",
+          "def-count-positive",
+          "def-find-max",
+          "def-binary-search",
+          "def-recursive-sum",
+          "def-memo-fib"
+        ],
+        "content": {
+          "ru": [
+            "## Зачем нужна функция\nФункция — это маленькая машина: положил аргументы, получил результат. Она прячет детали, даёт имя повторяющемуся действию и позволяет тестировать код по частям.",
+            "## Синтаксис\n```python\ndef add(a, b):\n    return a + b\n\nprint(add(2, 3))  # 5\n```\n`def` создаёт функцию, `return` отдаёт результат. Без `return` функция вернёт `None`.",
+            "## Параметры\n- Позиционные: `greet('Айбек')`.\n- Именованные: `greet(name='Айбек', greeting='Салам')`.\n- По умолчанию: `def greet(name, greeting='Привет')`.\n- `*args` — tuple лишних позиционных, `**kwargs` — dict лишних именованных.",
+            "## Область видимости\nПеременная внутри функции живёт только внутри. Если нужно изменить внешнее состояние — верни новое значение и присвой его снаружи. Изменяемые значения по умолчанию (списки, словари) — частая ловушка.",
+            "## Алгоритм: бинарный поиск\nGrokking Algorithms начинает с простого: список отсортирован, мы делим его пополам и отбрасываем половину.\n```python\ndef binary_search(items, target):\n    low, high = 0, len(items) - 1\n    while low <= high:\n        mid = (low + high) // 2\n        if items[mid] == target:\n            return mid\n        if items[mid] < target:\n            low = mid + 1\n        else:\n            high = mid - 1\n    return -1\n```\nСложность — O(log n).",
+            "## Рекурсия\nРекурсивная функция вызывает себя на меньшей задаче. Обязательны два элемента: базовый случай и шаг к нему.\n```python\ndef recursive_sum(numbers):\n    if not numbers:\n        return 0\n    return numbers[0] + recursive_sum(numbers[1:])\n```",
+            "## Мемоизация\nЕсли функция много раз считает одно и то же, сохраняй результаты в словаре. Наивный `fib(35)` делает миллионы вызовов, а с кэшем — около 35.",
+            "## Как решать задачи\n1. Сформулируй контракт: имя, вход, выход.\n2. Запиши 2–3 примера.\n3. Обработай крайние случаи: пустой список, ноль, отрицательные числа.\n4. Напиши простую версию.\n5. Прогони тесты и только потом оптимизируй.",
+            "## Мини-проверка\n- Чем `return` отличается от `print`?\n- Почему `best = numbers[0]`, а не `best = 0`?\n- Что произойдёт без базового случая?\n- Почему бинарный поиск требует отсортированный список?\n- Зачем нужна мемоизация?"
+          ],
+          "kg": [
+            "## Функция эмне үчүн керек\nФункция — кичине машина: аргументтерди салып, жыйынтык аласың. Ал деталдарды жашырат, кайталанган аракетке ат берет жана кодду бөлүп тесттөөгө мүмкүнчүлүк берет.",
+            "## Синтаксис\n```python\ndef add(a, b):\n    return a + b\n\nprint(add(2, 3))  # 5\n```\n`def` функция түзөт, `return` жыйынтыкты берет. `return` жок болсо функция `None` кайтарат.",
+            "## Параметрлер\n- Позициялык: `greet('Айбек')`.\n- Аталган: `greet(name='Айбек', greeting='Салам')`.\n- Демейки: `def greet(name, greeting='Привет')`.\n- `*args` — ашыкча позициялык tuple, `**kwargs` — ашыкча аталган dict.",
+            "## Көрүнүү аймагы\nФункция ичиндеги өзгөрмө функция ичинде гана жашайт. Сырткы абалды өзгөртүү керек болсо — жаңы маани кайтарып, сыртта дайында. Демейки өзгөрүүчү маанилер (тизме, сөздүк) — кеңири таралган ката.",
+            "## Алгоритм: бинардык издөө\nGrokking Algorithms жөнөкөй баштайт: тизме сорттолгон, биз аны экиге бөлүп, жарымын ыргытабыз.\n```python\ndef binary_search(items, target):\n    low, high = 0, len(items) - 1\n    while low <= high:\n        mid = (low + high) // 2\n        if items[mid] == target:\n            return mid\n        if items[mid] < target:\n            low = mid + 1\n        else:\n            high = mid - 1\n    return -1\n```\nТатаалдык — O(log n).",
+            "## Рекурсия\nРекурсивдүү функция өзүн кичине тапшырмада чакырат. Эки нерсе милдеттүү: базалык учур жана ага карай кадам.\n```python\ndef recursive_sum(numbers):\n    if not numbers:\n        return 0\n    return numbers[0] + recursive_sum(numbers[1:])\n```",
+            "## Мемоизация\nФункция бир эле нерсени көп эсептесе, жыйынтыктарды сөздүккө сакта. Жөнөкөй `fib(35)` миллиондогон чакыруу жасайт, кэш менен — болжол менен 35.",
+            "## Тапшырмаларды кантип чечүү керек\n1. Контрактты түз: ат, кирүү, чыгуу.\n2. 2–3 мисал жаз.\n3. Четки учурларды иштеп чык: бош тизме, нөл, терс сандар.\n4. Жөнөкөй версия жаз.\n5. Тесттерден өткөр, анан гана оптимизацияла.",
+            "## Мини-текшерүү\n- `return` менен `print` кандай айырмаланат?\n- Эмне үчүн `best = numbers[0]`, `best = 0` эмес?\n- Базалык учур болбосо эмне болот?\n- Эмне үчүн бинардык издөө сорттолгон тизме талап кылат?\n- Мемоизация эмне үчүн керек?"
+          ]
+        }
+      },
+      {
+        "slug": "functions-lesson",
+        "title": {
+          "ru": "Функции, аргументы, алгоритмы",
+          "kg": "Функциялар, аргументтер, алгоритмдер"
+        },
+        "summary": {
+          "ru": "Возврат, область видимости, lambda, сортировка и фильтрация словарей.",
+          "kg": "Return, scope, lambda, сорттоо жана фильтрлөө."
+        },
+        "minutes": 35,
+        "task_slugs": [
+          "second-largest",
+          "group-by-length",
+          "merge-stock",
+          "sort-products",
+          "first-unique-char",
+          "move-zeros",
+          "py-mutable-default",
+          "py-args-kwargs",
+          "py-recursion",
+          "flatten-once",
+          "safe-divide",
+          "apply-discount",
+          "word-frequency",
+          "is-palindrome",
+          "chunk-list",
+          "normalize-scores",
+          "find-missing"
+        ],
+        "content": {
+          "ru": [
+            "## Функция — это контракт\n`def name(args):` создаёт функцию. `return` отдаёт результат и завершает функцию. Если `return` нет, вернётся `None`.",
+            "## Аргументы\n- `*args` — позиционные аргументы, внутри `tuple`.\n- `**kwargs` — именованные аргументы, внутри `dict`.\n- Не ставь изменяемый объект в default без необходимости.",
+            "## Lambda\n`lambda x: x * 2` — короткая функция. Хороша для `sorted(key=...)`, но не для сложной логики.",
+            "## Что спросят\n1. Чем `def` отличается от `lambda`?\n2. Что вернёт функция без `return`?\n3. Что лежит в `args` и `kwargs`?\n4. Как работает `key` в `sorted`?"
+          ],
+          "kg": [
+            "## Функция — контракт\n`def name(args):` функция түзөт. `return` натыйжаны кайтарып, функцияны бүтүрөт. `return` жок болсо `None` кайтат.",
+            "## Аргументтер\n- `*args` — позициялык аргументтер, ичинде `tuple`.\n- `**kwargs` — аталышы бар аргументтер, ичинде `dict`.",
+            "## Lambda\n`lambda x: x * 2` — кыска функция. `sorted(key=...)` үчүн ыңгайлуу.",
+            "## Эмне сурашат\n1. `def` жана `lambda` айырмасы?\n2. `return` жок функция эмне кайтарат?\n3. `sorted` ичиндеги `key` кантип иштейт?"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "slug": "sql-databases",
+    "order": 3,
+    "track": "backend",
+    "icon": "database",
+    "accent": "#34D399",
+    "title": {
+      "ru": "SQL и базы данных",
+      "kg": "SQL жана маалымат базалары"
+    },
+    "subtitle": {
+      "ru": "15 команд, JOIN, GROUP BY, DELETE/TRUNCATE/DROP и ORM.",
+      "kg": "15 команда, JOIN, GROUP BY, DELETE/TRUNCATE/DROP жана ORM."
+    },
+    "estimated_minutes": 80,
+    "task_slugs": [
+      "sql-select",
+      "sql-join",
+      "sql-delete",
+      "sql-indexes",
+      "sql-transactions",
+      "sql-normalization"
+    ],
+    "lessons": [
+      {
+        "slug": "sql-lesson",
+        "title": {
+          "ru": "SELECT, JOIN, удаление и ORM",
+          "kg": "SELECT, JOIN, өчүрүү жана ORM"
+        },
+        "summary": {
+          "ru": "Порядок выполнения запроса, типы JOIN, удаление и слой ORM.",
+          "kg": "Сурамдын тартиби, JOIN түрлөрү, өчүрүү жана ORM."
+        },
+        "minutes": 30,
+        "task_slugs": [
+          "sql-select",
+          "sql-join",
+          "sql-delete",
+          "sql-indexes",
+          "sql-transactions",
+          "sql-normalization"
+        ],
+        "content": {
+          "ru": [
+            "## 15 команд\n`SELECT`, `FROM`, `WHERE`, `ORDER BY`, `LIMIT`, `OFFSET`, `JOIN`, `GROUP BY`, `HAVING`, `INSERT`, `UPDATE`, `DELETE`, `CREATE TABLE`, `ALTER TABLE`, `DROP TABLE`.",
+            "## Порядок выполнения\n`FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY → LIMIT`. `WHERE` фильтрует строки, `HAVING` — группы.",
+            "## JOIN\n`INNER JOIN` — только совпадения. `LEFT JOIN` — все строки слева + совпадения справа. `RIGHT JOIN` — наоборот. `FULL JOIN` — все строки.",
+            "## Удаление\n- `DELETE` — строки, таблица остаётся.\n- `TRUNCATE` — быстро очищает таблицу.\n- `DROP` — удаляет таблицу целиком.",
+            "## ORM\nORM превращает таблицы в Python-объекты. Django ORM: `Student.objects.filter(score__gte=80)`. Плюс — меньше SQL, минус — сложные запросы и N+1."
+          ],
+          "kg": [
+            "## 15 команда\n`SELECT`, `FROM`, `WHERE`, `ORDER BY`, `LIMIT`, `OFFSET`, `JOIN`, `GROUP BY`, `HAVING`, `INSERT`, `UPDATE`, `DELETE`, `CREATE TABLE`, `ALTER TABLE`, `DROP TABLE`.",
+            "## Аткарылуу тартиби\n`FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY → LIMIT`. `WHERE` саптарды, `HAVING` топторду фильтрлейт.",
+            "## JOIN\n`INNER JOIN` — дал келүүлөр гана. `LEFT JOIN` — сол таблицанын баары + оң жактагы дал келүүлөр. `RIGHT JOIN` — тескерисинче. `FULL JOIN` — баары.",
+            "## Өчүрүү\n- `DELETE` — саптар, таблица калат.\n- `TRUNCATE` — таблицаны тез тазалайт.\n- `DROP` — таблицаны толук өчүрөт.",
+            "## ORM\nORM таблицаларды Python объектилерине айландырат. Django ORM: `Student.objects.filter(score__gte=80)`. Плюс — аз SQL, минус — татаал сурамдар жана N+1."
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "slug": "linux-git",
+    "order": 4,
+    "track": "tools",
+    "icon": "terminal",
+    "accent": "#FBBF24",
+    "title": {
+      "ru": "Linux и Git",
+      "kg": "Linux жана Git"
+    },
+    "subtitle": {
+      "ru": "Команды терминала и путь от clone до push.",
+      "kg": "Терминал командалары жана clone'дон push'ко чейин."
+    },
+    "estimated_minutes": 50,
+    "task_slugs": [
+      "linux-commands",
+      "git-flow",
+      "linux-permissions",
+      "linux-processes",
+      "git-undo"
+    ],
+    "lessons": [
+      {
+        "slug": "linux-git-lesson",
+        "title": {
+          "ru": "Терминал и Git-поток",
+          "kg": "Терминал жана Git агымы"
+        },
+        "summary": {
+          "ru": "15 Linux-команд, 15 Git-команд, pull vs fetch, merge conflict.",
+          "kg": "15 Linux командасы, 15 Git командасы, pull vs fetch."
+        },
+        "minutes": 20,
+        "task_slugs": [
+          "linux-commands",
+          "git-flow",
+          "linux-permissions",
+          "linux-processes",
+          "git-undo"
+        ],
+        "content": {
+          "ru": [
+            "## Linux\n15 команд: `ls`, `cd`, `pwd`, `mkdir`, `touch`, `cp`, `mv`, `rm`, `cat`, `grep`, `find`, `chmod`, `ps`, `kill`, `df`.\n`chmod +x file` добавляет право выполнения, `grep -r 'text' .` ищет рекурсивно.",
+            "## Git\n`git init`, `clone`, `status`, `add`, `commit`, `log`, `diff`, `branch`, `checkout`, `switch`, `merge`, `pull`, `push`, `remote`, `reset`.\n`pull` = `fetch` + `merge`. `commit` фиксирует снимок, `push` отправляет в remote.",
+            "## Что спросят\n1. Чем `pull` отличается от `fetch`?\n2. Что делает `chmod +x`?\n3. Что такое merge conflict?"
+          ],
+          "kg": [
+            "## Linux\n15 команда: `ls`, `cd`, `pwd`, `mkdir`, `touch`, `cp`, `mv`, `rm`, `cat`, `grep`, `find`, `chmod`, `ps`, `kill`, `df`.\n`chmod +x file` аткаруу укугун кошот, `grep -r 'text' .` рекурсивдүү издейт.",
+            "## Git\n`git init`, `clone`, `status`, `add`, `commit`, `log`, `diff`, `branch`, `checkout`, `switch`, `merge`, `pull`, `push`, `remote`, `reset`.\n`pull` = `fetch` + `merge`. `commit` сүрөттү жазат, `push` remote'ко жөнөтөт.",
+            "## Эмне сурашат\n1. `pull` жана `fetch` айырмасы?\n2. `chmod +x` эмне кылат?\n3. Merge conflict деген эмне?"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "slug": "backend-api",
+    "order": 5,
+    "track": "backend",
+    "icon": "server",
+    "accent": "#60A5FA",
+    "title": {
+      "ru": "Backend и API",
+      "kg": "Backend жана API"
+    },
+    "subtitle": {
+      "ru": "HTTP, DRF, JWT и Docker — ответы, за которые дают баллы.",
+      "kg": "HTTP, DRF, JWT жана Docker — балл алына турган жооптор."
+    },
+    "estimated_minutes": 90,
+    "task_slugs": [
+      "http-status",
+      "drf-views",
+      "jwt-auth",
+      "rest-api",
+      "drf-serializers",
+      "docker-commands",
+      "backend-deploy",
+      "jwt-structure"
+    ],
+    "lessons": [
+      {
+        "slug": "backend-lesson",
+        "title": {
+          "ru": "HTTP, DRF, JWT",
+          "kg": "HTTP, DRF, JWT"
+        },
+        "summary": {
+          "ru": "Методы и статусы, APIView/Generic/ViewSet, токены и пароли.",
+          "kg": "Методдор жана статустар, APIView/Generic/ViewSet, токендер."
+        },
+        "minutes": 30,
+        "task_slugs": [
+          "http-status",
+          "drf-views",
+          "jwt-auth",
+          "rest-api",
+          "drf-serializers",
+          "docker-commands",
+          "backend-deploy",
+          "jwt-structure"
+        ],
+        "content": {
+          "ru": [
+            "## HTTP\nМетоды: `GET`, `POST`, `PUT`, `PATCH`, `DELETE`. Статусы: `200`, `201`, `204`, `400`, `401`, `403`, `404`, `500`.\nHTTPS — HTTP внутри TLS.",
+            "## DRF\n`APIView` — ручная логика. `GenericAPIView` — готовые CRUD-миксины и `get_queryset`. `ViewSet` + `Router` — CRUD-набор и автогенерация URL.\n`related_name` — имя обратной связи. Пагинация, CORS и Swagger — стандартные настройки.",
+            "## JWT\nТокен из header/payload/signature. Сервер не хранит сессию, а проверяет подпись. Access короткий, refresh длинный. Пароли хэшируют (bcrypt/argon2), а не шифруют.",
+            "## Docker\n`Dockerfile` описывает образ, контейнер — запущенный образ. `docker-compose` поднимает backend, db и redis одной командой."
+          ],
+          "kg": [
+            "## HTTP\nМетоддор: `GET`, `POST`, `PUT`, `PATCH`, `DELETE`. Статустар: `200`, `201`, `204`, `400`, `401`, `403`, `404`, `500`.\nHTTPS — TLS ичиндеги HTTP.",
+            "## DRF\n`APIView` — кол менен логика. `GenericAPIView` — даяр CRUD-миксиндер жана `get_queryset`. `ViewSet` + `Router` — CRUD жана URL автоматтык.\n`related_name` — кайтарма байланыштын аты.",
+            "## JWT\nheader/payload/signature бар токен. Сервер сессия сактабайт, кол тамганы текшерет. Access кыска, refresh узун. Паролдор хэштелет.",
+            "## Docker\n`Dockerfile` образды сүрөттөйт, контейнер — иштеп жаткан образ. `docker-compose` backend, db, redis көтөрөт."
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "slug": "data-ml",
+    "order": 6,
+    "track": "ai",
+    "icon": "chart",
+    "accent": "#F472B6",
+    "title": {
+      "ru": "ML и данные",
+      "kg": "ML жана маалымат"
+    },
+    "subtitle": {
+      "ru": "Pandas, train/test, переобучение и метрики.",
+      "kg": "Pandas, train/test, переобучение жана метрикалар."
+    },
+    "estimated_minutes": 140,
+    "task_slugs": [
+      "pandas-drills",
+      "ml-metrics",
+      "ml-hyperparameters",
+      "ml-overfitting",
+      "numpy-arrays",
+      "pandas-advanced",
+      "matplotlib-seaborn",
+      "sklearn-preprocessing",
+      "sklearn-regression",
+      "ml-evaluation",
+      "ml-train-val-split",
+      "ml-accuracy",
+      "ml-minmax",
+      "ml-training-pipeline",
+      "ml-model-compression"
+    ],
+    "lessons": [
+      {
+        "slug": "ml-lesson",
+        "title": {
+          "ru": "Pandas и базовый ML",
+          "kg": "Pandas жана негизги ML"
+        },
+        "summary": {
+          "ru": "15 методов pandas, X/y, train_test_split, accuracy/precision/recall.",
+          "kg": "15 pandas методу, X/y, train_test_split, метрикалар."
+        },
+        "minutes": 30,
+        "task_slugs": [
+          "pandas-drills",
+          "ml-metrics",
+          "ml-hyperparameters",
+          "ml-overfitting",
+          "numpy-arrays",
+          "pandas-advanced",
+          "matplotlib-seaborn",
+          "sklearn-preprocessing",
+          "sklearn-regression",
+          "ml-evaluation"
+        ],
+        "content": {
+          "ru": [
+            "## Pandas\n`read_csv`, `head`, `info`, `describe`, `isna`, `fillna`, `dropna`, `groupby`, `merge`, `sort_values`, `value_counts`, `apply`, `loc`, `iloc`, `to_csv`.\n`loc` — по меткам, `iloc` — по позициям.",
+            "## ML\n`X` — признаки, `y` — цель. `train_test_split` делит данные. Линейная регрессия предсказывает число, логистическая — класс.\nПереобучение: модель запомнила train. Недообучение: модель слишком простая.",
+            "## Метрики\nРегрессия: MAE, MSE, RMSE, R². Классификация: accuracy, precision, recall, F1, confusion matrix. При дисбалансе accuracy обманывает.",
+            "## NumPy и sklearn\n`ndarray`: `shape`, `dtype`, broadcasting, `axis=0/1`. `Pipeline` и `ColumnTransformer` соединяют scaler, encoder и модель; `fit` только на train, иначе leakage. Регрессия: MAE/MSE/RMSE/R²; классификация: precision/recall/F1, ROC-AUC и confusion matrix."
+          ],
+          "kg": [
+            "## Pandas\n`read_csv`, `head`, `info`, `describe`, `isna`, `fillna`, `dropna`, `groupby`, `merge`, `sort_values`, `value_counts`, `apply`, `loc`, `iloc`, `to_csv`.\n`loc` — белгилер боюнча, `iloc` — позиция боюнча.",
+            "## ML\n`X` — белгилер, `y` — максат. `train_test_split` маалыматты бөлөт. Сызыктуу регрессия санды, логистикалык — классты болжолдойт.\nПереобучение: модель trainди жаттады. Недообучение: модель өтө жөнөкөй.",
+            "## Метрикалар\nРегрессия: MAE, MSE, RMSE, R². Классификация: accuracy, precision, recall, F1, confusion matrix. Баланс эмес болсо accuracy алдайт.",
+            "## NumPy жана sklearn\n`ndarray`: `shape`, `dtype`, broadcasting, `axis=0/1`. `Pipeline` жана `ColumnTransformer` scaler, encoder жана моделди бириктирет; `fit` trainde гана, болбосо leakage. Регрессия: MAE/MSE/RMSE/R²; классификация: precision/recall/F1, ROC-AUC жана confusion matrix."
+          ]
+        }
+      },
+      {
+        "slug": "ml-service-capstone",
+        "title": {
+          "ru": "Capstone: обучил → сжал → FastAPI → Streamlit → GitHub",
+          "kg": "Capstone: окутту → кысты → FastAPI → Streamlit → GitHub"
+        },
+        "summary": {
+          "ru": "Полный путь новичка: данные, обучение, метрики, сжатие, API, UI и публикация артефакта.",
+          "kg": "Новичоктун толук жолу: маалымат, окутуу, метрикалар, кысуу, API, UI жана артефактты жарыялоо."
+        },
+        "minutes": 90,
+        "task_slugs": [
+          "ml-train-val-split",
+          "ml-accuracy",
+          "ml-minmax",
+          "ml-training-pipeline",
+          "ml-model-compression",
+          "fastapi-health",
+          "fastapi-upload-predict",
+          "streamlit-build-files",
+          "fastapi-ml-serving",
+          "streamlit-ml-client",
+          "mediapipe-finger-count",
+          "mediapipe-rps",
+          "mediapipe-gesture-pipeline",
+          "model-artifacts-git"
+        ],
+        "content": {
+          "ru": [
+            "## Маршрут capstone\n1. Данные: MNIST или свой датасет.\n2. Обучение: train/val split, loss, accuracy, `model.pth`.\n3. Проверка: test accuracy и ошибки модели.\n4. Сжатие: quantization/TorchScript/ONNX + сравнение размера.\n5. API: FastAPI + `UploadFile` + загрузка модели один раз.\n6. UI: Streamlit + `requests` + session_state.\n7. Публикация: README/model card, Git LFS или GitHub Release.\n8. Бонус: MediaPipe RPS как второй CV-проект.",
+            "## Критерии готовности\n- `model.pth` воспроизводимо обучается.\n- Метрики записаны в `metrics.json`.\n- API отвечает на `/health` и `/predict`.\n- Streamlit показывает предсказание и ошибки.\n- В README есть команды запуска и ограничения.\n- Секреты и датасеты не попали в Git.",
+            "## Команды\n```bash\npython train.py\nuvicorn app:app --port 8000\nstreamlit run streamlit_app.py\ncurl -F \"file=@digit.png\" http://127.0.0.1:8000/predict\n```",
+            "## Что рассказать на защите\nПроблема → данные → модель → метрика → ограничения → демо → следующий шаг. Не прячь слабые места: честные ограничения ценятся выше идеальных цифр.",
+            "## Проверка\nПройди code-задачи `ml-train-val-split`, `fastapi-upload-predict`, `streamlit-build-files`, `mediapipe-finger-count` и `mediapipe-rps`, затем theory-задачи о обучении и сжатии."
+          ],
+          "kg": [
+            "## Capstone маршруту\n1. Маалымат: MNIST же өз датасетиң.\n2. Окутуу: train/val бөлүү, loss, accuracy, `model.pth`.\n3. Текшерүү: test accuracy жана моделдин каталары.\n4. Кысуу: quantization/TorchScript/ONNX + өлчөмдү салыштыруу.\n5. API: FastAPI + `UploadFile` + моделди бир жолу жүктөө.\n6. UI: Streamlit + `requests` + session_state.\n7. Жарыялоо: README/model card, Git LFS же GitHub Release.\n8. Бонус: MediaPipe RPS экинчи CV-долбоор катары.",
+            "## Даярдык критерийлери\n- `model.pth` кайталанып окутулат.\n- Метрикалар `metrics.json`го жазылган.\n- API `/health` жана `/predict`ке жооп берет.\n- Streamlit предсказание жана каталарды көрсөтөт.\n- READMEде иштетүү буйруктары жана чектөөлөр бар.\n- Секреттер жана датасеттер Gitке түшпөгөн.",
+            "## Буйруктар\n```bash\npython train.py\nuvicorn app:app --port 8000\nstreamlit run streamlit_app.py\ncurl -F \"file=@digit.png\" http://127.0.0.1:8000/predict\n```",
+            "## Коргоод эмне айтуу керек\nПроблема → маалымат → модель → метрика → чектөөлөр → демо → кийинки кадам. Алсыз жерлерди жашырба: чыныгы чектөөлөр идеалдуу сандардан баалуу.",
+            "## Текшерүү\n`ml-train-val-split`, `fastapi-upload-predict`, `streamlit-build-files`, `mediapipe-finger-count` жана `mediapipe-rps` code-тапшырмаларын, анан окутуу жана кысуу theory-тапшырмаларын өт."
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "slug": "computer-vision",
+    "order": 7,
+    "track": "ai",
+    "icon": "eye",
+    "accent": "#2DD4BF",
+    "title": {
+      "ru": "CV: YOLO и MediaPipe",
+      "kg": "CV: YOLO жана MediaPipe"
+    },
+    "subtitle": {
+      "ru": "Детекция, разметка, 21 landmark и практический pipeline.",
+      "kg": "Детекция, разметка, 21 landmark жана практикалык pipeline."
+    },
+    "estimated_minutes": 120,
+    "task_slugs": [
+      "yolo-pipeline",
+      "mediapipe-hands",
+      "cv-transforms",
+      "cv-yolo-nms",
+      "pytorch-tensors",
+      "pytorch-data",
+      "pytorch-training",
+      "torchvision-transfer",
+      "torchaudio-torchtext",
+      "opencv-pipeline",
+      "mediapipe-finger-count",
+      "mediapipe-rps",
+      "opencv-nearest-resize",
+      "mediapipe-gesture-pipeline"
+    ],
+    "lessons": [
+      {
+        "slug": "cv-lesson",
+        "title": {
+          "ru": "OpenCV, YOLO, MediaPipe",
+          "kg": "OpenCV, YOLO, MediaPipe"
+        },
+        "summary": {
+          "ru": "Как обучают YOLO, что такое confidence и как использовать Hands.",
+          "kg": "YOLO кантип окутулат, confidence эмне жана Hands кантип колдонулат."
+        },
+        "minutes": 25,
+        "task_slugs": [
+          "yolo-pipeline",
+          "mediapipe-hands",
+          "cv-transforms",
+          "cv-yolo-nms",
+          "pytorch-tensors",
+          "pytorch-data",
+          "pytorch-training",
+          "torchvision-transfer",
+          "torchaudio-torchtext",
+          "opencv-pipeline"
+        ],
+        "content": {
+          "ru": [
+            "## OpenCV\n`imread`, `cvtColor`, `resize`, `GaussianBlur`, `Canny`, `findContours`, `rectangle`, `imshow`, `waitKey`.\nBGR — порядок каналов по умолчанию.",
+            "## YOLO\nДетекция в один проход: bounding boxes, классы, confidence. Для обучения нужны изображения, `.txt` разметка (класс, x_center, y_center, width, height в долях) и `data.yaml`.\nМетрики: precision, recall, mAP@0.5, mAP@0.5:0.95.",
+            "## MediaPipe\nHands находит 21 landmark кисти, Pose — 33 точки тела. Координаты нормализованы. Используется для жестов, фитнеса и AR.",
+            "## PyTorch и transfer learning\n`torch.tensor`, `device`, `requires_grad`; цикл `zero_grad → forward → loss → backward → step`; `Dataset`/`DataLoader`, `model.train()`/`eval()`. Pretrained backbone + новый head. torchaudio: waveform → mel; текст: tokens → ids → padding + mask."
+          ],
+          "kg": [
+            "## OpenCV\n`imread`, `cvtColor`, `resize`, `GaussianBlur`, `Canny`, `findContours`, `rectangle`, `imshow`, `waitKey`.\nBGR — демейки канал тартиби.",
+            "## YOLO\nБир өтүүдө детекция: bounding box, класс, confidence. Окутуу үчүн сүрөттөр, `.txt` разметка (класс, x_center, y_center, width, height үлүштө) жана `data.yaml` керек.\nМетрикалар: precision, recall, mAP@0.5, mAP@0.5:0.95.",
+            "## MediaPipe\nHands колдун 21 landmarkын, Pose дененин 33 чекитин табат. Координаттар нормалдаштырылган. Жесттер, фитнес жана AR үчүн.",
+            "## PyTorch жана transfer learning\n`torch.tensor`, `device`, `requires_grad`; цикл `zero_grad → forward → loss → backward → step`; `Dataset`/`DataLoader`, `model.train()`/`eval()`. Pretrained backbone + жаңы head. torchaudio: waveform → mel; текст: tokens → ids → padding + mask."
+          ]
+        }
+      },
+      {
+        "slug": "mediapipe-rps-practice",
+        "title": {
+          "ru": "Практика MediaPipe: landmarks → пальцы → жест",
+          "kg": "MediaPipe практикасы: landmarks → манжалар → жест"
+        },
+        "summary": {
+          "ru": "Разбираем 21 точку руки, считаем пальцы и собираем камень-ножницы-бумага на OpenCV.",
+          "kg": "21 кол чекитин талдап, манжаларды санап, OpenCVде таш-кайчы-кагаз курабыз."
+        },
+        "minutes": 45,
+        "task_slugs": [
+          "mediapipe-finger-count",
+          "mediapipe-rps",
+          "opencv-nearest-resize",
+          "mediapipe-gesture-pipeline"
+        ],
+        "content": {
+          "ru": [
+            "## 21 landmark\nMediaPipe Hands нумерует точки руки. Кончики пальцев: 8, 12, 16, 20. PIP-суставы: 6, 10, 14, 18. Большой палец: 4 и 3.",
+            "## Признак пальца\nДля вертикальных пальцев сравниваем `tip.y < pip.y`. В OpenCV ось Y растёт вниз, поэтому «выше» — это меньшее `y`.",
+            "## Жест\n0 пальцев — rock, 4 — paper, 2 — scissors, остальное — unknown. Это rule-based классификатор, его легко объяснить.",
+            "## OpenCV\nКадр приходит в BGR, MediaPipe ждёт RGB. Зеркаль селфи через `cv2.flip(frame, 1)`, рисуй landmarks и текст, выход по `q`.",
+            "## Resize\n`cv2.resize(..., INTER_NEAREST)` повторяет пиксели. Понимание `(x, y)` и `[row][col]` спасает от перепутанных осей.",
+            "## Устойчивость\nДобавь гистерезис на 5 кадров, углы пальцев и confidence. Для API отправляй landmarks, а не видео."
+          ],
+          "kg": [
+            "## 21 landmark\nMediaPipe Hands кол чекиттерин номерлейт. Манжа учтары: 8, 12, 16, 20. PIP муундары: 6, 10, 14, 18. Баш бармак: 4 жана 3.",
+            "## Манжа белгиси\nВертикалдуу манжалар үчүн `tip.y < pip.y` салыштырабыз. OpenCVде Y огу ылдый өсөт, ошондуктан «жогору» — кичине `y`.",
+            "## Жест\n0 манжа — rock, 4 — paper, 2 — scissors, калганы — unknown. Бул rule-based классификатор, аны түшүндүрүү оңой.",
+            "## OpenCV\nКадр BGR менен келет, MediaPipe RGB күтөт. Селфини `cv2.flip(frame, 1)` аркылуу күзгүлө, landmarks жана текст чий, `q` менен чык.",
+            "## Resize\n`cv2.resize(..., INTER_NEAREST)` пикселдерди кайталайт. `(x, y)` жана `[row][col]`ди түшүнүү октордун алмашуусун болтурбайт.",
+            "## Туруктуулук\n5 кадрга гистерезис, манжа бурчтары жана confidence кош. API үчүн видео эмес, landmarks жөнөт."
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "slug": "llm-streamlit",
+    "order": 8,
+    "track": "ai",
+    "icon": "spark",
+    "accent": "#A78BFA",
+    "title": {
+      "ru": "LLM, RAG и Streamlit",
+      "kg": "LLM, RAG жана Streamlit"
+    },
+    "subtitle": {
+      "ru": "LangChain, температура, чанки, embeddings и быстрый UI.",
+      "kg": "LangChain, температура, чанктар, embeddings жана тез UI."
+    },
+    "estimated_minutes": 120,
+    "task_slugs": [
+      "langchain-params",
+      "rag-pipeline",
+      "streamlit-state",
+      "llm-context-window",
+      "llm-rag-eval",
+      "streamlit-build-files",
+      "streamlit-counter",
+      "streamlit-ml-client"
+    ],
+    "lessons": [
+      {
+        "slug": "llm-lesson",
+        "title": {
+          "ru": "LangChain, RAG, Streamlit",
+          "kg": "LangChain, RAG, Streamlit"
+        },
+        "summary": {
+          "ru": "Сообщения и параметры модели, splitter, vector store, session_state и кэш.",
+          "kg": "Билдирүүлөр жана параметрлер, splitter, vector store, session_state жана кэш."
+        },
+        "minutes": 30,
+        "task_slugs": [
+          "langchain-params",
+          "rag-pipeline",
+          "streamlit-state",
+          "llm-context-window",
+          "llm-rag-eval"
+        ],
+        "content": {
+          "ru": [
+            "## LangChain\nСообщения: `SystemMessage`, `HumanMessage`, `AIMessage`, `ToolMessage`. Параметры: `temperature` (0 — стабильно), `top_p`, `max_tokens`. `PromptTemplate` собирает промпт, `OutputParser` разбирает ответ.",
+            "## RAG\nДокументы → splitter → embeddings → vector store. Запрос → поиск похожих чанков → контекст в промпт → ответ.\n`RecursiveCharacterTextSplitter` режет по иерархии разделителей; `chunk_size` и `chunk_overlap` влияют на качество. Векторные БД: Chroma, FAISS, Pinecone.",
+            "## Streamlit\n`st.title`, `st.write`, `st.file_uploader`, `st.dataframe`, `st.button`, `st.metric`. `st.session_state` хранит состояние, `@st.cache_data` кэширует данные, `@st.cache_resource` — модель или соединение.\nЗапуск: `streamlit run app.py`."
+          ],
+          "kg": [
+            "## LangChain\nБилдирүүлөр: `SystemMessage`, `HumanMessage`, `AIMessage`, `ToolMessage`. Параметрлер: `temperature` (0 — туруктуу), `top_p`, `max_tokens`. `PromptTemplate` промптту курайт, `OutputParser` жоопту талдайт.",
+            "## RAG\nДокументтер → splitter → embeddings → vector store. Сурам → окшош чанктарды издөө → промптко контекст → жооп.\n`RecursiveCharacterTextSplitter` бөлүүчүлөрдүн иерархиясы боюнча бөлөт; `chunk_size` жана `chunk_overlap` сапатка таасир этет.",
+            "## Streamlit\n`st.title`, `st.write`, `st.file_uploader`, `st.dataframe`, `st.button`, `st.metric`. `st.session_state` абалды сактайт, `@st.cache_data` маалыматты, `@st.cache_resource` моделди кэштейт.\nИштетүү: `streamlit run app.py`."
+          ]
+        }
+      },
+      {
+        "slug": "streamlit-ml-practice",
+        "title": {
+          "ru": "Практика Streamlit: файл, кнопка, API, session_state",
+          "kg": "Streamlit практикасы: файл, баскыч, API, session_state"
+        },
+        "summary": {
+          "ru": "Тонкий клиент для ML-сервиса: загрузка изображения, запрос к FastAPI и понятные ошибки.",
+          "kg": "ML-кызмат үчүн жука клиент: сүрөт жүктөө, FastAPIге суроо жана түшүнүктүү каталар."
+        },
+        "minutes": 30,
+        "task_slugs": [
+          "streamlit-build-files",
+          "streamlit-counter",
+          "streamlit-ml-client"
+        ],
+        "content": {
+          "ru": [
+            "## Streamlit — это скрипт\nКаждый клик перезапускает файл сверху вниз. Обычные переменные теряются, поэтому состояние хранят в `st.session_state`.",
+            "## Файл\n`st.file_uploader` даёт объект с `.name`, `.type`, `.getvalue()`. Превью — `st.image`, отправка — `requests.post(files=...)`.",
+            "## Формат files\n```python\nfiles = {'file': (uploaded_file.name, uploaded_file.getvalue(), uploaded_file.type)}\nresponse = requests.post(f'{API_URL}/predict', files=files, timeout=10)\n```",
+            "## Ошибки\nРазличай `ConnectionError` (сервер не запущен), `Timeout` (не ответил) и `HTTPError` (4xx/5xx). Пользователь должен увидеть понятное сообщение, а не traceback.",
+            "## Запуск\n```bash\nuvicorn app:app --port 8000\nstreamlit run streamlit_app.py\n```",
+            "## Дальше\nДобавь spinner, top-3 предсказания, ограничение размера и `.streamlit/secrets.toml` для `API_URL`."
+          ],
+          "kg": [
+            "## Streamlit — бул скрипт\nАр бир басуу файлды жогорудан ылдый кайра иштетет. Кадимки өзгөрмөлөр жоголот, ошондуктан абалды `st.session_state`те сакташат.",
+            "## Файл\n`st.file_uploader` `.name`, `.type`, `.getvalue()` бар объект берет. Превью — `st.image`, жөнөтүү — `requests.post(files=...)`.",
+            "## files форматы\n```python\nfiles = {'file': (uploaded_file.name, uploaded_file.getvalue(), uploaded_file.type)}\nresponse = requests.post(f'{API_URL}/predict', files=files, timeout=10)\n```",
+            "## Каталар\n`ConnectionError` (сервер иштебейт), `Timeout` (жооп берген жок) жана `HTTPError` (4xx/5xx) айырмала. Колдонуучу traceback эмес, түшүнүктүү билдирүү көрүшү керек.",
+            "## Иштетүү\n```bash\nuvicorn app:app --port 8000\nstreamlit run streamlit_app.py\n```",
+            "## Андан ары\nSpinner, top-3 предсказание, өлчөм чектөө жана `API_URL` үчүн `.streamlit/secrets.toml` кош."
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "slug": "fastapi-pydantic",
+    "order": 9,
+    "track": "backend",
+    "icon": "server",
+    "accent": "#F97316",
+    "title": {
+      "ru": "FastAPI и Pydantic",
+      "kg": "FastAPI жана Pydantic"
+    },
+    "subtitle": {
+      "ru": "Валидация, зависимости, async, WebSocket и тесты API.",
+      "kg": "Валидация, көз карандылыктар, async, WebSocket жана API тесттери."
+    },
+    "estimated_minutes": 130,
+    "task_slugs": [
+      "fastapi-basics",
+      "pydantic-models",
+      "fastapi-async",
+      "fastapi-dependencies",
+      "fastapi-errors",
+      "fastapi-websocket",
+      "fastapi-testing",
+      "pydantic-settings",
+      "fastapi-health",
+      "pydantic-validate-user",
+      "fastapi-upload-predict",
+      "fastapi-ml-serving"
+    ],
+    "lessons": [
+      {
+        "slug": "fastapi-lesson",
+        "title": {
+          "ru": "FastAPI: от модели до теста",
+          "kg": "FastAPI: моделден тестке чейин"
+        },
+        "summary": {
+          "ru": "Роуты, Pydantic-схемы, Depends, async, обработка ошибок, WebSocket и TestClient.",
+          "kg": "Роуттар, Pydantic схемалар, Depends, async, каталарды иштетүү, WebSocket жана TestClient."
+        },
+        "minutes": 35,
+        "task_slugs": [
+          "fastapi-basics",
+          "pydantic-models",
+          "fastapi-async",
+          "fastapi-dependencies",
+          "fastapi-errors",
+          "fastapi-websocket",
+          "fastapi-testing",
+          "pydantic-settings"
+        ],
+        "content": {
+          "ru": [
+            "## FastAPI\n`FastAPI()`, `@app.get/post`, `BaseModel` для body, `response_model` для ответа, автодокументация `/docs`. HTTP-статусы возвращай явно, вход валидируй схемой, а не ручными `if`.",
+            "## Pydantic\n`BaseModel`, `Field`, `field_validator`, `model_config`, `SecretStr`. Схемы разделяй на input/output, не отдавай пароль или внутренние поля. `pydantic-settings` читает `.env` и типизирует настройки.",
+            "## DI, async и тесты\n`Depends` для БД, текущего пользователя и сервисов. `async def` — для неблокирующего I/O; блокирующие вызовы не держи в event loop. Ошибки: `HTTPException`, единый handler. `TestClient` проверяет статус, JSON и валидацию. WebSocket: `@app.websocket`, `accept`, `receive_text`, `send_text`."
+          ],
+          "kg": [
+            "## FastAPI\n`FastAPI()`, `@app.get/post`, body үчүн `BaseModel`, жооп үчүн `response_model`, автодокументация `/docs`. HTTP статустарын ачык кайтар, кирүүнү кол менен `if` эмес, схема менен валидацияла.",
+            "## Pydantic\n`BaseModel`, `Field`, `field_validator`, `model_config`, `SecretStr`. Схемаларды input/output болуп бөл, пароль же ички талааларды кайтарба. `pydantic-settings` `.env` окуп, жөндөөлөрдү типтештирет.",
+            "## DI, async жана тесттер\nБД, учурдагы колдонуучу жана сервистер үчүн `Depends`. `async def` — блоктобогон I/O үчүн; блоктогон чакырууларды event loopто кармаба. Каталар: `HTTPException`, бирдиктүү handler. `TestClient` статус, JSON жана валидацияны текшерет. WebSocket: `@app.websocket`, `accept`, `receive_text`, `send_text`."
+          ]
+        }
+      },
+      {
+        "slug": "fastapi-ml-practice",
+        "title": {
+          "ru": "Практика FastAPI: health, Pydantic, upload, модель",
+          "kg": "FastAPI практикасы: health, Pydantic, upload, модель"
+        },
+        "summary": {
+          "ru": "От первого маршрута до реального ML-эндпоинта с UploadFile, валидацией и безопасными ошибками.",
+          "kg": "Биринчи маршруттан UploadFile, валидация жана коопсуз каталар менен чыныгы ML-эндпоинтке чейин."
+        },
+        "minutes": 45,
+        "task_slugs": [
+          "fastapi-health",
+          "pydantic-validate-user",
+          "fastapi-upload-predict",
+          "fastapi-ml-serving"
+        ],
+        "content": {
+          "ru": [
+            "## Маршрут — это контракт\n`@app.get('/health')` возвращает состояние сервиса. Начни с него: он нужен балансировщику и деплою.",
+            "## Pydantic на границе\nМодель `UserIn` проверяет типы и ограничения до бизнес-логики. Ошибка валидации — это 422, а не 500.",
+            "## UploadFile\nФайл приходит как `UploadFile`. Читай `await file.read()`, проверяй пустоту, MIME-тип и размер. Не передавай путь или имя файла вместо байтов.",
+            "## ML-эндпоинт\nМодель загружается один раз при старте. В запросе: чтение → декодирование → transforms → `unsqueeze(0)` → `model.eval()` + `inference_mode()` → JSON.",
+            "## Ошибки\n- 400 — пустой файл.\n- 413 — слишком большой файл.\n- 415 — неподдерживаемый тип.\n- 422 — неверное тело/параметры.\n- 500 — внутренняя ошибка, детали только в логах.",
+            "## Проверка\n```bash\ncurl -F \"file=@digit.png\" http://127.0.0.1:8000/predict\n```\nОжидаемый ответ: `{\"result\": 7, \"confidence\": 0.99}`.",
+            "## Дальше\nПодключи Streamlit-клиент и вынеси `API_URL` в переменную окружения. Не храни модель внутри Streamlit."
+          ],
+          "kg": [
+            "## Маршрут — бул контракт\n`@app.get('/health')` кызматтын абалын кайтарат. Андан башта: ал балансировщик жана деплой үчүн керек.",
+            "## Чекте Pydantic\n`UserIn` модели бизнес-логикага чейин типтерди жана чектөөлөрдү текшерет. Валидация катасы — 500 эмес, 422.",
+            "## UploadFile\nФайл `UploadFile` катары келет. `await file.read()` оку, боштугун, MIME-тибин жана өлчөмүн текшер. Байттардын ордуна жолду же файл атын бербе.",
+            "## ML-эндпоинт\nМодель стартта бир жолу жүктөлөт. Суроодо: окуу → декоддоо → transforms → `unsqueeze(0)` → `model.eval()` + `inference_mode()` → JSON.",
+            "## Каталар\n- 400 — бош файл.\n- 413 — өтө чоң файл.\n- 415 — колдоого алынбаган тип.\n- 422 — туура эмес тело/параметрлер.\n- 500 — ички ката, деталдар логдо гана.",
+            "## Текшерүү\n```bash\ncurl -F \"file=@digit.png\" http://127.0.0.1:8000/predict\n```\nКүтүлгөн жооп: `{\"result\": 7, \"confidence\": 0.99}`.",
+            "## Андан ары\nStreamlit-клиентти туташтырып, `API_URL`ди айлана-чөйрө өзгөрмөсүнө чыгар. Моделди Streamlit ичинде сактаба."
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "slug": "databases-orm",
+    "order": 10,
+    "track": "backend",
+    "icon": "database",
+    "accent": "#84CC16",
+    "title": {
+      "ru": "Базы данных и ORM",
+      "kg": "Маалымат базалары жана ORM"
+    },
+    "subtitle": {
+      "ru": "PostgreSQL, SQLite, Redis, MongoDB, SQLAlchemy и Alembic.",
+      "kg": "PostgreSQL, SQLite, Redis, MongoDB, SQLAlchemy жана Alembic."
+    },
+    "estimated_minutes": 95,
+    "task_slugs": [
+      "postgres-vs-sqlite",
+      "redis-caching",
+      "mongodb-basics",
+      "sqlalchemy-core",
+      "sqlalchemy-relationships",
+      "sqlalchemy-transactions",
+      "alembic-migrations",
+      "postgres-indexes"
+    ],
+    "lessons": [
+      {
+        "slug": "databases-lesson",
+        "title": {
+          "ru": "SQL, NoSQL и ORM без магии",
+          "kg": "SQL, NoSQL жана ORM сыйкырсыз"
+        },
+        "summary": {
+          "ru": "Выбор БД, кэш, документы, модели SQLAlchemy, транзакции, миграции и индексы.",
+          "kg": "БД тандоо, кэш, документтер, SQLAlchemy моделдери, транзакциялар, миграциялар жана индекстер."
+        },
+        "minutes": 40,
+        "task_slugs": [
+          "postgres-vs-sqlite",
+          "redis-caching",
+          "mongodb-basics",
+          "sqlalchemy-core",
+          "sqlalchemy-relationships",
+          "sqlalchemy-transactions",
+          "alembic-migrations",
+          "postgres-indexes"
+        ],
+        "content": {
+          "ru": [
+            "## Выбор хранилища\nSQLite — файл и прототип; PostgreSQL — конкурентность, типы, индексы и продакшен. Redis — кэш, очереди и TTL, не основная БД. MongoDB — документы и гибкая схема, но не замена реляционным связям.",
+            "## SQLAlchemy\n`create_engine`, `Session`, `select`, `Mapped`, `mapped_column`, `relationship`, `ForeignKey`. Ленивая загрузка может дать N+1; используй `selectinload`/`joinedload`. Транзакция: `commit` при успехе, `rollback` при ошибке.",
+            "## Alembic и индексы\n`alembic revision --autogenerate`, затем проверь миграцию руками и `upgrade head`. Индекс ускоряет `WHERE`/`JOIN`/`ORDER BY`, но замедляет запись и занимает место. Составной индекс начинай с самой селективной колонки."
+          ],
+          "kg": [
+            "## Сактоочуну тандоо\nSQLite — файл жана прототип; PostgreSQL — конкуренттүүлүк, типтер, индекстер жана продакшен. Redis — кэш, кезектер жана TTL, негизги БД эмес. MongoDB — документтер жана ийкемдүү схема, бирок реляциялык байланыштардын ордун баспайт.",
+            "## SQLAlchemy\n`create_engine`, `Session`, `select`, `Mapped`, `mapped_column`, `relationship`, `ForeignKey`. Lazy loading N+1 берет; `selectinload`/`joinedload` колдон. Транзакция: ийгиликте `commit`, катада `rollback`.",
+            "## Alembic жана индекстер\n`alembic revision --autogenerate`, анан миграцияны кол менен текшерип, `upgrade head`. Индекс `WHERE`/`JOIN`/`ORDER BY` тездетет, бирок жазууну жайлатат жана орун алат. Курамдык индексти эң селективдүү колонкадан башта."
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "slug": "automation-llm",
+    "order": 11,
+    "track": "ai",
+    "icon": "spark",
+    "accent": "#E879F9",
+    "title": {
+      "ru": "Автоматизация и LLM",
+      "kg": "Автоматизация жана LLM"
+    },
+    "subtitle": {
+      "ru": "Aiogram, LangChain, LangGraph, Dify/n8n и безопасные webhooks.",
+      "kg": "Aiogram, LangChain, LangGraph, Dify/n8n жана коопсуз webhookтор."
+    },
+    "estimated_minutes": 90,
+    "task_slugs": [
+      "aiogram-basics",
+      "aiogram-fsm",
+      "aiogram-webhooks",
+      "langchain-runnables",
+      "langgraph-state",
+      "dify-n8n",
+      "webhook-security"
+    ],
+    "lessons": [
+      {
+        "slug": "automation-lesson",
+        "title": {
+          "ru": "Боты, цепочки и low-code",
+          "kg": "Боттор, чынжырлар жана low-code"
+        },
+        "summary": {
+          "ru": "Handlers и FSM в Aiogram, Runnable в LangChain, state graph, Dify/n8n и проверка webhook.",
+          "kg": "Aiogramдо handler жана FSM, LangChainде Runnable, state graph, Dify/n8n жана webhook текшерүү."
+        },
+        "minutes": 35,
+        "task_slugs": [
+          "aiogram-basics",
+          "aiogram-fsm",
+          "aiogram-webhooks",
+          "langchain-runnables",
+          "langgraph-state",
+          "dify-n8n",
+          "webhook-security"
+        ],
+        "content": {
+          "ru": [
+            "## Aiogram\n`Bot`, `Dispatcher`, `@dp.message`, фильтры, `FSMContext`, `StatesGroup`. FSM хранит шаги диалога; данные пользователя не пиши в глобальные переменные. Polling — для локальной разработки, webhook — для продакшена.",
+            "## LangChain и LangGraph\n`Runnable`, `prompt | model | parser`, `invoke`/`ainvoke`. LangGraph задаёт состояние и переходы: nodes, edges, conditional edges, checkpointer. Для агента важны tool-вызовы и лимит шагов.",
+            "## Dify, n8n и webhooks\nDify/n8n собирают сценарии без кода, но HTTP-узлы требуют таймаутов и проверки ответа. Webhook принимает POST: проверь подпись/секрет, идемпотентность и лимит размера; не доверяй телу запроса."
+          ],
+          "kg": [
+            "## Aiogram\n`Bot`, `Dispatcher`, `@dp.message`, фильтрлер, `FSMContext`, `StatesGroup`. FSM диалог кадамдарын сактайт; колдонуучу маалыматын глобалдык өзгөрмөлөргө жазба. Polling — локалдык иште, webhook — продакшенде.",
+            "## LangChain жана LangGraph\n`Runnable`, `prompt | model | parser`, `invoke`/`ainvoke`. LangGraph абалды жана өтүүлөрдү берет: nodes, edges, conditional edges, checkpointer. Агент үчүн tool чакыруулары жана кадам лимити маанилүү.",
+            "## Dify, n8n жана webhookтор\nDify/n8n кодсуз сценарийлерди курат, бирок HTTP түйүндөрү таймаут жана жоопту текшерүүнү талап кылат. Webhook POST кабыл алат: кол тамга/секрет, идемпотенттүүлүк жана өлчөм лимитин текшер; сурамдын денесине ишенбе."
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "slug": "devops-security",
+    "order": 12,
+    "track": "tools",
+    "icon": "terminal",
+    "accent": "#38BDF8",
+    "title": {
+      "ru": "DevOps и безопасность",
+      "kg": "DevOps жана коопсуздук"
+    },
+    "subtitle": {
+      "ru": "Docker, nginx, AWS, CI/CD, pytest, Postman, RBAC и защита API.",
+      "kg": "Docker, nginx, AWS, CI/CD, pytest, Postman, RBAC жана API коргоо."
+    },
+    "estimated_minutes": 125,
+    "task_slugs": [
+      "dockerfile-best-practices",
+      "docker-compose",
+      "nginx-reverse-proxy",
+      "aws-basics",
+      "pythonanywhere-deploy",
+      "ci-cd-github-actions",
+      "pytest-professional",
+      "postman-testing",
+      "auth-rbac",
+      "api-security",
+      "model-artifacts-git"
+    ],
+    "lessons": [
+      {
+        "slug": "devops-security-lesson",
+        "title": {
+          "ru": "Деплой и защита приложения",
+          "kg": "Колдонманы жайгаштыруу жана коргоо"
+        },
+        "summary": {
+          "ru": "Образы и compose, reverse proxy, облако, CI, тесты и модель угроз API.",
+          "kg": "Образдар жана compose, reverse proxy, булут, CI, тесттер жана API коркунуч модели."
+        },
+        "minutes": 45,
+        "task_slugs": [
+          "dockerfile-best-practices",
+          "docker-compose",
+          "nginx-reverse-proxy",
+          "aws-basics",
+          "pythonanywhere-deploy",
+          "ci-cd-github-actions",
+          "pytest-professional",
+          "postman-testing",
+          "auth-rbac",
+          "api-security",
+          "model-artifacts-git"
+        ],
+        "content": {
+          "ru": [
+            "## Docker и nginx\nMulti-stage Dockerfile, непривилегированный пользователь, `.dockerignore`, healthcheck. Compose связывает app, db и cache. nginx — TLS, статика, proxy_pass и таймауты; приложение не должно быть напрямую доступно в интернет.",
+            "## Облако и CI/CD\nAWS: IAM по принципу минимальных прав, S3, EC2/ECS, RDS, переменные окружения и секреты. PythonAnywhere — быстрый деплой Django/Flask. CI (GitHub Actions): install → lint → test → build → deploy; секреты только в secrets.",
+            "## Безопасность и тесты\nJWT: короткий access, refresh, проверка подписи. RBAC и object-level права. bcrypt/argon2 для паролей, rate limit и API keys, webhook-подписи. pytest: fixtures, parametrize, monkeypatch, TestClient; Postman — коллекции, окружения и автотесты."
+          ],
+          "kg": [
+            "## Docker жана nginx\nMulti-stage Dockerfile, привилегиясыз колдонуучу, `.dockerignore`, healthcheck. Compose app, db жана cacheди байланыштырат. nginx — TLS, статика, proxy_pass жана таймаут; колдонмо интернетке түз жеткиликтүү болбошу керек.",
+            "## Булут жана CI/CD\nAWS: минималдуу укук принципи боюнча IAM, S3, EC2/ECS, RDS, чөйрө өзгөрмөлөрү жана секреттер. PythonAnywhere — Django/Flask үчүн тез деплой. CI (GitHub Actions): install → lint → test → build → deploy; секреттер secrets ичинде гана.",
+            "## Коопсуздук жана тесттер\nJWT: кыска access, refresh, кол тамга текшерүү. RBAC жана object-level укуктар. Пароль үчүн bcrypt/argon2, rate limit жана API keys, webhook кол тамгалары. pytest: fixtures, parametrize, monkeypatch, TestClient; Postman — коллекциялар, чөйрөлөр жана автотесттер."
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "slug": "exam-tactics",
+    "order": 13,
+    "track": "exam",
+    "icon": "target",
+    "accent": "#FB7185",
+    "title": {
+      "ru": "Тактика экзамена",
+      "kg": "Экзамен тактикасы"
+    },
+    "subtitle": {
+      "ru": "Как забрать 80+ и не потерять баллы на мелочах.",
+      "kg": "80+ алуу жана майда каталардан коргоо."
+    },
+    "estimated_minutes": 40,
+    "task_slugs": [
+      "exam-plan",
+      "oral-answer",
+      "exam-code-plan",
+      "exam-answer-drill"
+    ],
+    "lessons": [
+      {
+        "slug": "exam-tactics-lesson",
+        "title": {
+          "ru": "План на 100 баллов",
+          "kg": "100 баллга план"
+        },
+        "summary": {
+          "ru": "Порядок действий, устная формула ответа, разбор ошибок.",
+          "kg": "Иш тартиби, оозеки жооп формуласы, каталарды талдоо."
+        },
+        "minutes": 15,
+        "task_slugs": [
+          "exam-plan",
+          "oral-answer",
+          "exam-code-plan",
+          "exam-answer-drill"
+        ],
+        "content": {
+          "ru": [
+            "## План\n1. Прочитай все вопросы и отметь лёгкие.\n2. Сначала забери дешёвые баллы: термины, команды, короткие вопросы.\n3. Код пиши по шагам: сигнатура → пример → крайние случаи → тест.\n4. Оставь 10 минут на проверку.",
+            "## Устный ответ\nФормула: определение → зачем нужно → пример → отличие/ограничение. Начинай с точного определения, а не с «ну, это когда...».",
+            "## Цель\n80–100 — красный диплом. 20/20 на первом этапе, 25+/30 на втором, 40+/50 на третьем. Ошибки разбирай в тот же день."
+          ],
+          "kg": [
+            "## План\n1. Бардык суроолорду окуп, жеңилдерин белгиле.\n2. Адегенде арзан баллдарды ал: терминдер, командалар, кыска суроолор.\n3. Кодду кадам менен жаз: сигнатура → мисал → четки учурлар → тест.\n4. 10 мүнөттү текшерүүгө калтыр.",
+            "## Оозеки жооп\nФормула: аныктама → эмне үчүн керек → мисал → айырма/чек. Так аныктама менен башта.",
+            "## Максат\n80–100 — кызыл диплом. 1-этапта 20/20, 2-этапта 25+/30, 3-этапта 40+/50. Каталарды ошол эле күнү талда."
+          ]
+        }
+      }
+    ]
+  }
+]

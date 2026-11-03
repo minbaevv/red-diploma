@@ -1,0 +1,172 @@
+[
+  {
+    "slug": "ml-training-pipeline",
+    "type": "theory",
+    "module": "data-ml",
+    "title": {
+      "ru": "Обучение MNIST-модели в Colab: полный путь",
+      "kg": "Colab'до MNIST модели окутуу: толук жол"
+    },
+    "prompt": {
+      "ru": "Опиши и покажи полный путь обучения классификатора цифр: загрузка датасета, transforms, train/val split, DataLoader, цикл обучения, метрики, сохранение `model.pth` и скачивание из Colab. Объясни, почему каждый шаг нужен.",
+      "kg": "Цифра классификаторун окутуунун толук жолун түшүндүр жана код менен көрсөт: датасет жүктөө, transforms, train/val бөлүү, DataLoader, окутуу цикли, метрикалар, `model.pth` сактоо жана Colab'дон жүктөө. Ар бир кадам эмне үчүн керек экенин түшүндүр."
+    },
+    "difficulty": 4,
+    "points": 12,
+    "hints": [
+      {
+        "ru": "Начни с `transforms.ToTensor()` и нормализации.",
+        "kg": "`transforms.ToTensor()` жана нормалдаштыруудан башта."
+      },
+      {
+        "ru": "Раздели train на train/val до создания DataLoader.",
+        "kg": "DataLoader түзүүдөн мурун trainди train/valге бөл."
+      },
+      {
+        "ru": "Не забудь `model.train()` и `model.eval()`.",
+        "kg": "`model.train()` жана `model.eval()` унутпа."
+      },
+      {
+        "ru": "Сохраняй `state_dict`, а не весь объект модели.",
+        "kg": "Бүт модель объектисин эмес, `state_dict` сакта."
+      }
+    ],
+    "subquestions": [
+      {
+        "ru": "Зачем нужен validation set?",
+        "kg": "Validation set эмне үчүн керек?"
+      },
+      {
+        "ru": "Чем `loss` отличается от `accuracy`?",
+        "kg": "`loss` менен `accuracy` кандай айырмаланат?"
+      },
+      {
+        "ru": "Что произойдёт, если забыть `optimizer.zero_grad()`?",
+        "kg": "`optimizer.zero_grad()` унутулса эмне болот?"
+      },
+      {
+        "ru": "Почему сохраняют именно `state_dict`?",
+        "kg": "Эмне үчүн так `state_dict` сакталат?"
+      }
+    ],
+    "model_answer": {
+      "ru": "## Полный pipeline\n\n1. Выбери runtime GPU в Colab: `Runtime → Change runtime type → T4 GPU`.\n2. Загрузи датасет через `torchvision.datasets.MNIST`.\n3. Приведи картинки к тензору и нормализуй.\n4. Раздели train на train/val, создай `DataLoader`.\n5. Обучи несколько эпох, считай loss и val accuracy.\n6. Проверь финальную accuracy на test.\n7. Сохрани `model.state_dict()` и скачай файл.\n\n```python\nimport torch\nfrom torch import nn\nfrom torch.utils.data import DataLoader, random_split\nfrom torchvision import datasets, transforms\n\ndevice = torch.device('cuda' if torch.cuda.is_available() else 'cpu')\nprint('device:', device)\n\ntrain_tf = transforms.Compose([\n    transforms.ToTensor(),\n    transforms.Normalize((0.1307,), (0.3081,)),\n])\ntest_tf = transforms.Compose([\n    transforms.ToTensor(),\n    transforms.Normalize((0.1307,), (0.3081,)),\n])\n\nfull_train = datasets.MNIST(root='data', train=True, download=True, transform=train_tf)\ntest_ds = datasets.MNIST(root='data', train=False, download=True, transform=test_tf)\ntrain_ds, val_ds = random_split(\n    full_train, [50000, 10000],\n    generator=torch.Generator().manual_seed(42),\n)\n\ntrain_loader = DataLoader(train_ds, batch_size=64, shuffle=True)\nval_loader = DataLoader(val_ds, batch_size=256)\ntest_loader = DataLoader(test_ds, batch_size=256)\n\nclass DigitCNN(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.features = nn.Sequential(\n            nn.Conv2d(1, 16, kernel_size=3, padding=1),\n            nn.ReLU(),\n            nn.MaxPool2d(2),\n        )\n        self.classifier = nn.Sequential(\n            nn.Flatten(),\n            nn.Linear(16 * 14 * 14, 64),\n            nn.ReLU(),\n            nn.Linear(64, 10),\n        )\n\n    def forward(self, x):\n        return self.classifier(self.features(x))\n\nmodel = DigitCNN().to(device)\nloss_fn = nn.CrossEntropyLoss()\noptimizer = torch.optim.Adam(model.parameters(), lr=1e-3)\n\ndef train_one_epoch():\n    model.train()\n    total_loss = 0.0\n    for images, labels in train_loader:\n        images, labels = images.to(device), labels.to(device)\n        optimizer.zero_grad()\n        logits = model(images)\n        loss = loss_fn(logits, labels)\n        loss.backward()\n        optimizer.step()\n        total_loss += loss.item() * images.size(0)\n    return total_loss / len(train_loader.dataset)\n\n@torch.inference_mode()\ndef evaluate(loader):\n    model.eval()\n    correct = 0\n    total = 0\n    for images, labels in loader:\n        images, labels = images.to(device), labels.to(device)\n        preds = model(images).argmax(dim=1)\n        correct += (preds == labels).sum().item()\n        total += labels.size(0)\n    return correct / total\n\nfor epoch in range(1, 6):\n    train_loss = train_one_epoch()\n    val_acc = evaluate(val_loader)\n    print(f'epoch={epoch} loss={train_loss:.4f} val_acc={val_acc:.4f}')\n\ntest_acc = evaluate(test_loader)\nprint(f'test_acc={test_acc:.4f}')\n\ntorch.save(model.state_dict(), 'model.pth')\nprint('saved model.pth')\n\nfrom google.colab import files\nfiles.download('model.pth')  # работает в Google Colab\n```\n\n## Что важно объяснить\n- `model.train()` включает dropout/BN в режим обучения, `model.eval()` — в режим инференса.\n- `torch.inference_mode()` отключает градиенты и экономит память.\n- `CrossEntropyLoss` принимает сырые логиты, без softmax.\n- `state_dict` — это только веса, его удобно переносить в FastAPI.\n- Метрики считай на val, а финал проверяй на test один раз.\n\n## Что скачать\n- `model.pth` — веса.\n- `metrics.txt` или вывод эпох — доказательство обучения.\n- `requirements.txt` с версиями `torch`, `torchvision`.",
+      "kg": "## Толук pipeline\n\n1. Colab'до GPU runtime танда: `Runtime → Change runtime type → T4 GPU`.\n2. Датасетти `torchvision.datasets.MNIST` аркылуу жүктө.\n3. Сүрөттөрдү тензорго айландырып, нормалдаштыр.\n4. Trainди train/valге бөлүп, `DataLoader` түз.\n5. Бир нече эпох окутуп, loss жана val accuracy эсепте.\n6. Финалдык accuracyни testте текшер.\n7. `model.state_dict()` сактап, файлды жүктөп ал.\n\n```python\nimport torch\nfrom torch import nn\nfrom torch.utils.data import DataLoader, random_split\nfrom torchvision import datasets, transforms\n\ndevice = torch.device('cuda' if torch.cuda.is_available() else 'cpu')\nprint('device:', device)\n\ntrain_tf = transforms.Compose([\n    transforms.ToTensor(),\n    transforms.Normalize((0.1307,), (0.3081,)),\n])\ntest_tf = transforms.Compose([\n    transforms.ToTensor(),\n    transforms.Normalize((0.1307,), (0.3081,)),\n])\n\nfull_train = datasets.MNIST(root='data', train=True, download=True, transform=train_tf)\ntest_ds = datasets.MNIST(root='data', train=False, download=True, transform=test_tf)\ntrain_ds, val_ds = random_split(\n    full_train, [50000, 10000],\n    generator=torch.Generator().manual_seed(42),\n)\n\ntrain_loader = DataLoader(train_ds, batch_size=64, shuffle=True)\nval_loader = DataLoader(val_ds, batch_size=256)\ntest_loader = DataLoader(test_ds, batch_size=256)\n\nclass DigitCNN(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.features = nn.Sequential(\n            nn.Conv2d(1, 16, kernel_size=3, padding=1),\n            nn.ReLU(),\n            nn.MaxPool2d(2),\n        )\n        self.classifier = nn.Sequential(\n            nn.Flatten(),\n            nn.Linear(16 * 14 * 14, 64),\n            nn.ReLU(),\n            nn.Linear(64, 10),\n        )\n\n    def forward(self, x):\n        return self.classifier(self.features(x))\n\nmodel = DigitCNN().to(device)\nloss_fn = nn.CrossEntropyLoss()\noptimizer = torch.optim.Adam(model.parameters(), lr=1e-3)\n\ndef train_one_epoch():\n    model.train()\n    total_loss = 0.0\n    for images, labels in train_loader:\n        images, labels = images.to(device), labels.to(device)\n        optimizer.zero_grad()\n        logits = model(images)\n        loss = loss_fn(logits, labels)\n        loss.backward()\n        optimizer.step()\n        total_loss += loss.item() * images.size(0)\n    return total_loss / len(train_loader.dataset)\n\n@torch.inference_mode()\ndef evaluate(loader):\n    model.eval()\n    correct = 0\n    total = 0\n    for images, labels in loader:\n        images, labels = images.to(device), labels.to(device)\n        preds = model(images).argmax(dim=1)\n        correct += (preds == labels).sum().item()\n        total += labels.size(0)\n    return correct / total\n\nfor epoch in range(1, 6):\n    train_loss = train_one_epoch()\n    val_acc = evaluate(val_loader)\n    print(f'epoch={epoch} loss={train_loss:.4f} val_acc={val_acc:.4f}')\n\ntest_acc = evaluate(test_loader)\nprint(f'test_acc={test_acc:.4f}')\n\ntorch.save(model.state_dict(), 'model.pth')\nprint('saved model.pth')\n\nfrom google.colab import files\nfiles.download('model.pth')  # работает в Google Colab\n```\n\n## Эмнени түшүндүрүү керек\n- `model.train()` dropout/BNди окутуу режимине, `model.eval()` инференс режимине өткөрөт.\n- `torch.inference_mode()` градиенттерди өчүрүп, эстутумду үнөмдөйт.\n- `CrossEntropyLoss` softmaxсыз сырьё логиттерди кабыл алат.\n- `state_dict` — бул гана салмактар, аны FastAPIге оңой көчүрсө болот.\n- Метрикаларды valде эсептеп, финалды testте бир жолу текшер.\n\n## Эмнени жүктөө керек\n- `model.pth` — салмактар.\n- `metrics.txt` же эпохтордун чыгарылышы — окутуунун далили.\n- `requirements.txt` `torch`, `torchvision` версиялары менен."
+    },
+    "explanation": {
+      "ru": "Обучение — это цикл: forward → loss → backward → step. Сначала данные делятся на train/val, потом модель учится на train и проверяется на val. Только после этого сохраняются веса.",
+      "kg": "Окутуу — бул цикл: forward → loss → backward → step. Адегенде маалымат train/valге бөлүнөт, анан модель trainде үйрөнүп, valде текшерилет. Андан кийин гана салмактар сакталат."
+    },
+    "walkthrough": [
+      {
+        "ru": "1. Данные: MNIST + transforms.",
+        "kg": "1. Маалымат: MNIST + transforms."
+      },
+      {
+        "ru": "2. Разделение: 50k train / 10k val.",
+        "kg": "2. Бөлүү: 50k train / 10k val."
+      },
+      {
+        "ru": "3. Обучение: loss, optimizer, эпохи.",
+        "kg": "3. Окутуу: loss, optimizer, эпохтор."
+      },
+      {
+        "ru": "4. Оценка: val и test accuracy.",
+        "kg": "4. Баалоо: val жана test accuracy."
+      },
+      {
+        "ru": "5. Артефакт: `state_dict` → `model.pth`.",
+        "kg": "5. Артефакт: `state_dict` → `model.pth`."
+      }
+    ],
+    "pitfalls": {
+      "ru": "Не обучайся на test и не сохраняй модель до проверки baseline. Иначе высокий test score может быть случайным.",
+      "kg": "Testте окутпа жана baseline текшерүүдөн мурун модель сактаба. Болбосо жогорку test score кокустан болушу мүмкүн."
+    },
+    "exam_tip": {
+      "ru": "На экзамене назови цепочку: data → split → train → eval → save.",
+      "kg": "Экзаменде чынжырды ата: data → split → train → eval → save."
+    }
+  },
+  {
+    "slug": "ml-model-compression",
+    "type": "theory",
+    "module": "data-ml",
+    "title": {
+      "ru": "Сжатие модели: quantization, TorchScript, ONNX",
+      "kg": "Моделди кысуу: quantization, TorchScript, ONNX"
+    },
+    "prompt": {
+      "ru": "Модель обучена, но файл большой. Объясни, как уменьшить размер и ускорить инференс: dynamic quantization, TorchScript, ONNX. Покажи команды, проверку размера и проверку accuracy после сжатия.",
+      "kg": "Модель окутулду, бирок файл чоң. Өлчөмдү азайтып, инференсти тездетүүнү түшүндүр: dynamic quantization, TorchScript, ONNX. Буйруктарды, өлчөмдү текшерүүнү жана кысуудан кийинки accuracy текшерүүнү көрсөт."
+    },
+    "difficulty": 4,
+    "points": 10,
+    "hints": [
+      {
+        "ru": "Сравни размер `model.pth` и сжатого файла через `os.path.getsize`.",
+        "kg": "`model.pth` жана кысылган файлдын өлчөмүн `os.path.getsize` аркылуу салыштыр."
+      },
+      {
+        "ru": "Dynamic quantization применяют к `nn.Linear` на CPU.",
+        "kg": "Dynamic quantization `nn.Linear`га CPU'до колдонулат."
+      },
+      {
+        "ru": "TorchScript сохраняет граф и код модели.",
+        "kg": "TorchScript модельдин графын жана кодун сактайт."
+      },
+      {
+        "ru": "После сжатия обязательно проверь accuracy на том же test.",
+        "kg": "Кысуудан кийин ошол эле testте accuracy текшер."
+      }
+    ],
+    "subquestions": [
+      {
+        "ru": "Когда quantization даёт максимальный выигрыш?",
+        "kg": "Quantization качан эң чоң пайда берет?"
+      },
+      {
+        "ru": "Чем TorchScript отличается от `state_dict`?",
+        "kg": "TorchScript `state_dict`тен кандай айырмаланат?"
+      },
+      {
+        "ru": "Зачем нужен ONNX?",
+        "kg": "ONNX эмне үчүн керек?"
+      }
+    ],
+    "model_answer": {
+      "ru": "## Три пути сжатия\n\n### 1. Dynamic quantization\nВеса линейных слоёв переводятся в int8. На CPU это часто даёт в 2–4 раза меньший файл и ускорение.\n\n```python\nimport os\nimport torch\nfrom torch import nn\n\n# model уже обучена и находится в eval-режиме\nmodel.eval()\nfloat_size = os.path.getsize('model.pth') / 1024 / 1024\n\nquantized = torch.quantization.quantize_dynamic(\n    model.cpu(), {nn.Linear}, dtype=torch.qint8\n)\ntorch.save(quantized, 'model_quantized.pt')\nquant_size = os.path.getsize('model_quantized.pt') / 1024 / 1024\nprint(f'float={float_size:.2f} MB, quantized={quant_size:.2f} MB')\n```\n\n### 2. TorchScript\nСохраняет не только веса, но и граф/код. Удобно для C++ и мобильного инференса.\n\n```python\nscripted = torch.jit.script(model.eval())\nscripted.save('model_scripted.pt')\n```\n\n### 3. ONNX\nНейтральный формат для ONNX Runtime, TensorRT и других движков.\n\n```python\nexample = torch.randn(1, 1, 28, 28)\ntorch.onnx.export(\n    model.eval(), example, 'model.onnx',\n    input_names=['input'], output_names=['logits'],\n    dynamic_axes={'input': {0: 'batch'}, 'logits': {0: 'batch'}},\n    opset_version=17,\n)\n```\n\n## Обязательная проверка\n```python\n@torch.inference_mode()\ndef accuracy(model, loader, device='cpu'):\n    model.eval().to(device)\n    correct = total = 0\n    for images, labels in loader:\n        images, labels = images.to(device), labels.to(device)\n        preds = model(images).argmax(dim=1)\n        correct += (preds == labels).sum().item()\n        total += labels.size(0)\n    return correct / total\n\nprint('float:', accuracy(model, test_loader))\nprint('quantized:', accuracy(quantized, test_loader))\n```\n\n## Вывод\n- Сначала измерь baseline: размер, latency, accuracy.\n- Сжимай только после успешного обучения.\n- Падение accuracy больше 1–2% — повод не брать вариант.\n- Для FastAPI на CPU обычно лучший старт — dynamic quantization.",
+      "kg": "## Кысуунун үч жолу\n\n### 1. Dynamic quantization\nСызыктуу катмарлардын салмактары int8ге өтөт. CPU'до көбүнчө 2–4 эсе кичине файл жана тездик берет.\n\n```python\nimport os\nimport torch\nfrom torch import nn\n\n# model мурун окутулган жана eval режиминде\nmodel.eval()\nfloat_size = os.path.getsize('model.pth') / 1024 / 1024\n\nquantized = torch.quantization.quantize_dynamic(\n    model.cpu(), {nn.Linear}, dtype=torch.qint8\n)\ntorch.save(quantized, 'model_quantized.pt')\nquant_size = os.path.getsize('model_quantized.pt') / 1024 / 1024\nprint(f'float={float_size:.2f} MB, quantized={quant_size:.2f} MB')\n```\n\n### 2. TorchScript\nСалмактар гана эмес, граф/код да сакталат. C++ жана мобилдик инференс үчүн ыңгайлуу.\n\n```python\nscripted = torch.jit.script(model.eval())\nscripted.save('model_scripted.pt')\n```\n\n### 3. ONNX\nONNX Runtime, TensorRT жана башка кыймылдаткычтар үчүн нейтралдуу формат.\n\n```python\nexample = torch.randn(1, 1, 28, 28)\ntorch.onnx.export(\n    model.eval(), example, 'model.onnx',\n    input_names=['input'], output_names=['logits'],\n    dynamic_axes={'input': {0: 'batch'}, 'logits': {0: 'batch'}},\n    opset_version=17,\n)\n```\n\n## Милдеттүү текшерүү\n```python\n@torch.inference_mode()\ndef accuracy(model, loader, device='cpu'):\n    model.eval().to(device)\n    correct = total = 0\n    for images, labels in loader:\n        images, labels = images.to(device), labels.to(device)\n        preds = model(images).argmax(dim=1)\n        correct += (preds == labels).sum().item()\n        total += labels.size(0)\n    return correct / total\n\nprint('float:', accuracy(model, test_loader))\nprint('quantized:', accuracy(quantized, test_loader))\n```\n\n## Жыйынтык\n- Адегенде baseline өлчө: өлчөм, latency, accuracy.\n- Ийгиликтүү окутуудан кийин гана кыс.\n- Accuracy 1–2%тен көп төмөндөсө — вариантты алба.\n- CPU'догу FastAPI үчүн адатта dynamic quantization эң жакшы старт."
+    },
+    "explanation": {
+      "ru": "Сжатие — это trade-off между размером, скоростью и точностью. Сначала фиксируй baseline, потом сравнивай варианты на одном test set.",
+      "kg": "Кысуу — өлчөм, тездик жана тактык ортосундагы trade-off. Адегенде baseline жазып, анан варианттарды бир test setте салыштыр."
+    },
+    "walkthrough": [
+      {
+        "ru": "1. Измеряем размер и accuracy float-модели.",
+        "kg": "1. Float-моделдин өлчөмүн жана accuracyсин өлчөйбүз."
+      },
+      {
+        "ru": "2. Пробуем dynamic quantization.",
+        "kg": "2. Dynamic quantization аракет кылабыз."
+      },
+      {
+        "ru": "3. Пробуем TorchScript/ONNX при необходимости.",
+        "kg": "3. Керек болсо TorchScript/ONNX аракет кылабыз."
+      },
+      {
+        "ru": "4. Сравниваем точность и latency.",
+        "kg": "4. Тактыкты жана latencyни салыштырабыз."
+      }
+    ],
+    "pitfalls": {
+      "ru": "Не сжимай модель, которая ещё не прошла baseline: иначе не поймёшь, что сломалось.",
+      "kg": "Baselineден өтпөгөн моделди кыспа: болбосо эмне бузулганын түшүнбөйсүң."
+    },
+    "exam_tip": {
+      "ru": "На экзамене скажи: quantization — про int8, TorchScript — про граф, ONNX — про совместимость.",
+      "kg": "Экзаменде айт: quantization — int8, TorchScript — граф, ONNX — шайкештик."
+    }
+  }
+]

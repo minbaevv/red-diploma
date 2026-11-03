@@ -1,0 +1,346 @@
+[
+  {
+    "slug": "fastapi-ml-serving",
+    "type": "theory",
+    "module": "fastapi-pydantic",
+    "title": {
+      "ru": "FastAPI + PyTorch: сервис предсказания цифры",
+      "kg": "FastAPI + PyTorch: цифра предсказание кызматы"
+    },
+    "prompt": {
+      "ru": "Собери FastAPI-сервис, который загружает обученную модель, принимает изображение через `UploadFile`, делает предсказание и возвращает JSON. Объясни, почему модель загружается один раз, как обрабатывать пустой файл и ошибки.",
+      "kg": "Окутулган моделди жүктөп, `UploadFile` аркылуу сүрөт кабыл алып, предсказание жасап, JSON кайтарган FastAPI кызматын кура. Модель эмне үчүн бир жолу жүктөлөрүн, бош файлды жана каталарды кантип иштетүүнү түшүндүр."
+    },
+    "difficulty": 4,
+    "points": 12,
+    "hints": [
+      {
+        "ru": "Импортируй `Image` из `PIL`, а не из `tkinter`.",
+        "kg": "`Image`ти `PIL`ден импортто, `tkinter`ден эмес."
+      },
+      {
+        "ru": "Загружай `state_dict` один раз при старте приложения.",
+        "kg": "Колдонмо башталганда `state_dict` бир жолу жүктө."
+      },
+      {
+        "ru": "Проверь пустые байты до `Image.open`.",
+        "kg": "`Image.open`го чейин бош байттарды текшер."
+      },
+      {
+        "ru": "Не отдавай клиенту полный traceback: логируй, возвращай безопасный detail.",
+        "kg": "Кардарга толук traceback бербе: лог жаз, коопсуз detail кайтар."
+      }
+    ],
+    "subquestions": [
+      {
+        "ru": "Почему нельзя загружать модель на каждый запрос?",
+        "kg": "Эмне үчүн ар бир суроодо модель жүктөөгө болбойт?"
+      },
+      {
+        "ru": "Чем `400`, `415`, `413`, `500` отличаются в этом сервисе?",
+        "kg": "Бул кызматта `400`, `415`, `413`, `500` кандай айырмаланат?"
+      },
+      {
+        "ru": "Зачем нужен `model.eval()`?",
+        "kg": "`model.eval()` эмне үчүн керек?"
+      },
+      {
+        "ru": "Что изменится, если запустить на GPU?",
+        "kg": "GPU'до иштетсе эмне өзгөрөт?"
+      }
+    ],
+    "model_answer": {
+      "ru": "## Полный сервис\n\n```python\nimport io\nimport logging\n\nimport torch\nimport uvicorn\nfrom fastapi import FastAPI, File, HTTPException, UploadFile\nfrom PIL import Image\nfrom torch import nn\nfrom torchvision import transforms\n\nlogger = logging.getLogger(__name__)\nMODEL_PATH = \"model.pth\"\ndevice = torch.device(\"cuda\" if torch.cuda.is_available() else \"cpu\")\n\n\nclass CheckImage(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.first = nn.Sequential(\n            nn.Conv2d(1, 16, kernel_size=3, padding=1),\n            nn.ReLU(),\n            nn.MaxPool2d(2),\n        )\n        self.second = nn.Sequential(\n            nn.Flatten(),\n            nn.Linear(16 * 14 * 14, 64),\n            nn.ReLU(),\n            nn.Linear(64, 10),\n        )\n\n    def forward(self, x):\n        return self.second(self.first(x))\n\n\npreprocess = transforms.Compose([\n    transforms.Grayscale(num_output_channels=1),\n    transforms.Resize((28, 28)),\n    transforms.ToTensor(),\n])\n\napp = FastAPI(title=\"Digit Recognizer\")\nmodel = CheckImage().to(device)\nmodel.load_state_dict(torch.load(MODEL_PATH, map_location=device))\nmodel.eval()\n\n\n@app.get(\"/health\")\ndef health():\n    return {\"status\": \"ok\", \"device\": str(device)}\n\n\n@app.post(\"/predict\")\nasync def predict(file: UploadFile = File(...)):\n    if file.content_type not in {\"image/png\", \"image/jpeg\", \"image/jpg\"}:\n        raise HTTPException(status_code=415, detail=\"Unsupported media type\")\n\n    data = await file.read()\n    if not data:\n        raise HTTPException(status_code=400, detail=\"Empty file\")\n    if len(data) > 5 * 1024 * 1024:\n        raise HTTPException(status_code=413, detail=\"File too large\")\n\n    try:\n        image = Image.open(io.BytesIO(data)).convert(\"RGB\")\n        tensor = preprocess(image).unsqueeze(0).to(device)\n        with torch.inference_mode():\n            logits = model(tensor)\n            probs = torch.softmax(logits, dim=1)\n            confidence, pred = probs.max(dim=1)\n        return {\n            \"result\": int(pred.item()),\n            \"confidence\": round(float(confidence.item()), 4),\n        }\n    except Exception:\n        logger.exception(\"prediction failed\")\n        raise HTTPException(status_code=500, detail=\"Prediction failed\")\n\n\nif __name__ == \"__main__\":\n    uvicorn.run(app, host=\"127.0.0.1\", port=8000)\n```\n\n## Разбор\n- Модель загружается на уровне модуля: один раз при старте процесса. Это дорогая операция, её нельзя делать в каждом запросе.\n- `torch.load(..., map_location=device)` переносит веса на CPU или GPU.\n- `model.eval()` выключает dropout и переводит BatchNorm в inference-режим.\n- `preprocess` повторяет transforms из обучения: grayscale, resize 28×28, tensor.\n- `unsqueeze(0)` добавляет batch-размер: `(1, 1, 28, 28)`.\n- `torch.inference_mode()` не строит граф и экономит память.\n- `softmax` превращает логиты в вероятности; `argmax` даёт класс.\n\n## Ошибки\n- `400` — пустой файл.\n- `413` — файл больше лимита.\n- `415` — неподдерживаемый MIME-тип.\n- `500` — внутренняя ошибка модели/декодирования; детали только в логах.\n\n## Запуск\n```bash\nuvicorn app:app --host 127.0.0.1 --port 8000\ncurl -F \"file=@digit.png\" http://127.0.0.1:8000/predict\n```\n\n## Продакшен-замечания\n- Ограничь размер файла на уровне прокси и приложения.\n- Не делай тяжёлый inference в event loop: для CPU-нагрузки используй `run_in_threadpool` или очередь.\n- Для Streamlit, если запрос идёт из браузера напрямую, настрой CORS; если через Python-сервер Streamlit — CORS не нужен.\n- Логируй request id, latency и класс, но не содержимое изображения.",
+      "kg": "## Толук кызмат\n\n```python\nimport io\nimport logging\n\nimport torch\nimport uvicorn\nfrom fastapi import FastAPI, File, HTTPException, UploadFile\nfrom PIL import Image\nfrom torch import nn\nfrom torchvision import transforms\n\nlogger = logging.getLogger(__name__)\nMODEL_PATH = \"model.pth\"\ndevice = torch.device(\"cuda\" if torch.cuda.is_available() else \"cpu\")\n\n\nclass CheckImage(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.first = nn.Sequential(\n            nn.Conv2d(1, 16, kernel_size=3, padding=1),\n            nn.ReLU(),\n            nn.MaxPool2d(2),\n        )\n        self.second = nn.Sequential(\n            nn.Flatten(),\n            nn.Linear(16 * 14 * 14, 64),\n            nn.ReLU(),\n            nn.Linear(64, 10),\n        )\n\n    def forward(self, x):\n        return self.second(self.first(x))\n\n\npreprocess = transforms.Compose([\n    transforms.Grayscale(num_output_channels=1),\n    transforms.Resize((28, 28)),\n    transforms.ToTensor(),\n])\n\napp = FastAPI(title=\"Digit Recognizer\")\nmodel = CheckImage().to(device)\nmodel.load_state_dict(torch.load(MODEL_PATH, map_location=device))\nmodel.eval()\n\n\n@app.get(\"/health\")\ndef health():\n    return {\"status\": \"ok\", \"device\": str(device)}\n\n\n@app.post(\"/predict\")\nasync def predict(file: UploadFile = File(...)):\n    if file.content_type not in {\"image/png\", \"image/jpeg\", \"image/jpg\"}:\n        raise HTTPException(status_code=415, detail=\"Unsupported media type\")\n\n    data = await file.read()\n    if not data:\n        raise HTTPException(status_code=400, detail=\"Empty file\")\n    if len(data) > 5 * 1024 * 1024:\n        raise HTTPException(status_code=413, detail=\"File too large\")\n\n    try:\n        image = Image.open(io.BytesIO(data)).convert(\"RGB\")\n        tensor = preprocess(image).unsqueeze(0).to(device)\n        with torch.inference_mode():\n            logits = model(tensor)\n            probs = torch.softmax(logits, dim=1)\n            confidence, pred = probs.max(dim=1)\n        return {\n            \"result\": int(pred.item()),\n            \"confidence\": round(float(confidence.item()), 4),\n        }\n    except Exception:\n        logger.exception(\"prediction failed\")\n        raise HTTPException(status_code=500, detail=\"Prediction failed\")\n\n\nif __name__ == \"__main__\":\n    uvicorn.run(app, host=\"127.0.0.1\", port=8000)\n```\n\n## Талдоо\n- Модель модул деңгээлинде жүктөлөт: процесс башталганда бир жолу. Бул кымбат операция, аны ар бир суроодо жасоого болбойт.\n- `torch.load(..., map_location=device)` салмактарды CPU же GPU'га көчүрөт.\n- `model.eval()` dropoutту өчүрүп, BatchNormду inference режимине өткөрөт.\n- `preprocess` окутуудагы transformsди кайталайт: grayscale, resize 28×28, tensor.\n- `unsqueeze(0)` batch өлчөмүн кошот: `(1, 1, 28, 28)`.\n- `torch.inference_mode()` граф куруп, эстутумду үнөмдөйт.\n- `softmax` логиттерди ыктымалдуулукка айландырат; `argmax` классты берет.\n\n## Каталар\n- `400` — бош файл.\n- `413` — файл лимиттен чоң.\n- `415` — колдоого алынбаган MIME-тип.\n- `500` — модель/декоддоо ички катасы; деталдар логдо гана.\n\n## Иштетүү\n```bash\nuvicorn app:app --host 127.0.0.1 --port 8000\ncurl -F \"file=@digit.png\" http://127.0.0.1:8000/predict\n```\n\n## Продакшен эскертүүлөрү\n- Файл өлчөмүн прокси жана колдонмо деңгээлинде чекте.\n- Оор inferenceди event loopто жасаба: CPU жүгү үчүн `run_in_threadpool` же кезек колдон.\n- Streamlit браузерден түз суроо жөнөтсө CORS керек; Python-сервер аркылуу болсо CORS керек эмес.\n- Request id, latency жана классты лог жаз, бирок сүрөттүн мазмунун эмес."
+    },
+    "explanation": {
+      "ru": "Сервис разделяет ответственность: FastAPI принимает HTTP, PIL декодирует изображение, transforms готовят тензор, модель выдаёт класс. Каждый слой можно тестировать отдельно.",
+      "kg": "Кызмат жоопкерчиликти бөлөт: FastAPI HTTP кабыл алат, PIL сүрөттү декоддойт, transforms тензор даярдайт, модель классты берет. Ар бир катмарды өзүнчө тесттөөгө болот."
+    },
+    "walkthrough": [
+      {
+        "ru": "1. Загружаем модель один раз.",
+        "kg": "1. Моделди бир жолу жүктөйбүз."
+      },
+      {
+        "ru": "2. Принимаем `UploadFile`.",
+        "kg": "2. `UploadFile` кабыл алабыз."
+      },
+      {
+        "ru": "3. Проверяем тип, размер и пустоту.",
+        "kg": "3. Тип, өлчөм жана боштукту текшеребиз."
+      },
+      {
+        "ru": "4. Декодируем и делаем тензор.",
+        "kg": "4. Декоддоп, тензор жасайбыз."
+      },
+      {
+        "ru": "5. Inference и JSON-ответ.",
+        "kg": "5. Inference жана JSON жооп."
+      }
+    ],
+    "pitfalls": {
+      "ru": "Не вызывай `torch.load` на каждый запрос: это замедлит сервис и может переполнить память.",
+      "kg": "Ар бир суроодо `torch.load` чакырба: бул кызматты жайлатып, эстутумду толтурушу мүмкүн."
+    },
+    "exam_tip": {
+      "ru": "На экзамене проговори: load once → validate → preprocess → inference → JSON.",
+      "kg": "Экзаменде айт: load once → validate → preprocess → inference → JSON."
+    }
+  },
+  {
+    "slug": "streamlit-ml-client",
+    "type": "theory",
+    "module": "llm-streamlit",
+    "title": {
+      "ru": "Streamlit-клиент для ML API",
+      "kg": "ML API үчүн Streamlit-клиент"
+    },
+    "prompt": {
+      "ru": "Напиши Streamlit-приложение: загрузка картинки, предпросмотр, кнопка «Предсказать», отправка в FastAPI через `requests`, обработка ошибок и история предсказаний в `session_state`.",
+      "kg": "Streamlit колдонмосун жаз: сүрөт жүктөө, алдын ала көрүү, «Предсказать» баскычы, FastAPIге `requests` аркылуу жөнөтүү, каталарды иштетүү жана `session_state`те предсказание тарыхы."
+    },
+    "difficulty": 3,
+    "points": 10,
+    "hints": [
+      {
+        "ru": "Используй `uploaded_file.getvalue()` для байтов.",
+        "kg": "Байттар үчүн `uploaded_file.getvalue()` колдон."
+      },
+      {
+        "ru": "Передавай `files={'file': (name, bytes, mime)}`.",
+        "kg": "`files={'file': (name, bytes, mime)}` бер."
+      },
+      {
+        "ru": "Ставь `timeout` у `requests.post`.",
+        "kg": "`requests.post`ко `timeout` кой."
+      },
+      {
+        "ru": "Различай ConnectionError, Timeout и HTTPError.",
+        "kg": "ConnectionError, Timeout жана HTTPErrorди айырмала."
+      }
+    ],
+    "subquestions": [
+      {
+        "ru": "Почему Streamlit перезапускает скрипт при клике?",
+        "kg": "Эмне үчүн Streamlit басууда скриптти кайра иштетет?"
+      },
+      {
+        "ru": "Что хранит `st.session_state`?",
+        "kg": "`st.session_state` эмнени сактайт?"
+      },
+      {
+        "ru": "Почему API URL лучше брать из переменной окружения?",
+        "kg": "Эмне үчүн API URLди айлана-чөйрө өзгөрмөсүнөн алган жакшы?"
+      }
+    ],
+    "model_answer": {
+      "ru": "## Полный Streamlit-клиент\n\n```python\nimport os\n\nimport requests\nimport streamlit as st\nfrom PIL import Image\n\nAPI_URL = os.getenv(\"API_URL\", \"http://127.0.0.1:8000\")\n\nst.set_page_config(page_title=\"Digit Recognizer\", page_icon=\"🔢\")\nst.title(\"Распознавание цифр\")\n\nif \"history\" not in st.session_state:\n    st.session_state.history = []\n\nuploaded_file = st.file_uploader(\n    \"Загрузите изображение цифры\",\n    type=[\"png\", \"jpg\", \"jpeg\"],\n)\n\nif uploaded_file is not None:\n    image = Image.open(uploaded_file)\n    st.image(image, caption=\"Загруженное изображение\", width=200)\n\n    if st.button(\"Предсказать\", type=\"primary\"):\n        files = {\n            \"file\": (\n                uploaded_file.name,\n                uploaded_file.getvalue(),\n                uploaded_file.type or \"image/png\",\n            )\n        }\n        try:\n            response = requests.post(\n                f\"{API_URL}/predict\",\n                files=files,\n                timeout=10,\n            )\n            response.raise_for_status()\n            payload = response.json()\n            st.success(\n                f\"Цифра: {payload['result']} \"\n                f\"(confidence={payload.get('confidence', 'n/a')})\"\n            )\n            st.session_state.history.append(payload)\n        except requests.exceptions.ConnectionError:\n            st.error(\"Не удалось подключиться к FastAPI. Запусти uvicorn.\")\n        except requests.exceptions.Timeout:\n            st.error(\"FastAPI не ответил за 10 секунд.\")\n        except requests.exceptions.HTTPError:\n            st.error(f\"Ошибка API: {response.status_code} {response.text}\")\n        except Exception as exc:\n            st.error(f\"Произошла ошибка: {exc}\")\n\nif st.session_state.history:\n    st.subheader(\"История предсказаний\")\n    st.json(st.session_state.history)\n```\n\n## Запуск\n```bash\n# терминал 1\nuvicorn app:app --port 8000\n\n# терминал 2\nstreamlit run streamlit_app.py\n```\n\n## Разбор\n- `st.file_uploader` возвращает объект с `.name`, `.type`, `.getvalue()`.\n- `st.image` показывает превью, но не отправляет файл.\n- `st.button` запускает блок только при нажатии.\n- `requests.post(..., files=...)` собирает multipart/form-data.\n- `raise_for_status()` превращает 4xx/5xx в `HTTPError`.\n- `st.session_state` сохраняет историю между перезапусками скрипта.\n- Ошибки показываются пользователю через `st.error`, а не падают в консоль.\n\n## Что улучшить\n- Добавить `st.spinner('Модель думает...')`.\n- Ограничить размер файла до отправки.\n- Показывать top-3 класса с вероятностями.\n- Кэшировать модель на стороне API, а не в Streamlit.\n- Вынести `API_URL` в `.streamlit/secrets.toml` для деплоя.",
+      "kg": "## Толук Streamlit-клиент\n\n```python\nimport os\n\nimport requests\nimport streamlit as st\nfrom PIL import Image\n\nAPI_URL = os.getenv(\"API_URL\", \"http://127.0.0.1:8000\")\n\nst.set_page_config(page_title=\"Digit Recognizer\", page_icon=\"🔢\")\nst.title(\"Распознавание цифр\")\n\nif \"history\" not in st.session_state:\n    st.session_state.history = []\n\nuploaded_file = st.file_uploader(\n    \"Загрузите изображение цифры\",\n    type=[\"png\", \"jpg\", \"jpeg\"],\n)\n\nif uploaded_file is not None:\n    image = Image.open(uploaded_file)\n    st.image(image, caption=\"Загруженное изображение\", width=200)\n\n    if st.button(\"Предсказать\", type=\"primary\"):\n        files = {\n            \"file\": (\n                uploaded_file.name,\n                uploaded_file.getvalue(),\n                uploaded_file.type or \"image/png\",\n            )\n        }\n        try:\n            response = requests.post(\n                f\"{API_URL}/predict\",\n                files=files,\n                timeout=10,\n            )\n            response.raise_for_status()\n            payload = response.json()\n            st.success(\n                f\"Цифра: {payload['result']} \"\n                f\"(confidence={payload.get('confidence', 'n/a')})\"\n            )\n            st.session_state.history.append(payload)\n        except requests.exceptions.ConnectionError:\n            st.error(\"Не удалось подключиться к FastAPI. Запусти uvicorn.\")\n        except requests.exceptions.Timeout:\n            st.error(\"FastAPI не ответил за 10 секунд.\")\n        except requests.exceptions.HTTPError:\n            st.error(f\"Ошибка API: {response.status_code} {response.text}\")\n        except Exception as exc:\n            st.error(f\"Произошла ошибка: {exc}\")\n\nif st.session_state.history:\n    st.subheader(\"История предсказаний\")\n    st.json(st.session_state.history)\n```\n\n## Иштетүү\n```bash\n# терминал 1\nuvicorn app:app --port 8000\n\n# терминал 2\nstreamlit run streamlit_app.py\n```\n\n## Талдоо\n- `st.file_uploader` `.name`, `.type`, `.getvalue()` бар объект кайтарат.\n- `st.image` превью көрсөтөт, бирок файлды жөнөтпөйт.\n- `st.button` басылганда гана блокту иштетет.\n- `requests.post(..., files=...)` multipart/form-data курайт.\n- `raise_for_status()` 4xx/5xxти `HTTPError`ке айландырат.\n- `st.session_state` скрипт кайра иштетүүлөрүнүн ортосунда тарыхты сактайт.\n- Каталар колдонуучуга `st.error` аркылуу көрсөтүлөт, консолго кулабайт.\n\n## Эмнени жакшыртса болот\n- `st.spinner('Модель ойлонууда...')` кош.\n- Жөнөтүүдөн мурун файл өлчөмүн чекте.\n- Top-3 классты ыктымалдуулуктары менен көрсөт.\n- Моделди Streamlitте эмес, API тарапта кэште.\n- Деплой үчүн `API_URL`ди `.streamlit/secrets.toml`ко чыгар."
+    },
+    "explanation": {
+      "ru": "Streamlit — это тонкий клиент. Он не должен хранить модель или знать детали PyTorch: его задача — собрать файл, отправить HTTP-запрос и показать ответ.",
+      "kg": "Streamlit — жука клиент. Ал модель сактабашы жана PyTorch деталдарын билбеши керек: анын милдети — файлды чогултуп, HTTP-суроо жөнөтүп, жоопту көрсөтүү."
+    },
+    "walkthrough": [
+      {
+        "ru": "1. Загружаем файл и показываем превью.",
+        "kg": "1. Файл жүктөп, превью көрсөтөбүз."
+      },
+      {
+        "ru": "2. По кнопке собираем `files`.",
+        "kg": "2. Баскыч боюнча `files` чогултабыз."
+      },
+      {
+        "ru": "3. Отправляем POST с timeout.",
+        "kg": "3. Timeout менен POST жөнөтөбүз."
+      },
+      {
+        "ru": "4. Показываем success/error.",
+        "kg": "4. Success/error көрсөтөбүз."
+      },
+      {
+        "ru": "5. Сохраняем историю в session_state.",
+        "kg": "5. Тарыхты session_stateке сактайбыз."
+      }
+    ],
+    "pitfalls": {
+      "ru": "Не отправляй `uploaded_file` напрямую в `requests`: нужен кортеж с байтами и MIME-типом.",
+      "kg": "`uploaded_file`ти түз `requests`ке жөнөтпө: байттар жана MIME-тип менен кортеж керек."
+    },
+    "exam_tip": {
+      "ru": "На экзамене назови цепочку: uploader → preview → button → requests → success/error.",
+      "kg": "Экзаменде чынжырды ата: uploader → preview → button → requests → success/error."
+    }
+  },
+  {
+    "slug": "mediapipe-gesture-pipeline",
+    "type": "theory",
+    "module": "computer-vision",
+    "title": {
+      "ru": "OpenCV + MediaPipe: жесты RPS с камеры",
+      "kg": "OpenCV + MediaPipe: камерадан RPS жесттери"
+    },
+    "prompt": {
+      "ru": "Опиши и покажи pipeline распознавания жестов «камень-ножницы-бумага»: захват кадра OpenCV, перевод в RGB, MediaPipe Hands, 21 landmark, подсчёт пальцев, классификация, отрисовка результата.",
+      "kg": "«Таш-кайчы-кагаз» жесттерин таануу pipelineин түшүндүр жана көрсөт: OpenCV кадр алуу, RGBге өткөрүү, MediaPipe Hands, 21 landmark, манжаларды саноо, классификация, жыйынтыкты чийүү."
+    },
+    "difficulty": 4,
+    "points": 12,
+    "hints": [
+      {
+        "ru": "MediaPipe ждёт RGB, а OpenCV даёт BGR.",
+        "kg": "MediaPipe RGB күтөт, OpenCV BGR берет."
+      },
+      {
+        "ru": "Для зеркального селфи используй `cv2.flip(frame, 1)`.",
+        "kg": "Күзгү селфи үчүн `cv2.flip(frame, 1)` колдон."
+      },
+      {
+        "ru": "Сравнивай `y` кончиков 8/12/16/20 с `y` суставов 6/10/14/18.",
+        "kg": "8/12/16/20 учтарынын `y`син 6/10/14/18 муундарынын `y`си менен салыштыр."
+      },
+      {
+        "ru": "Не забудь `cap.release()` и `cv2.destroyAllWindows()`.",
+        "kg": "`cap.release()` жана `cv2.destroyAllWindows()` унутпа."
+      }
+    ],
+    "subquestions": [
+      {
+        "ru": "Почему MediaPipe получает RGB, а не BGR?",
+        "kg": "Эмне үчүн MediaPipe BGR эмес, RGB алат?"
+      },
+      {
+        "ru": "Почему большой палец сложнее считать по `y`?",
+        "kg": "Эмне үчүн баш бармакты `y` боюнча саноо кыйын?"
+      },
+      {
+        "ru": "Как повысить стабильность классификатора?",
+        "kg": "Классификатордун туруктуулугун кантип жогорулатууга болот?"
+      }
+    ],
+    "model_answer": {
+      "ru": "## Полный pipeline\n\n```python\nimport cv2\nimport mediapipe as mp\n\nmp_hands = mp.solutions.hands\nmp_drawing = mp.solutions.drawing_utils\n\n\ndef fingers_up(hand_landmarks):\n    lm = hand_landmarks.landmark\n    return [\n        1 if lm[8].y < lm[6].y else 0,\n        1 if lm[12].y < lm[10].y else 0,\n        1 if lm[16].y < lm[14].y else 0,\n        1 if lm[20].y < lm[18].y else 0,\n    ]\n\n\ndef classify(fingers):\n    total = sum(fingers)\n    if total == 0:\n        return \"rock\"\n    if total == 4:\n        return \"paper\"\n    if total == 2:\n        return \"scissors\"\n    return \"unknown\"\n\n\ncap = cv2.VideoCapture(0)\n\nwith mp_hands.Hands(\n    max_num_hands=1,\n    min_detection_confidence=0.6,\n    min_tracking_confidence=0.6,\n) as hands:\n    while cap.isOpened():\n        ok, frame = cap.read()\n        if not ok:\n            break\n\n        frame = cv2.flip(frame, 1)\n        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)\n        rgb.flags.writeable = False\n        results = hands.process(rgb)\n\n        if results.multi_hand_landmarks:\n            for hand in results.multi_hand_landmarks:\n                fingers = fingers_up(hand)\n                label = classify(fingers)\n                mp_drawing.draw_landmarks(\n                    frame, hand, mp_hands.HAND_CONNECTIONS\n                )\n                cv2.putText(\n                    frame, f\"{label} {fingers}\", (20, 50),\n                    cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 0), 2,\n                )\n\n        cv2.imshow(\"Rock-Paper-Scissors\", frame)\n        if cv2.waitKey(1) & 0xFF == ord(\"q\"):\n            break\n\ncap.release()\ncv2.destroyAllWindows()\n```\n\n## Как это работает\n1. `cv2.VideoCapture(0)` открывает камеру.\n2. Кадр переворачивается, чтобы зеркалить селфи.\n3. OpenCV хранит BGR, MediaPipe ждёт RGB: `cv2.cvtColor`.\n4. `hands.process(rgb)` возвращает `multi_hand_landmarks`.\n5. У каждой руки 21 landmark с нормализованными `x, y, z`.\n6. `fingers_up` сравнивает кончики и PIP-суставы.\n7. `classify` превращает количество пальцев в жест.\n8. `cv2.putText` и `draw_landmarks` показывают результат.\n\n## Улучшения\n- Добавь гистерезис: не меняй жест, пока он не стабилен 5 кадров.\n- Используй углы и расстояния, а не только `y`.\n- Обучи маленький классификатор на landmark-фичах.\n- Показывай FPS и confidence.\n- Для презентации запиши видео и добавь его в README.\n\n## Важно\nMediaPipe и OpenCV — отдельные зависимости. На сервере без камеры этот код не запустится; для API отправляй уже готовые landmark-фичи или изображение.",
+      "kg": "## Толук pipeline\n\n```python\nimport cv2\nimport mediapipe as mp\n\nmp_hands = mp.solutions.hands\nmp_drawing = mp.solutions.drawing_utils\n\n\ndef fingers_up(hand_landmarks):\n    lm = hand_landmarks.landmark\n    return [\n        1 if lm[8].y < lm[6].y else 0,\n        1 if lm[12].y < lm[10].y else 0,\n        1 if lm[16].y < lm[14].y else 0,\n        1 if lm[20].y < lm[18].y else 0,\n    ]\n\n\ndef classify(fingers):\n    total = sum(fingers)\n    if total == 0:\n        return \"rock\"\n    if total == 4:\n        return \"paper\"\n    if total == 2:\n        return \"scissors\"\n    return \"unknown\"\n\n\ncap = cv2.VideoCapture(0)\n\nwith mp_hands.Hands(\n    max_num_hands=1,\n    min_detection_confidence=0.6,\n    min_tracking_confidence=0.6,\n) as hands:\n    while cap.isOpened():\n        ok, frame = cap.read()\n        if not ok:\n            break\n\n        frame = cv2.flip(frame, 1)\n        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)\n        rgb.flags.writeable = False\n        results = hands.process(rgb)\n\n        if results.multi_hand_landmarks:\n            for hand in results.multi_hand_landmarks:\n                fingers = fingers_up(hand)\n                label = classify(fingers)\n                mp_drawing.draw_landmarks(\n                    frame, hand, mp_hands.HAND_CONNECTIONS\n                )\n                cv2.putText(\n                    frame, f\"{label} {fingers}\", (20, 50),\n                    cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 0), 2,\n                )\n\n        cv2.imshow(\"Rock-Paper-Scissors\", frame)\n        if cv2.waitKey(1) & 0xFF == ord(\"q\"):\n            break\n\ncap.release()\ncv2.destroyAllWindows()\n```\n\n## Кантип иштейт\n1. `cv2.VideoCapture(0)` камераны ачат.\n2. Кадр селфини күзгүлөө үчүн которулат.\n3. OpenCV BGR сактайт, MediaPipe RGB күтөт: `cv2.cvtColor`.\n4. `hands.process(rgb)` `multi_hand_landmarks` кайтарат.\n5. Ар бир колдо 21 landmark нормалдаштырылган `x, y, z` менен.\n6. `fingers_up` учтарды жана PIP муундарын салыштырат.\n7. `classify` манжалардын санын жестке айландырат.\n8. `cv2.putText` жана `draw_landmarks` жыйынтыкты көрсөтөт.\n\n## Жакшыртуулар\n- Гистерезис кош: жест 5 кадр туруктуу болмокчу.\n- Бир гана `y` эмес, бурчтарды жана аралыктарды колдон.\n- Landmark-белгилеринде кичине классификатор окут.\n- FPS жана confidence көрсөт.\n- Презентация үчүн видео жазып, READMEге кош.\n\n## Маанилүү\nMediaPipe жана OpenCV өзүнчө көз карандылыктар. Камерасыз серверде бул код иштебейт; API үчүн даяр landmark-белгилерин же сүрөттү жөнөт."
+    },
+    "explanation": {
+      "ru": "MediaPipe даёт геометрию руки, а классификатор — правило или модель поверх неё. Разделение «детекция → признаки → класс» делает проект понятным и расширяемым.",
+      "kg": "MediaPipe колдун геометриясын берет, классификатор — анын үстүндөгү эреже же модель. «детекция → белгилер → класс» бөлүнүшү долбоорду түшүнүктүү жана кеңейтүүгө ыңгайлуу кылат."
+    },
+    "walkthrough": [
+      {
+        "ru": "1. Камера → кадр.",
+        "kg": "1. Камера → кадр."
+      },
+      {
+        "ru": "2. BGR → RGB → MediaPipe.",
+        "kg": "2. BGR → RGB → MediaPipe."
+      },
+      {
+        "ru": "3. Landmarks → пальцы.",
+        "kg": "3. Landmarks → манжалар."
+      },
+      {
+        "ru": "4. Пальцы → жест.",
+        "kg": "4. Манжалар → жест."
+      },
+      {
+        "ru": "5. Отрисовка и выход по `q`.",
+        "kg": "5. Чийүү жана `q` менен чыгуу."
+      }
+    ],
+    "pitfalls": {
+      "ru": "Не путай координаты: MediaPipe нормализует `x, y` в `[0, 1]`, а OpenCV рисует в пикселях.",
+      "kg": "Координаталарды алмаштырба: MediaPipe `x, y`ни `[0, 1]`ге нормалдайт, OpenCV пикселдерде чийет."
+    },
+    "exam_tip": {
+      "ru": "На экзамене проговори: BGR→RGB, 21 landmark, признаки, правило, HUD.",
+      "kg": "Экзаменде айт: BGR→RGB, 21 landmark, белгилер, эреже, HUD."
+    }
+  },
+  {
+    "slug": "model-artifacts-git",
+    "type": "theory",
+    "module": "devops-security",
+    "title": {
+      "ru": "Артефакты модели и GitHub: LFS, релизы, секреты",
+      "kg": "Модель артефактылары жана GitHub: LFS, релиздер, секреттер"
+    },
+    "prompt": {
+      "ru": "Модель обучена и сжата. Объясни, как правильно сохранить её в Git/GitHub: `.gitignore`, Git LFS, GitHub Release, README с метриками, запрет секретов и больших датасетов.",
+      "kg": "Модель окутулуп, кысылды. Аны Git/GitHub'го туура сактоону түшүндүр: `.gitignore`, Git LFS, GitHub Release, метрикалар менен README, секреттерди жана чоң датасеттерди тыюу."
+    },
+    "difficulty": 3,
+    "points": 10,
+    "hints": [
+      {
+        "ru": "Не коммить `data/`, `.env`, виртуальные окружения и кэши.",
+        "kg": "`data/`, `.env`, виртуалдык чөйрөлөр жана кэштерди коммиттебе."
+      },
+      {
+        "ru": "Для `.pth` используй Git LFS или GitHub Release.",
+        "kg": "`.pth` үчүн Git LFS же GitHub Release колдон."
+      },
+      {
+        "ru": "В README укажи архитектуру, accuracy, вход/выход и как запустить.",
+        "kg": "READMEде архитектураны, accuracyни, кирүү/чыгууну жана иштетүүнү жаз."
+      },
+      {
+        "ru": "Проверь историю на случай случайно закоммиченных токенов.",
+        "kg": "Кокустан коммиттелген токендер үчүн тарыхты текшер."
+      }
+    ],
+    "subquestions": [
+      {
+        "ru": "Почему GitHub не любит большие бинарные файлы?",
+        "kg": "Эмне үчүн GitHub чоң бинардык файлдарды жактырбайт?"
+      },
+      {
+        "ru": "Чем Git LFS отличается от обычного Git?",
+        "kg": "Git LFS кадимки Gitтен кандай айырмаланат?"
+      },
+      {
+        "ru": "Что должно быть в model card?",
+        "kg": "Model cardта эмне болушу керек?"
+      }
+    ],
+    "model_answer": {
+      "ru": "## Что коммитить, а что нет\n\n**Коммитим:**\n- код обучения и инференса;\n- `requirements.txt` с версиями;\n- `metrics.json` / графики;\n- README и model card;\n- небольшой `model.pth` через LFS или Release.\n\n**Не коммитим:**\n- датасеты (`data/`);\n- `.env`, токены, пароли;\n- `__pycache__/`, `.ipynb_checkpoints/`, виртуальные окружения;\n- огромные чекпоинты без LFS.\n\n## Команды\n```bash\n# 1. Зафиксируй метрики и версию модели\npython -c \"import json; print(json.load(open('metrics.json')))\"\n\n# 2. Сложи артефакты в отдельную папку\nmkdir -p artifacts\ncopy model.pth artifacts\\digit_cnn_v1.pth\n\n# 3. Подключи Git LFS для весов\ngit lfs install\ngit lfs track \"*.pth\"\ngit add .gitattributes\n\n# 4. Спрячь данные и секреты\n@\"\ndata/\n__pycache__/\n.ipynb_checkpoints/\n.env\n\"@ | Set-Content .gitignore\n\n# 5. Закоммить модель, код, метрики и README\ngit add .gitignore artifacts/digit_cnn_v1.pth app.py train.py requirements.txt README.md metrics.json\ngit commit -m \"Add trained digit CNN v1\"\n\n# 6. Запушь в GitHub\ngit branch -M main\ngit remote add origin https://github.com/USER/red-diploma-digit.git\ngit push -u origin main\n\n# 7. Для больших файлов удобнее GitHub Release\ngh release create v1.0.0 artifacts/digit_cnn_v1.pth `\n  --title \"Digit CNN v1\" `\n  --notes \"test_acc=0.98, input=28x28 grayscale\"\n```\n\n## README / model card\n```markdown\n# Digit CNN\n- Task: MNIST digit classification\n- Architecture: Conv2d(1,16) → ReLU → MaxPool → FC(64) → FC(10)\n- Input: 28×28 grayscale image\n- Test accuracy: 0.98\n- Artifact: artifacts/digit_cnn_v1.pth\n- Run: uvicorn app:app --port 8000\n- Limitations: trained on MNIST only; poor on photos of handwritten text\n```\n\n## Безопасность\n- Не коммить `.env` и API-ключи.\n- Если секрет попал в историю — удали его из истории и перевыпусти ключ; просто удалить файл новым коммитом недостаточно.\n- Для CI храни секреты в GitHub Secrets.\n- Не выкладывай персональные данные из датасета.",
+      "kg": "## Эмнени коммиттөө керек, эмнени эмес\n\n**Коммиттейбиз:**\n- окутуу жана инференс кодун;\n- версиялары менен `requirements.txt`;\n- `metrics.json` / графиктер;\n- README жана model card;\n- LFS же Release аркылуу кичине `model.pth`.\n\n**Коммиттебейбиз:**\n- датасеттер (`data/`);\n- `.env`, токендер, сырсөздөр;\n- `__pycache__/`, `.ipynb_checkpoints/`, виртуалдык чөйрөлөр;\n- LFSсиз огромный чекпоинттер.\n\n## Буйруктар\n```bash\n# 1. Зафиксируй метрики и версию модели\npython -c \"import json; print(json.load(open('metrics.json')))\"\n\n# 2. Сложи артефакты в отдельную папку\nmkdir -p artifacts\ncopy model.pth artifacts\\digit_cnn_v1.pth\n\n# 3. Подключи Git LFS для весов\ngit lfs install\ngit lfs track \"*.pth\"\ngit add .gitattributes\n\n# 4. Спрячь данные и секреты\n@\"\ndata/\n__pycache__/\n.ipynb_checkpoints/\n.env\n\"@ | Set-Content .gitignore\n\n# 5. Закоммить модель, код, метрики и README\ngit add .gitignore artifacts/digit_cnn_v1.pth app.py train.py requirements.txt README.md metrics.json\ngit commit -m \"Add trained digit CNN v1\"\n\n# 6. Запушь в GitHub\ngit branch -M main\ngit remote add origin https://github.com/USER/red-diploma-digit.git\ngit push -u origin main\n\n# 7. Для больших файлов удобнее GitHub Release\ngh release create v1.0.0 artifacts/digit_cnn_v1.pth `\n  --title \"Digit CNN v1\" `\n  --notes \"test_acc=0.98, input=28x28 grayscale\"\n```\n\n## README / model card\n```markdown\n# Digit CNN\n- Task: MNIST digit classification\n- Architecture: Conv2d(1,16) → ReLU → MaxPool → FC(64) → FC(10)\n- Input: 28×28 grayscale image\n- Test accuracy: 0.98\n- Artifact: artifacts/digit_cnn_v1.pth\n- Run: uvicorn app:app --port 8000\n- Limitations: trained on MNIST only; poor on photos of handwritten text\n```\n\n## Коопсуздук\n- `.env` жана API-ачкычтарды коммиттебе.\n- Секрет тарыхка түшсө — аны тарыхтан алып салып, ачкычты кайра чыгар; файлды жаңы коммит менен өчүрүү жетишсиз.\n- CI үчүн секреттерди GitHub Secrets'те сакта.\n- Датасеттеги жеке маалыматтарды жарыялаба."
+    },
+    "explanation": {
+      "ru": "Git хранит историю, а не только текущие файлы. Поэтому секреты и большие данные нужно исключать до первого коммита, а веса — версионировать через LFS/Release.",
+      "kg": "Git азыркы файлдарды гана эмес, тарыхты да сактайт. Ошондуктан секреттерди жана чоң маалыматтарды биринчи коммиттен мурун чыгарып, салмактарды LFS/Release аркылуу версиялоо керек."
+    },
+    "walkthrough": [
+      {
+        "ru": "1. Фиксируем метрики и версию.",
+        "kg": "1. Метрикаларды жана версияны жазабыз."
+      },
+      {
+        "ru": "2. Прячем данные и секреты в `.gitignore`.",
+        "kg": "2. Маалыматтарды жана секреттерди `.gitignore`го жашырабыз."
+      },
+      {
+        "ru": "3. Подключаем LFS для весов.",
+        "kg": "3. Салмактар үчүн LFS кошобуз."
+      },
+      {
+        "ru": "4. Коммитим код, README, артефакт.",
+        "kg": "4. Кодду, READMEни, артефактты коммиттейбиз."
+      },
+      {
+        "ru": "5. Пуш и Release для больших файлов.",
+        "kg": "5. Чоң файлдар үчүн пуш жана Release."
+      }
+    ],
+    "pitfalls": {
+      "ru": "Не коммить токен в `.env`, даже если репозиторий приватный: история остаётся, доступы могут утечь.",
+      "kg": "`.env`теги токенди коммиттебе, репозиторий приватдуу болсо да: тарых калат, жетүү мүмкүнчүлүгү агып кетиши мүмкүн."
+    },
+    "exam_tip": {
+      "ru": "На экзамене скажи: код — в Git, данные — отдельно, веса — LFS/Release, секреты — Secrets.",
+      "kg": "Экзаменде айт: код — Git'те, маалымат — өзүнчө, салмактар — LFS/Release, секреттер — Secrets."
+    }
+  }
+]

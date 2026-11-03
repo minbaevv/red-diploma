@@ -1,0 +1,410 @@
+[
+  {
+    "slug": "sql-select",
+    "type": "theory",
+    "module": "sql-databases",
+    "title": { "ru": "Порядок SELECT", "kg": "SELECT тартиби" },
+    "prompt": {
+      "ru": "Объясни порядок выполнения SQL-запроса и разницу `WHERE` / `HAVING`. Приведи пример.",
+      "kg": "SQL сурамынын аткарылуу тартибин жана `WHERE` / `HAVING` айырмасын түшүндүр. Мисал келтир."
+    },
+    "difficulty": 1,
+    "points": 8,
+    "hints": [
+      { "ru": "Начни с `FROM`, а не с `SELECT`.", "kg": "`SELECT` эмес, `FROM` менен башта." },
+      { "ru": "`HAVING` работает после группировки.", "kg": "`HAVING` топтоодон кийин иштейт." }
+    ],
+    "model_answer": {
+      "ru": "Порядок: `FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY → LIMIT`.\n\n`WHERE` фильтрует строки до группировки. `HAVING` фильтрует уже сгруппированные строки и может использовать агрегаты.\n\n```sql\nSELECT department, COUNT(*) AS total\nFROM employees\nWHERE salary > 1000\nGROUP BY department\nHAVING COUNT(*) > 5\nORDER BY total DESC;\n```",
+      "kg": "Тартип: `FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY → LIMIT`.\n\n`WHERE` топтоого чейин саптарды фильтрлейт. `HAVING` топтолгон саптарды фильтрлейт жана агрегаттарды колдонот.\n\n```sql\nSELECT department, COUNT(*) AS total\nFROM employees\nWHERE salary > 1000\nGROUP BY department\nHAVING COUNT(*) > 5;\n```"
+    },
+    "explanation": {
+      "ru": "На экзамене достаточно назвать порядок и привести пример с `HAVING COUNT(*)`.",
+      "kg": "Экзаменде тартипти айтып, `HAVING COUNT(*)` мисалын келтирсе жетишет."
+    }
+  },
+  {
+    "slug": "sql-join",
+    "type": "theory",
+    "module": "sql-databases",
+    "title": { "ru": "Типы JOIN", "kg": "JOIN түрлөрү" },
+    "prompt": {
+      "ru": "Сравни `INNER`, `LEFT`, `RIGHT` и `FULL JOIN`. Когда какой использовать?",
+      "kg": "`INNER`, `LEFT`, `RIGHT`, `FULL JOIN` салыштыр. Качан кайсынысын колдонуу керек?"
+    },
+    "difficulty": 2,
+    "points": 8,
+    "hints": [
+      { "ru": "Нарисуй две таблицы и совпадения.", "kg": "Эки таблицаны жана дал келүүлөрдү тарт." },
+      { "ru": "`LEFT JOIN` сохраняет все строки левой таблицы.", "kg": "`LEFT JOIN` сол таблицанын баарын сактайт." }
+    ],
+    "model_answer": {
+      "ru": "`INNER JOIN` — только строки, где есть совпадение в обеих таблицах.\n`LEFT JOIN` — все строки левой + совпадения справа; если совпадения нет, справа `NULL`.\n`RIGHT JOIN` — зеркально `LEFT`. `FULL JOIN` — все строки обеих таблиц.\n\n`LEFT JOIN` нужен, когда важно не потерять клиентов без заказов. `INNER JOIN` — когда нужны только пары.",
+      "kg": "`INNER JOIN` — эки таблицада тең дал келген саптар.\n`LEFT JOIN` — сол таблицанын баары + оң жактагы дал келүүлөр; жок болсо `NULL`.\n`RIGHT JOIN` — `LEFT`тин тескериси. `FULL JOIN` — эки таблицанын баары.\n\nЗаказсыз кардарларды жоготпоо үчүн `LEFT JOIN` керек. Тек жуптар керек болсо `INNER JOIN`."
+    },
+    "explanation": {
+      "ru": "Самый частый вопрос: чем `LEFT JOIN` отличается от `INNER JOIN` и где появится `NULL`.",
+      "kg": "Эң көп суроо: `LEFT JOIN` жана `INNER JOIN` айырмасы, `NULL` кайда пайда болот."
+    }
+  },
+  {
+    "slug": "sql-delete",
+    "type": "theory",
+    "module": "sql-databases",
+    "title": { "ru": "DELETE, TRUNCATE, DROP", "kg": "DELETE, TRUNCATE, DROP" },
+    "prompt": {
+      "ru": "Чем отличаются `DELETE`, `TRUNCATE` и `DROP`? Приведи ситуации, когда использовать каждый.",
+      "kg": "`DELETE`, `TRUNCATE`, `DROP` айырмасы? Кайсынысын качан колдонуу керек?"
+    },
+    "difficulty": 1,
+    "points": 6,
+    "hints": [
+      { "ru": "Один удаляет строки, другой — таблицу.", "kg": "Бири саптарды, экинчиси таблицаны өчүрөт." },
+      { "ru": "Подумай про `WHERE` и скорость.", "kg": "`WHERE` жана ылдамдык жөнүндө ойлон." }
+    ],
+    "model_answer": {
+      "ru": "`DELETE` удаляет строки и поддерживает `WHERE`; таблица остаётся. Можно откатить в транзакции.\n`TRUNCATE` быстро удаляет все строки, обычно без `WHERE`.\n`DROP TABLE` удаляет таблицу вместе со структурой и данными.\n\nПример: `DELETE FROM orders WHERE created_at < '2024-01-01';`, `TRUNCATE logs;`, `DROP TABLE temp_import;`.",
+      "kg": "`DELETE` саптарды өчүрөт жана `WHERE` колдонот; таблица калат. Транзакцияда кайтарууга болот.\n`TRUNCATE` бардык саптарды тез өчүрөт, `WHERE` жок.\n`DROP TABLE` таблицаны структурасы жана маалыматы менен өчүрөт.\n\nМисал: `DELETE FROM orders WHERE created_at < '2024-01-01';`, `TRUNCATE logs;`, `DROP TABLE temp_import;`."
+    },
+    "explanation": {
+      "ru": "Запомни связку: `DELETE` — строки, `TRUNCATE` — все строки быстро, `DROP` — таблица целиком.",
+      "kg": "Байланышты эсте: `DELETE` — саптар, `TRUNCATE` — баары тез, `DROP` — таблица."
+    }
+  },
+  {
+    "slug": "linux-commands",
+    "type": "theory",
+    "module": "linux-git",
+    "title": { "ru": "15 Linux-команд", "kg": "15 Linux командасы" },
+    "prompt": {
+      "ru": "Назови 15 Linux-команд и подробно объясни 5 из них.",
+      "kg": "15 Linux командасын ата жана 5ин кеңири түшүндүр."
+    },
+    "difficulty": 1,
+    "points": 8,
+    "hints": [
+      { "ru": "Раздели команды на файлы, процессы и сеть.", "kg": "Командаларды файл, процесс жана тармакка бөл." },
+      { "ru": "`grep`, `find`, `chmod` — самые частые вопросы.", "kg": "`grep`, `find`, `chmod` — эң көп суроолор." }
+    ],
+    "model_answer": {
+      "ru": "`ls`, `cd`, `pwd`, `mkdir`, `touch`, `cp`, `mv`, `rm`, `cat`, `grep`, `find`, `chmod`, `ps`, `kill`, `df`.\n\nПодробно: `grep -r 'error' .` ищет текст рекурсивно; `find . -name '*.py'` ищет файлы; `chmod +x run.sh` делает скрипт исполняемым; `ps aux` показывает процессы; `df -h` показывает диски.",
+      "kg": "`ls`, `cd`, `pwd`, `mkdir`, `touch`, `cp`, `mv`, `rm`, `cat`, `grep`, `find`, `chmod`, `ps`, `kill`, `df`.\n\n`grep -r 'error' .` текстти рекурсивдүү издейт; `find . -name '*.py'` файлдарды издейт; `chmod +x run.sh` скриптти аткарууга уруксат берет; `ps aux` процесстерди көрсөтөт; `df -h` дисктерди көрсөтөт."
+    },
+    "explanation": {
+      "ru": "Не надо рассказывать все 15 идеально. Назови список и выбери 5 для глубины.",
+      "kg": "15ин тең идеалдуу айтуу шарт эмес. Тизмени ата да, 5ин терең түшүндүр."
+    }
+  },
+  {
+    "slug": "git-flow",
+    "type": "theory",
+    "module": "linux-git",
+    "title": { "ru": "Git: clone → push", "kg": "Git: clone → push" },
+    "prompt": {
+      "ru": "Опиши путь от `git clone` до `git push`. Чем `git pull` отличается от `git fetch`?",
+      "kg": "`git clone`дон `git push`ко чейинки жолду жаз. `git pull` жана `git fetch` айырмасы?"
+    },
+    "difficulty": 2,
+    "points": 8,
+    "hints": [
+      { "ru": "Вспомни `add`, `commit`, `push`.", "kg": "`add`, `commit`, `push` эсте." },
+      { "ru": "`pull` — это `fetch` + `merge`.", "kg": "`pull` — `fetch` + `merge`." }
+    ],
+    "model_answer": {
+      "ru": "`git clone <url>` копирует репозиторий. Дальше: `git switch -c feature`, изменения, `git status`, `git add .`, `git commit -m 'feat: ...'`, `git pull --rebase`, `git push -u origin feature`.\n\n`git fetch` скачивает изменения, но не меняет рабочую ветку. `git pull` скачивает и сразу вливает (`merge` или `rebase`).",
+      "kg": "`git clone <url>` репозиторийди көчүрөт. Анан: `git switch -c feature`, өзгөртүүлөр, `git status`, `git add .`, `git commit -m 'feat: ...'`, `git pull --rebase`, `git push -u origin feature`.\n\n`git fetch` өзгөртүүлөрдү жүктөйт, бирок ишчи бутакты өзгөртпөйт. `git pull` жүктөп, дароо бириктирет."
+    },
+    "explanation": {
+      "ru": "На экзамене назови последовательность и объясни разницу fetch/pull.",
+      "kg": "Экзаменде ырааттуулукту ата жана fetch/pull айырмасын түшүндүр."
+    }
+  },
+  {
+    "slug": "http-status",
+    "type": "theory",
+    "module": "backend-api",
+    "title": { "ru": "HTTP-статусы", "kg": "HTTP статустары" },
+    "prompt": {
+      "ru": "Объясни разницу между 400, 401, 403, 404 и 500. Приведи примеры.",
+      "kg": "400, 401, 403, 404 жана 500 айырмасын түшүндүр. Мисал келтир."
+    },
+    "difficulty": 1,
+    "points": 8,
+    "hints": [
+      { "ru": "401 — «кто ты?», 403 — «я знаю, но нельзя».", "kg": "401 — «сен кимсиң?», 403 — «билем, бирок болбойт»." },
+      { "ru": "404 — ресурс не найден, 500 — ошибка сервера.", "kg": "404 — ресурс жок, 500 — сервер катасы." }
+    ],
+    "model_answer": {
+      "ru": "`400 Bad Request` — клиент прислал некорректные данные. `401 Unauthorized` — нет аутентификации: токен отсутствует или просрочен. `403 Forbidden` — пользователь аутентифицирован, но прав недостаточно. `404 Not Found` — ресурс не существует. `500 Internal Server Error` — необработанная ошибка на сервере.\n\nПример: без токена → 401; с токеном студента при удалении чужого курса → 403; `/courses/999` → 404.",
+      "kg": "`400 Bad Request` — клиент туура эмес маалымат жөнөттү. `401 Unauthorized` — аутентификация жок: токен жок же мөөнөтү бүткөн. `403 Forbidden` — колдонуучу аутентификацияланган, бирок укугу жетишсиз. `404 Not Found` — ресурс жок. `500 Internal Server Error` — сервердеги иштетилбеген ката.\n\nМисал: токенсиз → 401; студент токени менен башканын курсын өчүрүү → 403; `/courses/999` → 404."
+    },
+    "explanation": {
+      "ru": "Ключевая пара — 401/403. 401 лечится логином, 403 — правами.",
+      "kg": "Негизги жуп — 401/403. 401 логин менен, 403 укук менен чечилет."
+    }
+  },
+  {
+    "slug": "drf-views",
+    "type": "theory",
+    "module": "backend-api",
+    "title": { "ru": "APIView, Generic, ViewSet", "kg": "APIView, Generic, ViewSet" },
+    "prompt": {
+      "ru": "Сравни `APIView`, `GenericAPIView` и `ViewSet` в DRF. Когда что использовать?",
+      "kg": "DRFте `APIView`, `GenericAPIView`, `ViewSet` салыштыр. Качан кайсы?"
+    },
+    "difficulty": 2,
+    "points": 10,
+    "hints": [
+      { "ru": "Начни с уровня контроля.", "kg": "Көзөмөл деңгээлинен башта." },
+      { "ru": "ViewSet обычно работает с Router.", "kg": "ViewSet көбүнчө Router менен иштейт." }
+    ],
+    "model_answer": {
+      "ru": "`APIView` — максимальный контроль: сам пишешь `get`, `post`, `put`, `delete`. Подходит для нестандартной логики.\n`GenericAPIView` — даёт `queryset`, `serializer_class`, `get_queryset`, готовые CRUD-миксины. Меньше кода для CRUD.\n`ViewSet` — набор CRUD-действий, подключается через `Router` и даёт URL автоматически.\n\nПример: кастомный экспорт отчёта — `APIView`; обычный CRUD студентов — `ModelViewSet`.",
+      "kg": "`APIView` — максималдуу көзөмөл: `get`, `post`, `put`, `delete` өзүң жазасың. Стандарттык эмес логика үчүн.\n`GenericAPIView` — `queryset`, `serializer_class`, `get_queryset`, даяр CRUD. Аз код.\n`ViewSet` — CRUD аракеттеринин топтому, `Router` аркылуу URL автоматтык түрдө.\n\nМисал: отчет экспорту — `APIView`; студенттердин CRUD — `ModelViewSet`."
+    },
+    "explanation": {
+      "ru": "Ответ должен звучать как «контроль vs скорость разработки».",
+      "kg": "Жооп «көзөмөл vs тездик» деп угулушу керек."
+    }
+  },
+  {
+    "slug": "jwt-auth",
+    "type": "theory",
+    "module": "backend-api",
+    "title": { "ru": "JWT и пароли", "kg": "JWT жана паролдор" },
+    "prompt": {
+      "ru": "Как работает JWT? Зачем нужен refresh token? Почему пароли хэшируют, а не шифруют?",
+      "kg": "JWT кантип иштейт? Refresh token эмне үчүн? Паролдор эмне үчүн хэштелет?"
+    },
+    "difficulty": 3,
+    "points": 10,
+    "hints": [
+      { "ru": "JWT состоит из header, payload, signature.", "kg": "JWT header, payload, signatureдан турат." },
+      { "ru": "Хэш необратим, шифрование обратимо.", "kg": "Хэш кайтарылбайт, шифрлөө кайтарылат." }
+    ],
+    "model_answer": {
+      "ru": "JWT — токен из header, payload и signature. Сервер проверяет подпись и не хранит сессию. Access token живёт недолго, refresh — дольше и позволяет получить новый access без логина.\nПароли хэшируют (bcrypt/argon2), потому что утечка хэша не даёт исходный пароль. Шифрование обратимо, для паролей это неправильно.\nJWT подписан, но не зашифрован: payload можно прочитать, секреты туда не кладут.",
+      "kg": "JWT — header, payload жана signatureдан турган токен. Сервер кол тамганы текшерет жана сессия сактабайт. Access кыска, refresh узун жана кайра логинсиз жаңы access алууга мүмкүндүк берет.\nПаролдор хэштелет (bcrypt/argon2), себеби хэш агып кетсе да баштапкы пароль алынбайт. Шифрлөө кайтарылат, пароль үчүн туура эмес.\nJWT кол коюлган, бирок шифрленбеген: payload окулат."
+    },
+    "explanation": {
+      "ru": "Сильный ответ: подпись ≠ шифрование, refresh нужен для короткого access token.",
+      "kg": "Күчтүү жооп: кол тамга ≠ шифрлөө, refresh кыска access үчүн керек."
+    }
+  },
+  {
+    "slug": "pandas-drills",
+    "type": "theory",
+    "module": "data-ml",
+    "title": { "ru": "15 методов pandas", "kg": "15 pandas методу" },
+    "prompt": {
+      "ru": "Назови 15 методов pandas и объясни разницу `loc` / `iloc`.",
+      "kg": "15 pandas методу ата жана `loc` / `iloc` айырмасын түшүндүр."
+    },
+    "difficulty": 1,
+    "points": 8,
+    "hints": [
+      { "ru": "Раздели методы на чтение, очистку, группировку и вывод.", "kg": "Методдорду окуу, тазалоо, топтоо жана чыгарууга бөл." },
+      { "ru": "`loc` — метки, `iloc` — позиции.", "kg": "`loc` — белгилер, `iloc` — позициялар." }
+    ],
+    "model_answer": {
+      "ru": "`read_csv`, `head`, `info`, `describe`, `isna`, `fillna`, `dropna`, `groupby`, `merge`, `sort_values`, `value_counts`, `apply`, `loc`, `iloc`, `to_csv`.\n\n`loc` выбирает по меткам индекса/колонок: `df.loc[df['score'] > 80, 'name']`. `iloc` — по целочисленным позициям: `df.iloc[0:5, 0:2]`.\n\n`df.groupby('city')['salary'].mean()` — средняя зарплата по городам.",
+      "kg": "`read_csv`, `head`, `info`, `describe`, `isna`, `fillna`, `dropna`, `groupby`, `merge`, `sort_values`, `value_counts`, `apply`, `loc`, `iloc`, `to_csv`.\n\n`loc` индекс/колонка белгилери боюнча тандайт: `df.loc[df['score'] > 80, 'name']`. `iloc` — позиция боюнча: `df.iloc[0:5, 0:2]`.\n\n`df.groupby('city')['salary'].mean()` — шаарлар боюнча орточо айлык."
+    },
+    "explanation": {
+      "ru": "На экзамене достаточно 15 названий и одного примера `loc`/`iloc`.",
+      "kg": "Экзаменде 15 ат жана бир `loc`/`iloc` мисалы жетет."
+    }
+  },
+  {
+    "slug": "ml-metrics",
+    "type": "theory",
+    "module": "data-ml",
+    "title": { "ru": "Метрики ML", "kg": "ML метрикалары" },
+    "prompt": {
+      "ru": "Объясни accuracy, precision, recall, F1 и confusion matrix. Почему accuracy обманывает при дисбалансе?",
+      "kg": "Accuracy, precision, recall, F1 жана confusion matrix түшүндүр. Баланс эмес болсо accuracy эмне үчүн алдайт?"
+    },
+    "difficulty": 2,
+    "points": 10,
+    "hints": [
+      { "ru": "Начни с confusion matrix: TP, TN, FP, FN.", "kg": "Confusion matrixтен башта: TP, TN, FP, FN." },
+      { "ru": "Precision — не ошибиться, recall — не пропустить.", "kg": "Precision — ката кетирбөө, recall — өткөрүп жибербөө." }
+    ],
+    "model_answer": {
+      "ru": "`accuracy = (TP + TN) / все`. `precision = TP / (TP + FP)` — насколько точен положительный прогноз. `recall = TP / (TP + FN)` — сколько положительных нашли. `F1` — гармоническое среднее precision и recall.\nПри дисбалансе (например, 99% отрицательных) модель может всегда говорить «нет» и иметь accuracy 99%, но recall = 0. Поэтому смотрят precision/recall/F1 и confusion matrix.",
+      "kg": "`accuracy = (TP + TN) / баары`. `precision = TP / (TP + FP)` — оң прогноз канчалык так. `recall = TP / (TP + FN)` — оңдордун канчасын тапты. `F1` — precision жана recall гармоникалык орточосу.\nБаланс эмес болсо (99% терс) модель дайым «жок» деп, accuracy 99% алат, бирок recall = 0. Ошондуктан precision/recall/F1 жана confusion matrix каралат."
+    },
+    "explanation": {
+      "ru": "Формула + пример дисбаланса — идеальный ответ на этот вопрос.",
+      "kg": "Формула + баланс эмес мисал — идеалдуу жооп."
+    }
+  },
+  {
+    "slug": "yolo-pipeline",
+    "type": "theory",
+    "module": "computer-vision",
+    "title": { "ru": "YOLO pipeline", "kg": "YOLO pipeline" },
+    "prompt": {
+      "ru": "Что нужно для обучения YOLO? Опиши формат разметки и метрики.",
+      "kg": "YOLO окутуу үчүн эмне керек? Разметка форматын жана метрикаларды жаз."
+    },
+    "difficulty": 2,
+    "points": 10,
+    "hints": [
+      { "ru": "Нужны изображения, `.txt` и `data.yaml`.", "kg": "Сүрөттөр, `.txt` жана `data.yaml` керек." },
+      { "ru": "В `.txt`: класс, x_center, y_center, width, height.", "kg": "`.txt` ичинде: класс, x_center, y_center, width, height." }
+    ],
+    "model_answer": {
+      "ru": "Нужны изображения, разметка `.txt` для каждого изображения и `data.yaml` с путями и классами. В строке `.txt`: `class x_center y_center width height`, координаты нормализованы 0..1.\nОбучение: `model.train(data='data.yaml', epochs=50, imgsz=640)`. Метрики: precision, recall, mAP@0.5, mAP@0.5:0.95. Инференс: `model.predict(source=..., conf=0.25)`.",
+      "kg": "Сүрөттөр, ар бир сүрөт үчүн `.txt` разметка жана `data.yaml` керек. `.txt` сабында: `class x_center y_center width height`, координаттар 0..1 нормалдаштырылган.\nОкутуу: `model.train(data='data.yaml', epochs=50, imgsz=640)`. Метрикалар: precision, recall, mAP@0.5, mAP@0.5:0.95. Инференс: `model.predict(source=..., conf=0.25)`."
+    },
+    "explanation": {
+      "ru": "Экзаменатор ждет три вещи: данные+разметка, команда обучения, метрики.",
+      "kg": "Экзаменатор үч нерсе күтөт: маалымат+разметка, окутуу командасы, метрикалар."
+    }
+  },
+  {
+    "slug": "mediapipe-hands",
+    "type": "theory",
+    "module": "computer-vision",
+    "title": { "ru": "MediaPipe Hands", "kg": "MediaPipe Hands" },
+    "prompt": {
+      "ru": "Как работает MediaPipe Hands? Сколько landmarks и где это применяют?",
+      "kg": "MediaPipe Hands кантип иштейт? Канча landmark жана кайда колдонулат?"
+    },
+    "difficulty": 1,
+    "points": 8,
+    "hints": [
+      { "ru": "Hands возвращает 21 точку.", "kg": "Hands 21 чекит кайтарат." },
+      { "ru": "Координаты нормализованы.", "kg": "Координаттар нормалдаштырылган." }
+    ],
+    "model_answer": {
+      "ru": "MediaPipe Hands находит кисть и возвращает 21 landmark: запястье, суставы пальцев и кончики. Координаты нормализованы (x, y от 0 до 1), есть z. По ним считают жесты, позицию пальцев, расстояние между точками.\nПрименение: жесты, фитнес-тренировки, AR-примерка, управление без касания.",
+      "kg": "MediaPipe Hands колду таап, 21 landmark кайтарат: билек, манжа муундары жана учтары. Координаттар нормалдаштырылган (x, y 0..1), z бар. Алар аркылуу жесттерди, манжа позициясын, чекиттердин аралыгын эсептейт.\nКолдонуу: жесттер, фитнес, AR-кийим, тийбей башкаруу."
+    },
+    "explanation": {
+      "ru": "21 landmark — главное число, которое проверяют. Дальше — пример применения.",
+      "kg": "21 landmark — текшериле турган негизги сан. Анан колдонуу мисалы."
+    }
+  },
+  {
+    "slug": "langchain-params",
+    "type": "theory",
+    "module": "llm-streamlit",
+    "title": { "ru": "Параметры LLM", "kg": "LLM параметрлери" },
+    "prompt": {
+      "ru": "Объясни `temperature`, `top_p`, `max_tokens` и типы сообщений в LangChain.",
+      "kg": "`temperature`, `top_p`, `max_tokens` жана LangChain билдирүү түрлөрүн түшүндүр."
+    },
+    "difficulty": 2,
+    "points": 8,
+    "hints": [
+      { "ru": "`temperature=0` — стабильно, выше — креативнее.", "kg": "`temperature=0` — туруктуу, жогору — креативдүү." },
+      { "ru": "`SystemMessage`, `HumanMessage`, `AIMessage`.", "kg": "`SystemMessage`, `HumanMessage`, `AIMessage`." }
+    ],
+    "model_answer": {
+      "ru": "`temperature` управляет случайностью: 0 — детерминированно, 1 — креативно. `top_p` ограничивает выбор токенов вероятностной массой. `max_tokens` ограничивает длину ответа.\nСообщения: `SystemMessage` задаёт роль/правила, `HumanMessage` — запрос пользователя, `AIMessage` — ответ модели, `ToolMessage` — результат инструмента.",
+      "kg": "`temperature` кокустукту башкарат: 0 — детерминдүү, 1 — креативдүү. `top_p` токендерди ыктымалдык массасы менен чектейт. `max_tokens` жооптун узундугун чектейт.\nБилдирүүлөр: `SystemMessage` роль/эреже, `HumanMessage` колдонуучунун сурамы, `AIMessage` модель жообу, `ToolMessage` куралдын натыйжасы."
+    },
+    "explanation": {
+      "ru": "Достаточно точных определений и одного примера, где `temperature=0`.",
+      "kg": "Так аныктамалар жана `temperature=0` мисалы жетет."
+    }
+  },
+  {
+    "slug": "rag-pipeline",
+    "type": "theory",
+    "module": "llm-streamlit",
+    "title": { "ru": "RAG-пайплайн", "kg": "RAG pipeline" },
+    "prompt": {
+      "ru": "Опиши этапы RAG. Зачем нужны splitter, embeddings и vector store?",
+      "kg": "RAG этаптарын жаз. Splitter, embeddings жана vector store эмне үчүн керек?"
+    },
+    "difficulty": 2,
+    "points": 10,
+    "hints": [
+      { "ru": "Документы → чанки → embeddings → поиск → ответ.", "kg": "Документтер → чанктар → embeddings → издөө → жооп." },
+      { "ru": "`chunk_overlap` сохраняет контекст на границах.", "kg": "`chunk_overlap` чек арадагы контекстти сактайт." }
+    ],
+    "model_answer": {
+      "ru": "RAG = Retrieval + Generation. Документы режутся splitter'ом на чанки, каждый чанк превращается в embedding и сохраняется в vector store. Запрос тоже превращается в embedding, находится top-k похожих чанков, они добавляются в промпт как контекст, и LLM генерирует ответ.\n`chunk_size` влияет на детализацию, `chunk_overlap` сохраняет контекст на границах.",
+      "kg": "RAG = Retrieval + Generation. Документтер splitter менен чанктарга бөлүнөт, ар бир чанк embeddingке айланып vector store'го сакталат. Сурам да embedding болуп, top-k окшош чанктар табылат, промптко контекст катары кошулат, LLM жооп жаратат.\n`chunk_size` деталдуулукка, `chunk_overlap` чек арадагы контекстке таасир этет."
+    },
+    "explanation": {
+      "ru": "Главное — назвать оба этапа: retrieval и generation, и роль vector store.",
+      "kg": "Негизгиси — эки этап: retrieval жана generation, vector store'нун ролу."
+    }
+  },
+  {
+    "slug": "streamlit-state",
+    "type": "theory",
+    "module": "llm-streamlit",
+    "title": { "ru": "Streamlit state и кэш", "kg": "Streamlit state жана кэш" },
+    "prompt": {
+      "ru": "Зачем нужен `st.session_state`? Чем `cache_data` отличается от `cache_resource`?",
+      "kg": "`st.session_state` эмне үчүн? `cache_data` жана `cache_resource` айырмасы?"
+    },
+    "difficulty": 1,
+    "points": 6,
+    "hints": [
+      { "ru": "Streamlit перезапускает скрипт при каждом действии.", "kg": "Streamlit ар бир аракетте скриптти кайра иштетет." },
+      { "ru": "Модель — ресурс, DataFrame — данные.", "kg": "Модель — ресурс, DataFrame — маалымат." }
+    ],
+    "model_answer": {
+      "ru": "Streamlit перезапускает скрипт сверху вниз при каждом взаимодействии. `st.session_state` сохраняет значения между перезапусками: счётчики, выбранные фильтры, чат.\n`@st.cache_data` кэширует данные (DataFrame, результат функции) и сериализует их. `@st.cache_resource` кэширует ресурсы, которые нельзя сериализовать: модель, соединение с БД.",
+      "kg": "Streamlit ар бир аракетте скриптти жогорудан ылдый кайра иштетет. `st.session_state` кайра иштетүүлөрдүн ортосунда маанилерди сактайт: эсептегич, фильтр, чат.\n`@st.cache_data` маалыматты (DataFrame, функция натыйжасын) кэштейт. `@st.cache_resource` сериалдаштырууга болбой турган ресурстарды: модель, БД байланышын кэштейт."
+    },
+    "explanation": {
+      "ru": "Запомни: `cache_data` — данные, `cache_resource` — модель/соединение.",
+      "kg": "Эсте: `cache_data` — маалымат, `cache_resource` — модель/байланыш."
+    }
+  },
+  {
+    "slug": "exam-plan",
+    "type": "theory",
+    "module": "exam-tactics",
+    "title": { "ru": "План на 100 баллов", "kg": "100 баллга план" },
+    "prompt": {
+      "ru": "Опиши план действий на экзамене из трёх этапов: 20, 30 и 50 баллов.",
+      "kg": "20, 30 жана 50 баллдан турган үч этаптуу экзамендин план."
+    },
+    "difficulty": 1,
+    "points": 8,
+    "hints": [
+      { "ru": "Сначала дешёвые баллы.", "kg": "Адегенде арзан баллдар." },
+      { "ru": "Код — по шагам, с крайними случаями.", "kg": "Код — кадам менен, четки учурлар менен." }
+    ],
+    "model_answer": {
+      "ru": "1. Просмотреть все вопросы и отметить лёгкие.\n2. Забрать 20 баллов первого этапа: термины и короткие вопросы.\n3. На втором этапе сначала SQL/Git/Linux, потом две задачи.\n4. На третьем — короткие вопросы, затем три задачи; код писать по шаблону сигнатура → пример → крайние случаи → тест.\n5. Оставить 10 минут на проверку. Цель — 80+, а не идеально всё.",
+      "kg": "1. Бардык суроолорду карап, жеңилдерин белгиле.\n2. Биринчи этаптын 20 баллын ал: терминдер жана кыска суроолор.\n3. Экинчи этапта адегенде SQL/Git/Linux, анан эки тапшырма.\n4. Үчүнчүдө кыска суроолор, анан үч тапшырма; кодду сигнатура → мисал → четки учурлар → тест деп жаз.\n5. 10 мүнөттү текшерүүгө калтыр. Максат — 80+, идеалдуу эмес."
+    },
+    "explanation": {
+      "ru": "Стратегия важнее идеального знания всех тем: сначала гарантированные баллы.",
+      "kg": "Стратегия бардык теманы идеалдуу билүүдөн маанилүү: адегенде кепилденген баллдар."
+    }
+  },
+  {
+    "slug": "oral-answer",
+    "type": "theory",
+    "module": "exam-tactics",
+    "title": { "ru": "Формула устного ответа", "kg": "Оозеки жооп формуласы" },
+    "prompt": {
+      "ru": "Сформулируй ответ на вопрос «Что такое JWT?» по формуле: определение → зачем → пример → ограничение.",
+      "kg": "«JWT деген эмне?» суроосуна формула боюнча жооп бер: аныктама → эмне үчүн → мисал → чек."
+    },
+    "difficulty": 1,
+    "points": 8,
+    "hints": [
+      { "ru": "Начни с точного определения.", "kg": "Так аныктама менен башта." },
+      { "ru": "В конце добавь ограничение про payload.", "kg": "Аягында payload чектөөсүн кош." }
+    ],
+    "model_answer": {
+      "ru": "JWT — это подписанный токен для аутентификации, состоящий из header, payload и signature.\nОн нужен, чтобы сервер не хранил сессию и проверял пользователя по подписи.\nПример: после логина сервер выдаёт access token, клиент отправляет его в заголовке `Authorization: Bearer <token>`.\nОграничение: payload не зашифрован, поэтому секреты в него не кладут; access token делают короткоживущим.",
+      "kg": "JWT — аутентификация үчүн кол коюлган токен, header, payload жана signatureдан турат.\nСервер сессия сактабай, колдонуучуну кол тамга боюнча текшерүү үчүн керек.\nМисал: логинден кийин сервер access token берет, клиент аны `Authorization: Bearer <token>` заголовогунда жөнөтөт.\nЧек: payload шифрленбеген, секрет салынбайт; access token кыска мөөнөттүү болот."
+    },
+    "explanation": {
+      "ru": "Формула работает для любого термина: определение, польза, пример, ограничение.",
+      "kg": "Формула ар кандай термин үчүн иштейт: аныктама, пайда, мисал, чек."
+    }
+  }
+]

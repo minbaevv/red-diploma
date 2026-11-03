@@ -1,0 +1,427 @@
+[
+  {
+    "slug": "fastapi-health",
+    "type": "code",
+    "module": "fastapi-pydantic",
+    "title": {
+      "ru": "FastAPI: первый эндпоинт /health",
+      "kg": "FastAPI: биринчи /health эндпоинти"
+    },
+    "prompt": {
+      "ru": "Создай FastAPI-приложение в `create_app()` и добавь `GET /health`, который возвращает `{\"status\": \"ok\"}`. Проверь его через `TestClient`.",
+      "kg": "`create_app()` ичинде FastAPI колдонмосун түз жана `{\"status\": \"ok\"}` кайтарган `GET /health` кош. `TestClient` менен текшер."
+    },
+    "difficulty": 2,
+    "points": 8,
+    "starter_code": "from fastapi import FastAPI\nfrom fastapi.testclient import TestClient\n\n\ndef create_app():\n    app = FastAPI()\n    # добавь GET /health\n    return app",
+    "tests": [
+      {
+        "input": "TestClient(create_app()).get('/health').json()",
+        "expected": {
+          "status": "ok"
+        }
+      },
+      {
+        "input": "TestClient(create_app()).get('/health').status_code",
+        "expected": 200
+      },
+      {
+        "input": "TestClient(create_app()).get('/missing').status_code",
+        "expected": 404
+      }
+    ],
+    "hints": [
+      {
+        "ru": "Декоратор `@app.get('/health')` регистрирует маршрут.",
+        "kg": "`@app.get('/health')` декоратору маршрутту каттайт."
+      },
+      {
+        "ru": "Функция внутри должна вернуть словарь.",
+        "kg": "Ички функция сөздүк кайтарышы керек."
+      }
+    ],
+    "subquestions": [
+      {
+        "ru": "Что такое декоратор маршрута?",
+        "kg": "Маршрут декоратору деген эмне?"
+      },
+      {
+        "ru": "Почему `TestClient` удобен для тестов?",
+        "kg": "Эмне үчүн `TestClient` тесттер үчүн ыңгайлуу?"
+      }
+    ],
+    "solution": "from fastapi import FastAPI\nfrom fastapi.testclient import TestClient\n\n\ndef create_app():\n    app = FastAPI()\n\n    @app.get('/health')\n    def health():\n        return {'status': 'ok'}\n\n    return app",
+    "explanation": {
+      "ru": "FastAPI связывает HTTP-метод, путь и функцию. `@app.get('/health')` превращает обычную функцию в обработчик запроса.",
+      "kg": "FastAPI HTTP-методду, жолду жана функцияны байланыштырат. `@app.get('/health')` жөнөкөй функцияны суроо иштетүүчүгө айландырат."
+    },
+    "walkthrough": [
+      {
+        "ru": "1. Создаём `app = FastAPI()`.",
+        "kg": "1. `app = FastAPI()` түзөбүз."
+      },
+      {
+        "ru": "2. Добавляем `@app.get('/health')`.",
+        "kg": "2. `@app.get('/health')` кошобуз."
+      },
+      {
+        "ru": "3. Возвращаем `{'status': 'ok'}`.",
+        "kg": "3. `{'status': 'ok'}` кайтарабыз."
+      },
+      {
+        "ru": "4. Проверяем статус и JSON через `TestClient`.",
+        "kg": "4. `TestClient` аркылуу статус жана JSON текшеребиз."
+      }
+    ],
+    "pitfalls": {
+      "ru": "Не запускай uvicorn внутри теста: `TestClient` работает без реального сервера.",
+      "kg": "Тест ичинде uvicorn иштетпе: `TestClient` чыныгы серверсиз иштейт."
+    },
+    "exam_tip": {
+      "ru": "На экзамене назови три части: приложение, маршрут, обработчик.",
+      "kg": "Экзаменде үч бөлүктү ата: колдонмо, маршрут, иштетүүчү."
+    }
+  },
+  {
+    "slug": "pydantic-validate-user",
+    "type": "code",
+    "module": "fastapi-pydantic",
+    "title": {
+      "ru": "Pydantic: валидация пользователя",
+      "kg": "Pydantic: колдонуучуну валидациялоо"
+    },
+    "prompt": {
+      "ru": "Дан класс `UserIn`. Напиши `validate_user(data)`: верни `True`, если данные проходят валидацию Pydantic, и `False`, если нет.",
+      "kg": "`UserIn` классы берилген. `validate_user(data)` жаз: маалымат Pydantic валидациясынан өтсө `True`, өтпөсө `False` кайтар."
+    },
+    "difficulty": 2,
+    "points": 8,
+    "starter_code": "from pydantic import BaseModel, Field, ValidationError\n\n\nclass UserIn(BaseModel):\n    name: str = Field(min_length=2)\n    age: int = Field(ge=0, le=120)\n\n\ndef validate_user(data):\n    # твой код\n    pass",
+    "tests": [
+      {
+        "input": "validate_user({'name': 'Aida', 'age': 20})",
+        "expected": true
+      },
+      {
+        "input": "validate_user({'name': 'A', 'age': 20})",
+        "expected": false
+      },
+      {
+        "input": "validate_user({'name': 'Aida', 'age': -1})",
+        "expected": false
+      },
+      {
+        "input": "validate_user({'name': 'Aida', 'age': 121})",
+        "expected": false
+      }
+    ],
+    "hints": [
+      {
+        "ru": "Создание `UserIn(**data)` само запускает валидацию.",
+        "kg": "`UserIn(**data)` түзүү валидацияны өзү иштетет."
+      },
+      {
+        "ru": "Поймай `ValidationError`.",
+        "kg": "`ValidationError` карма."
+      },
+      {
+        "ru": "Верни `True` только после успешного создания модели.",
+        "kg": "Модель ийгиликтүү түзүлгөндөн кийин гана `True` кайтар."
+      }
+    ],
+    "subquestions": [
+      {
+        "ru": "Где описаны ограничения `min_length` и `ge/le`?",
+        "kg": "`min_length` жана `ge/le` чектөөлөрү кайда жазылган?"
+      },
+      {
+        "ru": "Почему `data` может быть не словарём?",
+        "kg": "Эмне үчүн `data` сөздүк эмес болушу мүмкүн?"
+      }
+    ],
+    "solution": "from pydantic import BaseModel, Field, ValidationError\n\n\nclass UserIn(BaseModel):\n    name: str = Field(min_length=2)\n    age: int = Field(ge=0, le=120)\n\n\ndef validate_user(data):\n    try:\n        UserIn(**data)\n        return True\n    except (ValidationError, TypeError):\n        return False",
+    "explanation": {
+      "ru": "Pydantic проверяет типы и ограничения на входе. Это защищает бизнес-логику от грязных данных до того, как они попадут в базу.",
+      "kg": "Pydantic кирүүдөгү типтерди жана чектөөлөрдү текшерет. Бул кирген маалымат базага жеткенге чейин бизнес-логиканы коргойт."
+    },
+    "walkthrough": [
+      {
+        "ru": "1. Пробуем `UserIn(**data)`.",
+        "kg": "1. `UserIn(**data)` аракет кылабыз."
+      },
+      {
+        "ru": "2. Если ошибка — возвращаем `False`.",
+        "kg": "2. Ката болсо — `False` кайтарабыз."
+      },
+      {
+        "ru": "3. Если модель создалась — `True`.",
+        "kg": "3. Модель түзүлсө — `True`."
+      }
+    ],
+    "pitfalls": {
+      "ru": "Не возвращай строку с ошибкой вместо `bool`: тесты ждут именно `True/False`.",
+      "kg": "Катанын ордуна сап кайтарба: тесттер так `True/False` күтөт."
+    },
+    "exam_tip": {
+      "ru": "На экзамене скажи: Pydantic — это слой валидации на границе API.",
+      "kg": "Экзаменде айт: Pydantic — API чегиндеги валидация катмары."
+    }
+  },
+  {
+    "slug": "fastapi-upload-predict",
+    "type": "code",
+    "module": "fastapi-pydantic",
+    "title": {
+      "ru": "FastAPI: загрузка файла в /predict",
+      "kg": "FastAPI: /predictке файл жүктөө"
+    },
+    "prompt": {
+      "ru": "Реализуй `POST /predict` с `UploadFile`. Прочитай файл, при пустом файле верни `404`, иначе `{\"result\": predict(data)}`. Модель передаётся функцией `predict` — так тест не зависит от PyTorch.",
+      "kg": "`UploadFile` менен `POST /predict` ишке ашыр. Файлды оку, бош болсо `404`, болбосо `{\"result\": predict(data)}` кайтар. Модель `predict` функциясы менен берилет — тест PyTorch'ко көз каранды болбойт."
+    },
+    "difficulty": 4,
+    "points": 10,
+    "starter_code": "from fastapi import FastAPI, UploadFile, File, HTTPException\nfrom fastapi.testclient import TestClient\n\n\ndef create_app(predict):\n    app = FastAPI()\n    # добавь POST /predict\n    return app",
+    "tests": [
+      {
+        "input": "TestClient(create_app(lambda data: 7)).post('/predict', files={'file': ('x.png', b'abc', 'image/png')}).json()",
+        "expected": {
+          "result": 7
+        }
+      },
+      {
+        "input": "TestClient(create_app(lambda data: 7)).post('/predict', files={'file': ('x.png', b'', 'image/png')}).status_code",
+        "expected": 404
+      },
+      {
+        "input": "TestClient(create_app(lambda data: len(data))).post('/predict', files={'file': ('x.png', b'hello', 'image/png')}).json()",
+        "expected": {
+          "result": 5
+        }
+      }
+    ],
+    "hints": [
+      {
+        "ru": "`UploadFile` читается асинхронно через `await file.read()`.",
+        "kg": "`UploadFile` `await file.read()` аркылуу асинхрондуу окулат."
+      },
+      {
+        "ru": "Пустой файл — это `b''`.",
+        "kg": "Бош файл — бул `b''`."
+      },
+      {
+        "ru": "Не забудь `File(...)` в параметре.",
+        "kg": "Параметрде `File(...)` унутпа."
+      }
+    ],
+    "subquestions": [
+      {
+        "ru": "Почему обработчик `async`?",
+        "kg": "Эмне үчүн иштетүүчү `async`?"
+      },
+      {
+        "ru": "Почему пустой файл лучше отклонять до модели?",
+        "kg": "Эмне үчүн бош файлды модельга чейин четке кагуу жакшы?"
+      },
+      {
+        "ru": "Какой статус-код у ошибки клиента?",
+        "kg": "Кардардын катасы үчүн кайсы статус-код?"
+      }
+    ],
+    "solution": "from fastapi import FastAPI, UploadFile, File, HTTPException\nfrom fastapi.testclient import TestClient\n\n\ndef create_app(predict):\n    app = FastAPI()\n\n    @app.post('/predict')\n    async def predict_route(file: UploadFile = File(...)):\n        data = await file.read()\n        if not data:\n            raise HTTPException(status_code=404, detail='Файл кошулган жок')\n        return {'result': predict(data)}\n\n    return app",
+    "explanation": {
+      "ru": "Это реальная схема ML-сервиса: файл приходит в FastAPI, проверяется, превращается в тензор и уходит в модель. В тесте модель заменена лямбдой, но маршрут и обработка ошибок настоящие.",
+      "kg": "Бул чыныгы ML-сервистин схемасы: файл FastAPIге келет, текшерилет, тензорго айланып, модельго кетет. Тестте модель лямбда менен алмаштырылган, бирок маршрут жана каталарды иштетүү чыныгы."
+    },
+    "walkthrough": [
+      {
+        "ru": "1. Объявляем `@app.post('/predict')`.",
+        "kg": "1. `@app.post('/predict')` жарыялайбыз."
+      },
+      {
+        "ru": "2. Принимаем `file: UploadFile = File(...)`.",
+        "kg": "2. `file: UploadFile = File(...)` кабыл алабыз."
+      },
+      {
+        "ru": "3. Читаем байты и проверяем пустоту.",
+        "kg": "3. Байттарды окуп, боштугун текшеребиз."
+      },
+      {
+        "ru": "4. Возвращаем результат `predict(data)`.",
+        "kg": "4. `predict(data)` жыйынтыгын кайтарабыз."
+      }
+    ],
+    "pitfalls": {
+      "ru": "Не используй `file.filename` как данные: читать нужно содержимое через `await file.read()`.",
+      "kg": "`file.filename`ди маалымат катары колдонбо: мазмунду `await file.read()` аркылуу окуу керек."
+    },
+    "exam_tip": {
+      "ru": "На экзамене проговори цепочку: upload → read → validate → model → JSON.",
+      "kg": "Экзаменде чынжырды айт: upload → read → validate → model → JSON."
+    }
+  },
+  {
+    "slug": "streamlit-build-files",
+    "type": "code",
+    "module": "llm-streamlit",
+    "title": {
+      "ru": "Streamlit: подготовка файла для requests",
+      "kg": "Streamlit: requests үчүн файл даярдоо"
+    },
+    "prompt": {
+      "ru": "Streamlit отправляет файл в FastAPI через `requests.post(url, files=...)`. Напиши `build_files(name, data, mime='image/png')`, который возвращает словарь формата `{'file': (name, data, mime)}`.",
+      "kg": "Streamlit файлды FastAPIге `requests.post(url, files=...)` аркылуу жөнөтөт. `build_files(name, data, mime='image/png')` жаз: `{'file': (name, data, mime)}` форматындагы сөздүк кайтарсын."
+    },
+    "difficulty": 2,
+    "points": 6,
+    "starter_code": "def build_files(name, data, mime='image/png'):\n    # твой код\n    pass",
+    "tests": [
+      {
+        "input": "build_files('digit.png', b'abc')['file'][0]",
+        "expected": "digit.png"
+      },
+      {
+        "input": "type(build_files('digit.png', b'abc')['file']).__name__",
+        "expected": "tuple"
+      },
+      {
+        "input": "build_files('a.jpg', b'x', 'image/jpeg')['file'][2]",
+        "expected": "image/jpeg"
+      },
+      {
+        "input": "build_files('a.png', b'xy')['file'][1] == b'xy'",
+        "expected": true
+      }
+    ],
+    "hints": [
+      {
+        "ru": "Ключ должен быть именно `'file'`.",
+        "kg": "Ачкыч так `'file'` болушу керек."
+      },
+      {
+        "ru": "Значение — кортеж из трёх элементов.",
+        "kg": "Маани — үч элементтен турган кортеж."
+      }
+    ],
+    "subquestions": [
+      {
+        "ru": "Зачем `requests` нужен именно такой формат?",
+        "kg": "Эмне үчүн `requests`ке так ушундай формат керек?"
+      },
+      {
+        "ru": "Почему MIME-тип важен для API?",
+        "kg": "Эмне үчүн API үчүн MIME-тип маанилүү?"
+      }
+    ],
+    "solution": "def build_files(name, data, mime='image/png'):\n    return {'file': (name, data, mime)}",
+    "explanation": {
+      "ru": "`requests` ожидает `files={'file': (filename, bytes, content_type)}`. Это мост между `UploadFile` в Streamlit и `UploadFile` в FastAPI.",
+      "kg": "`requests` `files={'file': (filename, bytes, content_type)}` күтөт. Бул Streamlitтеги `UploadFile` менен FastAPIдеги `UploadFile` ортосундагы көпүрө."
+    },
+    "walkthrough": [
+      {
+        "ru": "1. Формируем кортеж `(name, data, mime)`.",
+        "kg": "1. `(name, data, mime)` кортежин түзөбүз."
+      },
+      {
+        "ru": "2. Оборачиваем в словарь с ключом `file`.",
+        "kg": "2. `file` ачкычы менен сөздүккө ороп."
+      },
+      {
+        "ru": "3. Передаём в `requests.post` без ручной сборки multipart.",
+        "kg": "3. multipart кол менен куруунун ордуна `requests.post`ко беребиз."
+      }
+    ],
+    "pitfalls": {
+      "ru": "Не передавай путь к файлу вместо байтов: Streamlit уже держит файл в памяти.",
+      "kg": "Файлдын жолун байттардын ордуна бербе: Streamlit файлды эс тутумда кармайт."
+    },
+    "exam_tip": {
+      "ru": "На экзамене назови три поля: filename, bytes, content-type.",
+      "kg": "Экзаменде үч талааны ата: filename, bytes, content-type."
+    }
+  },
+  {
+    "slug": "streamlit-counter",
+    "type": "code",
+    "module": "llm-streamlit",
+    "title": {
+      "ru": "Streamlit: обновление session_state",
+      "kg": "Streamlit: session_state жаңыртуу"
+    },
+    "prompt": {
+      "ru": "Напиши `bump_counter(state, key='count', step=1)`: увеличь значение в словаре `state` на `step`, создай ключ с нуля при необходимости и верни `state`.",
+      "kg": "`bump_counter(state, key='count', step=1)` жаз: `state` сөздүгүндөгү маанини `step`ке көбөйт, керек болсо ачкычты нөлдөн түз жана `state` кайтар."
+    },
+    "difficulty": 2,
+    "points": 6,
+    "starter_code": "def bump_counter(state, key='count', step=1):\n    # твой код\n    pass",
+    "tests": [
+      {
+        "input": "bump_counter({})",
+        "expected": {
+          "count": 1
+        }
+      },
+      {
+        "input": "bump_counter({'count': 4}, step=2)",
+        "expected": {
+          "count": 6
+        }
+      },
+      {
+        "input": "bump_counter({'likes': 2}, key='likes')",
+        "expected": {
+          "likes": 3
+        }
+      }
+    ],
+    "hints": [
+      {
+        "ru": "`dict.get(key, 0)` даёт значение или ноль.",
+        "kg": "`dict.get(key, 0)` маанини же нөлдү берет."
+      },
+      {
+        "ru": "Обнови словарь и верни его.",
+        "kg": "Сөздүктү жаңыртып, аны кайтар."
+      }
+    ],
+    "subquestions": [
+      {
+        "ru": "Почему `session_state` должен сохраняться между перезапусками Streamlit?",
+        "kg": "Эмне үчүн `session_state` Streamlit кайра иштетүүлөрүнүн ортосунда сакталышы керек?"
+      },
+      {
+        "ru": "Что будет при `state = {}` внутри функции?",
+        "kg": "Функция ичинде `state = {}` болсо эмне болот?"
+      }
+    ],
+    "solution": "def bump_counter(state, key='count', step=1):\n    state[key] = state.get(key, 0) + step\n    return state",
+    "explanation": {
+      "ru": "Streamlit перезапускает скрипт при каждом взаимодействии. `st.session_state` хранит данные между запусками, а функция-редьюсер делает обновление предсказуемым.",
+      "kg": "Streamlit ар бир аракетте скриптти кайра иштетет. `st.session_state` иштетүүлөрдүн ортосунда маалыматты сактайт, ал эми редьюсер функция жаңыртууну болжолдуу кылат."
+    },
+    "walkthrough": [
+      {
+        "ru": "1. Берём текущее значение через `get`.",
+        "kg": "1. Учурдагы маанини `get` аркылуу алабыз."
+      },
+      {
+        "ru": "2. Прибавляем `step`.",
+        "kg": "2. `step`ти кошобуз."
+      },
+      {
+        "ru": "3. Возвращаем тот же словарь.",
+        "kg": "3. Ошол эле сөздүктү кайтарабыз."
+      }
+    ],
+    "pitfalls": {
+      "ru": "Не пересоздавай `state` внутри функции — иначе изменение потеряется.",
+      "kg": "Функция ичинде `state`ти кайра түзбө — болбосо өзгөртүү жоголот."
+    },
+    "exam_tip": {
+      "ru": "На экзамене свяжи с `st.session_state`: Streamlit не хранит обычные переменные между кликами.",
+      "kg": "Экзаменде `st.session_state` менен байланыштыр: Streamlit кадимки өзгөрмөлөрдү басуулардын ортосунда сактабайт."
+    }
+  }
+]
