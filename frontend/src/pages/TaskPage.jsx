@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import {
   ArrowLeft,
+  BookOpen,
   CheckCircle2,
   Circle,
   Clock,
@@ -9,10 +10,12 @@ import {
   GraduationCap,
   HelpCircle,
   Lightbulb,
+  ListChecks,
   Play,
   RotateCcw,
   Route,
   Sparkles,
+  Terminal,
   TriangleAlert,
   XCircle,
 } from 'lucide-react'
@@ -25,8 +28,90 @@ import { Badge, CodeEditor, HintList, Markdown } from '../components/ui'
 
 function value(value) {
   if (value === undefined) return '—'
+  if (value === null) return 'None'
   if (typeof value === 'string') return value
   return JSON.stringify(value)
+}
+
+function stepText(text) {
+  return String(text || '').replace(/^\s*\d+[.)]\s*/, '')
+}
+
+function TaskTutorial({ task }) {
+  const { lang } = useApp()
+  const bi = useBi()
+  if (task.type !== 'code') return null
+
+  const examples = task.examples || []
+  const plan = task.walkthrough?.length ? task.walkthrough : task.hints || []
+  if (!examples.length && !plan.length && !task.explanation && !task.pitfalls) return null
+
+  return (
+    <section className="task-tutorial">
+      <div className="tutorial-head">
+        <div>
+          <div className="eyebrow"><BookOpen size={15} /> {bi('Разбор перед практикой', 'Практикага чейин талдоо')}</div>
+          <h2>{bi('Сначала пойми, потом пиши', 'Адегенде түшүн, анан жаз')}</h2>
+          <p>
+            {bi(
+              'Прочитай примеры и план. Код напиши сам — готовый пример можно открыть ниже, если застрял.',
+              'Мисалдарды жана планды оку. Кодду өзүң жаз — кыстыгып калсаң, даяр мисалды төмөнөн ачсаң болот.',
+            )}
+          </p>
+        </div>
+        <Badge tone="cyan">{bi('учимся', 'үйрөнөбүз')}</Badge>
+      </div>
+
+      <div className="tutorial-grid">
+        {examples.length > 0 && (
+          <div className="note-block">
+            <div className="note-title"><Terminal size={16} /> {bi('Примеры', 'Мисалдар')}</div>
+            <div className="example-list">
+              {examples.map((example, index) => (
+                <div className="example-row" key={`${example.input}-${index}`}>
+                  <code>{example.input}</code>
+                  <span className="example-arrow">→</span>
+                  <code>{value(example.expected)}</code>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {task.explanation && (
+          <div className="note-block">
+            <div className="note-title"><Lightbulb size={16} /> {bi('Идея', 'Идея')}</div>
+            <p>{pick(task.explanation, lang)}</p>
+          </div>
+        )}
+
+        {plan.length > 0 && (
+          <div className="note-block tutorial-wide">
+            <div className="note-title"><ListChecks size={16} /> {bi('План по шагам', 'Кадам-кадам план')}</div>
+            <ol>
+              {plan.map((step, index) => (
+                <li key={index}>{stepText(pick(step, lang))}</li>
+              ))}
+            </ol>
+          </div>
+        )}
+
+        {task.pitfalls && (
+          <div className="note-block note-warn tutorial-wide">
+            <div className="note-title"><TriangleAlert size={16} /> {bi('Типичная ошибка', 'Типтүү ката')}</div>
+            <p>{pick(task.pitfalls, lang)}</p>
+          </div>
+        )}
+
+        {task.exam_tip && (
+          <div className="note-block note-tip tutorial-wide">
+            <div className="note-title"><GraduationCap size={16} /> {bi('На экзамене', 'Экзаменде')}</div>
+            <p>{pick(task.exam_tip, lang)}</p>
+          </div>
+        )}
+      </div>
+    </section>
+  )
 }
 
 function StudyNotes({ task }) {
@@ -42,7 +127,7 @@ function StudyNotes({ task }) {
           <div className="note-title"><Route size={16} /> {bi('Разбор по шагам', 'Кадамдап талдоо')}</div>
           <ol>
             {task.walkthrough.map((step, index) => (
-              <li key={index}>{pick(step, lang)}</li>
+              <li key={index}>{stepText(pick(step, lang))}</li>
             ))}
           </ol>
         </div>
@@ -191,6 +276,8 @@ export default function TaskPage() {
 
       {done && pathInfo && <PathNext pathInfo={pathInfo} />}
 
+      <TaskTutorial task={task} />
+
       <div className="task-layout">
         <div className="task-main">
           {isCode ? (
@@ -245,8 +332,6 @@ export default function TaskPage() {
                 </div>
               )}
 
-              {result?.passed && <StudyNotes task={task} />}
-
               <div className="solution-block">
                 {!showSolution ? (
                   <button className="btn btn-ghost" onClick={revealSolution}>
@@ -262,7 +347,6 @@ export default function TaskPage() {
                     </div>
                     <CodeEditor value={solution?.solution || ''} readOnly height="240px" />
                     {solution?.explanation && <Markdown>{pick(solution.explanation, lang)}</Markdown>}
-                    {!result?.passed && <StudyNotes task={task} />}
                   </>
                 )}
               </div>

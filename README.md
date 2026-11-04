@@ -5,7 +5,7 @@ Bilingual (RU/KG) exam cockpit for the Motion Web backend + AI final exam. It co
 ## What is inside
 
 - **13 modules**: Python core, functions, SQL, Linux/Git, backend/API, ML/data, computer vision, LLM/RAG/Streamlit, FastAPI/Pydantic, databases/ORM, automation/LLM, DevOps/security, exam tactics.
-- **140 tasks**: 42 code tasks checked by tests and 98 theory tasks with model answers, follow-up questions, walkthroughs, pitfalls, and exam tips. The capstone path covers `def` functions, ML training, model compression, FastAPI serving, Streamlit UI, MediaPipe gestures, and GitHub artifacts.
+- **140 tasks**: 42 code tasks checked by tests and 98 theory tasks with model answers, follow-up questions, walkthroughs, pitfalls, and exam tips. Every code task starts with a **practice walkthrough**: worked examples, the core idea, a step-by-step plan, a common mistake, and an exam tip before the editor. The capstone path covers `def` functions, ML training, model compression, FastAPI serving, Streamlit UI, MediaPipe gestures, and GitHub artifacts.
 - **Guided start**: `/start` shows a 20-step `ml-capstone` route from Python to a deployed ML service. Every completed lesson or task shows a **Continue** button that opens the next step with `?path=ml-capstone&step=N`.
 - **3 exams**: stage 1 (20 points), stage 2 (30 points), stage 3 (50 points). A total of 80+ is the red-diploma target.
 - **Bilingual UI and content** with RU/KG switching.
