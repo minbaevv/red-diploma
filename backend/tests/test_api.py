@@ -52,6 +52,15 @@ def test_every_code_solution_passes():
         assert result["passed"], task["slug"]
 
 
+def test_every_code_task_has_guided_explanation():
+    code_tasks = [task for task in content.tasks() if task["type"] == "code"]
+    for task in code_tasks:
+        assert task.get("walkthrough"), task["slug"]
+        assert task.get("pitfalls"), task["slug"]
+        assert task.get("exam_tip"), task["slug"]
+        assert task.get("explanation"), task["slug"]
+
+
 def test_bootstrap_hides_tests_and_solutions(client: TestClient):
     response = client.get("/api/bootstrap")
     assert response.status_code == 200
@@ -60,6 +69,10 @@ def test_bootstrap_hides_tests_and_solutions(client: TestClient):
     for task in payload["tasks"]:
         assert "tests" not in task
         assert "solution" not in task
+    code_tasks = [task for task in payload["tasks"] if task["type"] == "code"]
+    assert len(code_tasks) == 42
+    for task in code_tasks:
+        assert 1 <= len(task.get("examples", [])) <= 2, task["slug"]
 
 
 def test_bootstrap_includes_valid_guided_path(client: TestClient):

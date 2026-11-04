@@ -74,11 +74,14 @@ class NoteRequest(BaseModel):
 
 
 def _task_public(task: dict[str, Any]) -> dict[str, Any]:
-    return {
+    public = {
         key: value
         for key, value in task.items()
         if key not in {"tests", "solution"}
     }
+    if task.get("tests"):
+        public["examples"] = task["tests"][:2]
+    return public
 
 
 def _module_summary(module: dict[str, Any]) -> dict[str, Any]:
