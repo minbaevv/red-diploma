@@ -1,0 +1,897 @@
+{
+  "slug": "transforms",
+  "order": 5,
+  "icon": "eye",
+  "accent": "#8b5cf6",
+  "title": {
+    "ru": "Torchvision: ToTensor и transforms",
+    "kg": "Torchvision: ToTensor жана transforms"
+  },
+  "description": {
+    "ru": "ToTensor, Normalize, Compose, аугментации, train/val и инференс. Каждый вопрос — с кодом.",
+    "kg": "ToTensor, Normalize, Compose, аугментациялар, train/val жана инференс. Ар бир суроо — код менен."
+  },
+  "minutes": 25,
+  "questions": [
+    {
+      "id": "transforms-01",
+      "prompt": {
+        "ru": "Что делает `ToTensor()` с формой картинки?",
+        "kg": "`ToTensor()` сүрөттүн формасы менен эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "HWC → CHW",
+            "kg": "HWC → CHW"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "CHW → HWC",
+            "kg": "CHW → HWC"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Не меняет форму",
+            "kg": "Форманы өзгөртпөйт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Добавляет batch-измерение",
+            "kg": "Batch өлчөмүн кошот"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "PIL-картинка имеет форму `[H, W, C]`. PyTorch-свёртки ждут `[C, H, W]`, поэтому `ToTensor()` переставляет оси. Batch добавляется позже через `unsqueeze(0)` или `DataLoader`.",
+        "kg": "PIL сүрөтү `[H, W, C]` формасында. PyTorch свёрткалары `[C, H, W]` күтөт, ошондуктан `ToTensor()` окторду алмаштырат. Batch кийин `unsqueeze(0)` же `DataLoader` аркылуу кошулат."
+      },
+      "code": "transforms.ToTensor()",
+      "example": "```python\nfrom PIL import Image\nfrom torchvision import transforms\n\nimg = Image.open(\"digit.png\")   # [H, W, C]\nx = transforms.ToTensor()(img)  # [C, H, W]\nprint(x.shape)\n```"
+    },
+    {
+      "id": "transforms-02",
+      "prompt": {
+        "ru": "Что `ToTensor()` делает с типом и диапазоном пикселей?",
+        "kg": "`ToTensor()` пикселдердин тиби жана диапазону менен эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "uint8 [0, 255] → float32 [0, 1]",
+            "kg": "uint8 [0, 255] → float32 [0, 1]"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "float32 [0, 1] → uint8 [0, 255]",
+            "kg": "float32 [0, 1] → uint8 [0, 255]"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Оставляет uint8",
+            "kg": "uint8 калтырат"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Нормализует к mean=0, std=1",
+            "kg": "mean=0, std=1 болуп нормалдайт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`ToTensor()` делит значения на 255 и приводит к `float32`. Нормализацию к нулевому среднему делает отдельный `Normalize`.",
+        "kg": "`ToTensor()` маанилерди 255ке бөлүп, `float32` кылат. Нөл орточого нормалдоону өзүнчө `Normalize` жасайт."
+      },
+      "code": "transforms.ToTensor()",
+      "example": "```python\nx = transforms.ToTensor()(img)\nprint(x.dtype)        # torch.float32\nprint(x.min(), x.max())  # 0.0 1.0\n```"
+    },
+    {
+      "id": "transforms-03",
+      "prompt": {
+        "ru": "Зачем нужен `Normalize((0.1307,), (0.3081,))`?",
+        "kg": "`Normalize((0.1307,), (0.3081,))` эмне үчүн керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Приводит пиксели к виду (x - mean) / std",
+            "kg": "Пикселдерди (x - mean) / std түрүнө келтирет"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Переводит в uint8",
+            "kg": "uint8'ге айландырат"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Меняет размер картинки",
+            "kg": "Сүрөттүн өлчөмүн өзгөртөт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Добавляет batch",
+            "kg": "Batch кошот"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`Normalize` вычитает среднее и делит на стандартное отклонение. Для MNIST mean=0.1307, std=0.3081. Для CIFAR/ImageNet свои значения.",
+        "kg": "`Normalize` орточону кемитип, стандарттык четтөөгө бөлөт. MNIST үчүн mean=0.1307, std=0.3081. CIFAR/ImageNet үчүн өз маанилери."
+      },
+      "code": "transforms.Normalize((0.1307,), (0.3081,))",
+      "example": "```python\ntrain_tf = transforms.Compose([\n    transforms.ToTensor(),\n    transforms.Normalize((0.1307,), (0.3081,)),\n])\n```"
+    },
+    {
+      "id": "transforms-04",
+      "prompt": {
+        "ru": "В каком порядке идут `ToTensor` и `Normalize` в `Compose`?",
+        "kg": "`Compose` ичинде `ToTensor` жана `Normalize` кандай тартипте турат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Сначала ToTensor, потом Normalize",
+            "kg": "Адегенде ToTensor, анан Normalize"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Сначала Normalize, потом ToTensor",
+            "kg": "Адегенде Normalize, анан ToTensor"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Порядок не важен",
+            "kg": "Тартип маанилүү эмес"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Они несовместимы",
+            "kg": "Алар шайкеш эмес"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`Compose` применяет transforms слева направо. `Normalize` работает с тензором, поэтому должен идти после `ToTensor`.",
+        "kg": "`Compose` transforms'тарды солдон оңго колдонот. `Normalize` тензор менен иштейт, ошондуктан `ToTensor` дан кийин турушу керек."
+      },
+      "code": "transforms.Compose([transforms.ToTensor(), transforms.Normalize(...)])",
+      "example": "```python\ntf = transforms.Compose([\n    transforms.Resize((28, 28)),\n    transforms.ToTensor(),\n    transforms.Normalize((0.1307,), (0.3081,)),\n])\n```"
+    },
+    {
+      "id": "transforms-05",
+      "prompt": {
+        "ru": "Что делает `Resize((224, 224))`?",
+        "kg": "`Resize((224, 224))` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Меняет ширину и высоту картинки на 224×224",
+            "kg": "Сүрөттүн туурасын жана бийиктигин 224×224 кылат"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Меняет число каналов",
+            "kg": "Каналдардын санын өзгөртөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Добавляет batch",
+            "kg": "Batch кошот"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Нормализует пиксели",
+            "kg": "Пикселдерди нормалдайт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`Resize` меняет пространственный размер, каналы не трогает. Для pretrained-моделей часто нужен 224×224, для MNIST — 28×28.",
+        "kg": "`Resize` мейкиндик өлчөмүн өзгөртөт, каналдарга тийбейт. Pretrained моделдер үчүн көбүнчө 224×224, MNIST үчүн 28×28 керек."
+      },
+      "code": "transforms.Resize((224, 224))",
+      "example": "```python\ntf = transforms.Compose([\n    transforms.Resize((224, 224)),\n    transforms.ToTensor(),\n])\n```"
+    },
+    {
+      "id": "transforms-06",
+      "prompt": {
+        "ru": "Чем `CenterCrop(224)` отличается от `RandomCrop(224)`?",
+        "kg": "`CenterCrop(224)` `RandomCrop(224)` тен эмнеси менен айырмаланат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "CenterCrop берёт центр, RandomCrop — случайную область",
+            "kg": "CenterCrop борбордон, RandomCrop кокустук аймактан алат"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "CenterCrop только для теста",
+            "kg": "CenterCrop тест үчүн гана"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "RandomCrop не меняет размер",
+            "kg": "RandomCrop өлчөмдү өзгөртпөйт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Разницы нет",
+            "kg": "Айырма жок"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`CenterCrop` детерминированный — хорош для val/test. `RandomCrop` случайный — это аугментация для train.",
+        "kg": "`CenterCrop` детерминдүү — val/test үчүн жакшы. `RandomCrop` кокустук — train үчүн аугментация."
+      },
+      "code": "transforms.CenterCrop(224)",
+      "example": "```python\nval_tf = transforms.Compose([\n    transforms.Resize(256),\n    transforms.CenterCrop(224),\n    transforms.ToTensor(),\n])\n```"
+    },
+    {
+      "id": "transforms-07",
+      "prompt": {
+        "ru": "Зачем `RandomCrop(32, padding=4)` используют на train?",
+        "kg": "`RandomCrop(32, padding=4)` train'де эмне үчүн колдонулат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Чтобы модель видела объект в разных сдвигах",
+            "kg": "Модель объектини ар кандай жылыштарда көрүшү үчүн"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Чтобы уменьшить картинку",
+            "kg": "Сүрөттү кичирейтүү үчүн"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Чтобы убрать цвет",
+            "kg": "Түстү алып салуу үчүн"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Чтобы нормализовать пиксели",
+            "kg": "Пикселдерди нормалдоо үчүн"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Padding добавляет рамку, затем случайно вырезается 32×32. Это учит модель устойчивости к сдвигу. На val/test такой случайности быть не должно.",
+        "kg": "Padding рамка кошот, анан кокустук менен 32×32 кесилет. Бул моделди жылышка туруктуу кылат. Val/test'те мындай кокустук болбошу керек."
+      },
+      "code": "transforms.RandomCrop(32, padding=4)",
+      "example": "```python\ntrain_tf = transforms.Compose([\n    transforms.RandomCrop(32, padding=4),\n    transforms.RandomHorizontalFlip(),\n    transforms.ToTensor(),\n])\n```"
+    },
+    {
+      "id": "transforms-08",
+      "prompt": {
+        "ru": "Почему `RandomHorizontalFlip()` нельзя ставить в validation?",
+        "kg": "Эмне үчүн `RandomHorizontalFlip()` validation'га коюлбайт?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Validation должен быть детерминированным и честным",
+            "kg": "Validation детерминдүү жана таза болушу керек"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Flip меняет число классов",
+            "kg": "Flip класстардын санын өзгөртөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Flip удаляет пиксели",
+            "kg": "Flip пикселдерди өчүрөт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Flip работает только с RGB",
+            "kg": "Flip RGB менен гана иштейт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Аугментации увеличивают разнообразие train. Если применять их к validation, метрика будет шумной и не сравнится между эпохами.",
+        "kg": "Аугментациялар train'дин ар түрдүүлүгүн көбөйтөт. Аларды validation'га колдонсо, метрика ызы-чуу болуп, эпохалар арасында салыштырууга болбойт."
+      },
+      "code": "transforms.RandomHorizontalFlip()",
+      "example": "```python\ntrain_tf = transforms.Compose([\n    transforms.RandomHorizontalFlip(),\n    transforms.ToTensor(),\n])\nval_tf = transforms.Compose([\n    transforms.ToTensor(),\n])\n```"
+    },
+    {
+      "id": "transforms-09",
+      "prompt": {
+        "ru": "Что делает `RandomRotation(10)`?",
+        "kg": "`RandomRotation(10)` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Случайно поворачивает картинку до ±10 градусов",
+            "kg": "Сүрөттү ±10 градуска чейин кокустук бурат"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Поворачивает на 10 градусов всегда",
+            "kg": "Дайыма 10 градуска бурат"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Уменьшает в 10 раз",
+            "kg": "10 эсе кичирейтет"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Меняет 10 каналов",
+            "kg": "10 каналды өзгөртөт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Это аугментация для train. Для цифр и текста поворот нужно применять осторожно: `6` и `9` могут стать неразличимыми.",
+        "kg": "Бул train үчүн аугментация. Сандар жана текст үчүн бурууну этият колдонуу керек: `6` жана `9` айырмаланбай калышы мүмкүн."
+      },
+      "code": "transforms.RandomRotation(10)",
+      "example": "```python\ntrain_tf = transforms.Compose([\n    transforms.RandomRotation(10),\n    transforms.ToTensor(),\n])\n```"
+    },
+    {
+      "id": "transforms-10",
+      "prompt": {
+        "ru": "Что меняет `ColorJitter`?",
+        "kg": "`ColorJitter` эмнени өзгөртөт?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Яркость, контраст, насыщенность и оттенок",
+            "kg": "Жарыктыкты, контрастты, каныккандыкты жана өңдү"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Размер картинки",
+            "kg": "Сүрөттүн өлчөмүн"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Число каналов",
+            "kg": "Каналдардын санын"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Формат файла",
+            "kg": "Файлдын форматын"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1)` — аугментация train. Для MNIST/ч/б картинок hue и saturation почти бессмысленны.",
+        "kg": "`ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1)` — train аугментация. MNIST/ак-кара сүрөттөр үчүн hue жана saturation дээрлик маанисиз."
+      },
+      "code": "transforms.ColorJitter(brightness=0.2, contrast=0.2)",
+      "example": "```python\ntrain_tf = transforms.Compose([\n    transforms.ColorJitter(brightness=0.2, contrast=0.2),\n    transforms.ToTensor(),\n])\n```"
+    },
+    {
+      "id": "transforms-11",
+      "prompt": {
+        "ru": "Что делает `RandomResizedCrop(224)`?",
+        "kg": "`RandomResizedCrop(224)` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Случайно вырезает область и растягивает её до 224×224",
+            "kg": "Кокустук аймакты кесип, 224×224кө чейин созот"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Всегда берёт центр",
+            "kg": "Дайыма борбордон алат"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Только меняет цвет",
+            "kg": "Түстү гана өзгөртөт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Добавляет шум",
+            "kg": "Ызы-чуу кошот"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Комбинирует случайный масштаб, aspect ratio и crop, затем resize. Сильная аугментация для train, особенно для ImageNet-подобных задач.",
+        "kg": "Кокустук масштаб, aspect ratio жана crop'ту бириктирип, анан resize жасат. Train үчүн күчтүү аугментация, өзгөчө ImageNet сыяктуу тапшырмаларда."
+      },
+      "code": "transforms.RandomResizedCrop(224)",
+      "example": "```python\ntrain_tf = transforms.Compose([\n    transforms.RandomResizedCrop(224),\n    transforms.RandomHorizontalFlip(),\n    transforms.ToTensor(),\n    transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),\n])\n```"
+    },
+    {
+      "id": "transforms-12",
+      "prompt": {
+        "ru": "Что делает `Grayscale(num_output_channels=1)`?",
+        "kg": "`Grayscale(num_output_channels=1)` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Превращает RGB в один канал яркости",
+            "kg": "RGB'ни бир жарыктык каналына айландырат"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Удаляет все каналы",
+            "kg": "Бардык каналдарды өчүрөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Добавляет alpha-канал",
+            "kg": "Alpha каналын кошот"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Меняет размер",
+            "kg": "Өлчөмдү өзгөртөт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Для MNIST нужен 1 канал, для pretrained ResNet — 3. `num_output_channels=1` даёт `[1, H, W]`, `3` — повторяет яркость в три канала.",
+        "kg": "MNIST үчүн 1 канал, pretrained ResNet үчүн 3 керек. `num_output_channels=1` `[1, H, W]` берет, `3` — жарыктыкты үч каналга кайталайт."
+      },
+      "code": "transforms.Grayscale(num_output_channels=1)",
+      "example": "```python\ntf = transforms.Compose([\n    transforms.Grayscale(num_output_channels=1),\n    transforms.Resize((28, 28)),\n    transforms.ToTensor(),\n])\n```"
+    },
+    {
+      "id": "transforms-13",
+      "prompt": {
+        "ru": "Чем train transforms отличаются от val/test?",
+        "kg": "Train transforms val/test'тен эмнеси менен айырмаланат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Train использует случайные аугментации, val/test — только детерминированные",
+            "kg": "Train кокустук аугментацияларды, val/test детерминдүүлөрдү гана колдонот"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Val использует больше аугментаций",
+            "kg": "Val көбүрөөк аугментация колдонот"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Они всегда одинаковые",
+            "kg": "Алар дайыма бирдей"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Val не использует ToTensor",
+            "kg": "Val ToTensor колдонбойт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Train: RandomCrop, Flip, Rotation, ColorJitter. Val/test: Resize, CenterCrop, ToTensor, Normalize. Так метрика честная и воспроизводимая.",
+        "kg": "Train: RandomCrop, Flip, Rotation, ColorJitter. Val/test: Resize, CenterCrop, ToTensor, Normalize. Ошентип метрика таза жана кайтарылмалуу болот."
+      },
+      "code": "train_tf != val_tf",
+      "example": "```python\ntrain_tf = transforms.Compose([\n    transforms.RandomHorizontalFlip(),\n    transforms.ToTensor(),\n])\nval_tf = transforms.Compose([\n    transforms.ToTensor(),\n])\n```"
+    },
+    {
+      "id": "transforms-14",
+      "prompt": {
+        "ru": "Откуда правильно импортировать `Image` для открытия картинки?",
+        "kg": "Сүрөттү ачуу үчүн `Image`'ды туура кайдан импорттоо керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "from PIL import Image",
+            "kg": "from PIL import Image"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "from torchvision import Image",
+            "kg": "from torchvision import Image"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "from torch import Image",
+            "kg": "from torch import Image"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "from cv2 import Image",
+            "kg": "from cv2 import Image"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`PIL.Image` открывает файлы с диска: `Image.open(\"x.png\")`. `torchvision` такого символа не экспортирует.",
+        "kg": "`PIL.Image` дисктеги файлдарды ачат: `Image.open(\"x.png\")`. `torchvision` мындай символду экспорттобойт."
+      },
+      "code": "from PIL import Image",
+      "example": "```python\nfrom PIL import Image\n\nimg = Image.open(\"digit.png\").convert(\"L\")\nprint(img.size, img.mode)\n```"
+    },
+    {
+      "id": "transforms-15",
+      "prompt": {
+        "ru": "Что произойдёт при `from torchvision import Image`?",
+        "kg": "`from torchvision import Image` болгондо эмне болот?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "ImportError: cannot import name 'Image'",
+            "kg": "ImportError: cannot import name 'Image'"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Картинка откроется",
+            "kg": "Сүрөт ачылат"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Создастся тензор",
+            "kg": "Тензор түзүлөт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Ничего не произойдёт",
+            "kg": "Эч нерсе болбойт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "В `torchvision` нет `Image`. Для файлов — `PIL.Image`, для чтения сразу в тензор — `torchvision.io.read_image`.",
+        "kg": "`torchvision` ичинде `Image` жок. Файлдар үчүн — `PIL.Image`, дароо тензорго окуу үчүн — `torchvision.io.read_image`."
+      },
+      "code": "from torchvision import Image",
+      "example": "```python\n# Ошибка\n# from torchvision import Image\n\n# Правильно\nfrom PIL import Image\n\n# Или сразу тензор\nfrom torchvision.io import read_image\nx = read_image(\"digit.png\")\n```"
+    },
+    {
+      "id": "transforms-16",
+      "prompt": {
+        "ru": "Как получить batch-форму `[1, 1, 28, 28]` для одной картинки?",
+        "kg": "Бир сүрөт үчүн `[1, 1, 28, 28]` batch формасын кантип алуу керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "val_tf(img).unsqueeze(0)",
+            "kg": "val_tf(img).unsqueeze(0)"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "val_tf(img).squeeze(0)",
+            "kg": "val_tf(img).squeeze(0)"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "val_tf(img).flatten()",
+            "kg": "val_tf(img).flatten()"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "val_tf(img).permute(0, 1, 2)",
+            "kg": "val_tf(img).permute(0, 1, 2)"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "После transforms одна картинка имеет `[C, H, W]`. `unsqueeze(0)` добавляет ось batch. `squeeze(0)` наоборот убирает её.",
+        "kg": "Transforms'тан кийин бир сүрөт `[C, H, W]` болот. `unsqueeze(0)` batch оксун кошот. `squeeze(0)` тескерисинче алып салат."
+      },
+      "code": "val_tf(img).unsqueeze(0)",
+      "example": "```python\nx = val_tf(img).unsqueeze(0)\nprint(x.shape)  # torch.Size([1, 1, 28, 28])\n\nmodel.eval()\nwith torch.inference_mode():\n    logits = model(x)\n```"
+    },
+    {
+      "id": "transforms-17",
+      "prompt": {
+        "ru": "Какая форма у батча MNIST при `batch_size=64`?",
+        "kg": "`batch_size=64` болгондо MNIST батчынын формасы кандай?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "[64, 1, 28, 28]",
+            "kg": "[64, 1, 28, 28]"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "[64, 28, 28, 1]",
+            "kg": "[64, 28, 28, 1]"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "[1, 64, 28, 28]",
+            "kg": "[1, 64, 28, 28]"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "[64, 784]",
+            "kg": "[64, 784]"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Порядок PyTorch: `[N, C, H, W]`. 64 картинки, 1 канал, 28×28. `[64, 784]` — это уже после `flatten` для полносвязной сети.",
+        "kg": "PyTorch тартиби: `[N, C, H, W]`. 64 сүрөт, 1 канал, 28×28. `[64, 784]` — бул толук байланышкан тармак үчүн `flatten` дан кийин."
+      },
+      "code": "images, labels = next(iter(train_loader))",
+      "example": "```python\nimages, labels = next(iter(train_loader))\nprint(images.shape)  # torch.Size([64, 1, 28, 28])\nprint(labels.shape)  # torch.Size([64])\n```"
+    },
+    {
+      "id": "transforms-18",
+      "prompt": {
+        "ru": "Зачем нужен `ToPILImage()`?",
+        "kg": "`ToPILImage()` эмне үчүн керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Превращает тензор обратно в PIL для показа",
+            "kg": "Тензорду көрсөтүү үчүн кайра PIL'ге айландырат"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Обучает модель",
+            "kg": "Моделди үйрөтөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Считает accuracy",
+            "kg": "Accuracy эсептейт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Добавляет batch",
+            "kg": "Batch кошот"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Полезно для отладки и визуализации после transforms. Если тензор нормализован, сначала нужно денормализовать значения.",
+        "kg": "Transforms'тан кийин отладка жана визуалдаштыруу үчүн пайдалуу. Эгер тензор нормалданган болсо, адегенде маанилерди денормалдоо керек."
+      },
+      "code": "transforms.ToPILImage()(x)",
+      "example": "```python\nfrom torchvision import transforms\n\nto_pil = transforms.ToPILImage()\nimg = to_pil(x.squeeze(0))\nimg.show()\n```"
+    },
+    {
+      "id": "transforms-19",
+      "prompt": {
+        "ru": "Почему `Normalize` нельзя применить к PIL-картинке сразу?",
+        "kg": "Эмне үчүн `Normalize`'ды PIL сүрөтүнө дароо колдонсо болбойт?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Normalize ожидает тензор, а PIL — нет",
+            "kg": "Normalize тензор күтөт, PIL эмес"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Normalize работает только с JPEG",
+            "kg": "Normalize JPEG менен гана иштейт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "PIL не поддерживает цвета",
+            "kg": "PIL түстөрдү колдобойт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Нет разницы",
+            "kg": "Айырма жок"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Поэтому в `Compose` сначала `ToTensor`, потом `Normalize`. Если перепутать, получишь ошибку о неподдерживаемом типе.",
+        "kg": "Ошондуктан `Compose` ичинде адегенде `ToTensor`, анан `Normalize`. Алмаштырсаң, колдоого алынбаган тип тууралуу ката чыгат."
+      },
+      "code": "transforms.Compose([transforms.ToTensor(), transforms.Normalize(...)])",
+      "example": "```python\n# Ошибка: Normalize(PIL)\n# Правильно\ntf = transforms.Compose([\n    transforms.ToTensor(),\n    transforms.Normalize((0.1307,), (0.3081,)),\n])\n```"
+    },
+    {
+      "id": "transforms-20",
+      "prompt": {
+        "ru": "Где применяются transforms, если передать `transform=train_tf` в Dataset?",
+        "kg": "Dataset'ке `transform=train_tf` берсе, transforms кайда колдонулат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "К каждому элементу при `__getitem__`, до сборки batch",
+            "kg": "Ар бир элементке `__getitem__` учурунда, batch чогулганга чейин"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Ко всему batch после DataLoader",
+            "kg": "DataLoader'ден кийин бүт batch'ке"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Только при сохранении модели",
+            "kg": "Моделди сактоодо гана"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Только на GPU",
+            "kg": "GPU'до гана"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Dataset отдаёт уже преобразованный тензор, DataLoader только собирает их в batch. Поэтому transforms выполняются в worker-процессах, а не в модели.",
+        "kg": "Dataset өзгөртүлгөн тензорду берет, DataLoader аларды batch'ке гана чогултат. Ошондуктан transforms worker-процесстерде аткарылат, моделде эмес."
+      },
+      "code": "datasets.MNIST(..., transform=train_tf)",
+      "example": "```python\ntrain_ds = datasets.MNIST(\n    root=\"data\", train=True, download=True, transform=train_tf,\n)\ntrain_loader = DataLoader(train_ds, batch_size=64, shuffle=True)\n```"
+    }
+  ]
+}

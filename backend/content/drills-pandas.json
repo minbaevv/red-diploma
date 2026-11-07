@@ -1,0 +1,1337 @@
+{
+  "slug": "pandas",
+  "order": 4,
+  "icon": "chart",
+  "accent": "#fbbf24",
+  "title": {
+    "ru": "Pandas: 30 операций",
+    "kg": "Pandas: 30 операция"
+  },
+  "description": {
+    "ru": "Чтение, фильтры, loc/iloc, пропуски, groupby, merge, pivot, даты и сохранение. Всё на реальных примерах.",
+    "kg": "Окуу, фильтрлер, loc/iloc, пропусктар, groupby, merge, pivot, күндөр жана сактоо. Баары реалдуу мисалдарда."
+  },
+  "minutes": 30,
+  "questions": [
+    {
+      "id": "pandas-01",
+      "prompt": {
+        "ru": "Как импортировать pandas с общепринятым псевдонимом?",
+        "kg": "Pandas'ты жалпы кабыл алынган псевдоним менен кантип импорттоо керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "import pandas as pd",
+            "kg": "import pandas as pd"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "import pd",
+            "kg": "import pd"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "from pandas import pd",
+            "kg": "from pandas import pd"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "include pandas",
+            "kg": "include pandas"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`pd` — соглашение, которое делает код узнаваемым. В примерах и документации почти всегда используют `pd`.",
+        "kg": "`pd` — кодду таанымал кылган конвенция. Мисалдарда жана документацияда дээрлик дайыма `pd` колдонулат."
+      },
+      "code": "import pandas as pd",
+      "example": "```python\nimport pandas as pd\nprint(pd.__version__)\n```"
+    },
+    {
+      "id": "pandas-02",
+      "prompt": {
+        "ru": "Как прочитать CSV-файл в DataFrame?",
+        "kg": "CSV файлын DataFrame'ге кантип окуу керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "df = pd.read_csv(\"data.csv\")",
+            "kg": "df = pd.read_csv(\"data.csv\")"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "df = pd.open_csv(\"data.csv\")",
+            "kg": "df = pd.open_csv(\"data.csv\")"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "df = pd.DataFrame(\"data.csv\")",
+            "kg": "df = pd.DataFrame(\"data.csv\")"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "df = pd.load(\"data.csv\")",
+            "kg": "df = pd.load(\"data.csv\")"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`read_csv` автоматически определяет разделитель и типы. Для других разделителей: `sep=\";\"`, для кодировки: `encoding=\"utf-8\"`.",
+        "kg": "`read_csv` бөлүүчүнү жана типтерди автоматтык аныктайт. Башка бөлүүчүлөр үчүн: `sep=\";\"`, коддоо үчүн: `encoding=\"utf-8\"`."
+      },
+      "code": "df = pd.read_csv(\"data.csv\")",
+      "example": "```python\nimport pandas as pd\n\ndf = pd.read_csv(\"data.csv\")\nprint(df.head())\n```"
+    },
+    {
+      "id": "pandas-03",
+      "prompt": {
+        "ru": "Что делает `df.head()`?",
+        "kg": "`df.head()` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Показывает первые 5 строк",
+            "kg": "Биринчи 5 сапты көрсөтөт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Показывает последние 5 строк",
+            "kg": "Акыркы 5 сапты көрсөтөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Удаляет первые 5 строк",
+            "kg": "Биринчи 5 сапты өчүрөт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Считает строки",
+            "kg": "Саптарды эсептейт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "По умолчанию 5 строк, можно указать `df.head(10)`. Последние строки — `df.tail()`.",
+        "kg": "Демейки 5 сап, `df.head(10)` деп көрсөтсө болот. Акыркы саптар — `df.tail()`."
+      },
+      "code": "df.head()",
+      "example": "```python\ndf.head()\ndf.head(10)\ndf.tail(3)\n```"
+    },
+    {
+      "id": "pandas-04",
+      "prompt": {
+        "ru": "Что показывает `df.info()`?",
+        "kg": "`df.info()` эмнени көрсөтөт?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Типы колонок, non-null значения и память",
+            "kg": "Колонкалардын типтерин, non-null маанилерди жана эстутумду"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Только первые строки",
+            "kg": "Биринчи саптарды гана"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Только среднее",
+            "kg": "Орточону гана"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "График",
+            "kg": "График"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`info()` — быстрый аудит данных: сколько строк, где NaN, какие dtype. После чтения CSV это первое, что стоит смотреть.",
+        "kg": "`info()` — маалыматтын тез аудити: канча сап, кайда NaN, кандай dtype. CSV окугандан кийин эң обдон карай турган нерсе."
+      },
+      "code": "df.info()",
+      "example": "```python\n$ df.info()\n<class 'pandas.core.frame.DataFrame'>\nRangeIndex: 1000 entries, 0 to 999\nData columns (total 5 columns):\n #   Column      Non-Null Count  Dtype\n---  ------      --------------  -----\n 0   name        1000 non-null   object\n 1   age         980 non-null    float64\n```"
+    },
+    {
+      "id": "pandas-05",
+      "prompt": {
+        "ru": "Что показывает `df.describe()`?",
+        "kg": "`df.describe()` эмнени көрсөтөт?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Статистику числовых колонок: count, mean, std, min, quartiles, max",
+            "kg": "Сандык колонкалардын статистикасын: count, mean, std, min, кварталдар, max"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Список колонок",
+            "kg": "Колонкалардын тизмесин"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Только уникальные значения",
+            "kg": "Уникалдуу маанилерди гана"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Типы данных",
+            "kg": "Маалымат типтерин"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "По умолчанию только числовые колонки. `df.describe(include=\"all\")` добавит категориальные, `include=\"object\"` — только строковые.",
+        "kg": "Демейки сандык колонкалар гана. `df.describe(include=\"all\")` категориалдыктарды кошот, `include=\"object\"` — тексттиктерди гана."
+      },
+      "code": "df.describe()",
+      "example": "```python\ndf.describe()\ndf.describe(include=\"all\")\n```"
+    },
+    {
+      "id": "pandas-06",
+      "prompt": {
+        "ru": "Что возвращает `df.shape`?",
+        "kg": "`df.shape` эмнени кайтарат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Кортеж (строки, колонки)",
+            "kg": "Кортеж (саптар, колонкалар)"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Список колонок",
+            "kg": "Колонкалардын тизмеси"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Типы данных",
+            "kg": "Маалымат типтери"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Количество NaN",
+            "kg": "NaN'дардын саны"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`shape` — это атрибут, без скобок. `df.shape[0]` — число строк, `df.shape[1]` — число колонок. `len(df)` тоже даёт число строк.",
+        "kg": "`shape` — кашасыз атрибут. `df.shape[0]` — саптардын саны, `df.shape[1]` — колонкалардын саны. `len(df)` да саптардын санын берет."
+      },
+      "code": "df.shape",
+      "example": "```python\nrows, cols = df.shape\nprint(rows, cols)\nprint(len(df))\n```"
+    },
+    {
+      "id": "pandas-07",
+      "prompt": {
+        "ru": "Что вернёт `df[\"age\"]`?",
+        "kg": "`df[\"age\"]` эмнени кайтарат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Series с колонкой age",
+            "kg": "age колонкасы менен Series"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "DataFrame со всеми колонками",
+            "kg": "Бардык колонкалары бар DataFrame"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Число строк",
+            "kg": "Саптардын саны"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Среднее значение",
+            "kg": "Орточо маани"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Одна колонка — это `Series` (одномерный массив с индексом). Несколько колонок — `DataFrame`.",
+        "kg": "Бир колонка — `Series` (индекси бар бир өлчөмдүү массив). Бир нече колонка — `DataFrame`."
+      },
+      "code": "df[\"age\"]",
+      "example": "```python\nages = df[\"age\"]\nprint(type(ages))          # <class 'pandas.core.series.Series'>\nprint(ages.mean())\n```"
+    },
+    {
+      "id": "pandas-08",
+      "prompt": {
+        "ru": "Как выбрать сразу колонки `name` и `age`?",
+        "kg": "`name` жана `age` колонкаларын бирге кантип тандоо керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "df[[\"name\", \"age\"]]",
+            "kg": "df[[\"name\", \"age\"]]"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "df[\"name\", \"age\"]",
+            "kg": "df[\"name\", \"age\"]"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "df(name, age)",
+            "kg": "df(name, age)"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "df.select(\"name\", \"age\")",
+            "kg": "df.select(\"name\", \"age\")"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Двойные скобки: внешние — индексация, внутренний список — набор колонок. Результат — DataFrame, а не Series.",
+        "kg": "Кош каша: тышкарысы — индексация, ички тизме — колонкалардын топтому. Натыйжа — Series эмес, DataFrame."
+      },
+      "code": "df[[\"name\", \"age\"]]",
+      "example": "```python\nsubset = df[[\"name\", \"age\"]]\nprint(subset.head())\n```"
+    },
+    {
+      "id": "pandas-09",
+      "prompt": {
+        "ru": "Чем `df.loc[0, \"name\"]` отличается от `df.iloc[0, 1]`?",
+        "kg": "`df.loc[0, \"name\"]` `df.iloc[0, 1]` тен эмнеси менен айырмаланат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "loc работает по меткам, iloc — по позициям",
+            "kg": "loc белгилер боюнча, iloc позициялар боюнча иштейт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "loc только для чисел",
+            "kg": "loc сандар үчүн гана"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "iloc только для строк",
+            "kg": "iloc саптар үчүн гана"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Разницы нет",
+            "kg": "Айырма жок"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`loc` — label-based: имя строки/колонки. `iloc` — integer position: 0-я строка, 1-я колонка. После фильтрации индексы могут не совпадать с позициями.",
+        "kg": "`loc` — label-based: саптын/колонканын аты. `iloc` — integer position: 0-сап, 1-колонка. Фильтрациядан кийин индекстер позицияларга дал келбеши мүмкүн."
+      },
+      "code": "df.loc[0, \"name\"]\ndf.iloc[0, 1]",
+      "example": "```python\nprint(df.loc[0, \"name\"])   # по индексу и имени колонки\nprint(df.iloc[0, 1])       # первая строка, вторая колонка\n```"
+    },
+    {
+      "id": "pandas-10",
+      "prompt": {
+        "ru": "Как отфильтровать строки, где `age > 18`?",
+        "kg": "`age > 18` болгон саптарды кантип фильтрлөө керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "df[df[\"age\"] > 18]",
+            "kg": "df[df[\"age\"] > 18]"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "df.filter(\"age > 18\")",
+            "kg": "df.filter(\"age > 18\")"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "df.where(age > 18)",
+            "kg": "df.where(age > 18)"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "df[\"age\" > 18]",
+            "kg": "df[\"age\" > 18]"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Булева маска — Series из True/False. `df[...]` оставляет строки, где True. Несколько условий объединяй через `&`, `|`, а каждое условие бери в скобки.",
+        "kg": "Булева маска — True/False'тен турган Series. `df[...]` True болгон саптарды калтырат. Бир нече шартты `&`, `|` менен бириктирип, ар бир шартты кашаага ал."
+      },
+      "code": "df[df[\"age\"] > 18]",
+      "example": "```python\nadults = df[df[\"age\"] > 18]\nrich_adults = df[(df[\"age\"] > 18) & (df[\"salary\"] > 1000)]\n```"
+    },
+    {
+      "id": "pandas-11",
+      "prompt": {
+        "ru": "Что делает `df.query(\"age > 18\")`?",
+        "kg": "`df.query(\"age > 18\")` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Фильтрует строки по условию в виде строки",
+            "kg": "Саптарды текст түрүндөгү шарт боюнча фильтрлейт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Удаляет колонку age",
+            "kg": "age колонкасын өчүрөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Сортирует по age",
+            "kg": "age боюнча иреттейт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Считает среднее",
+            "kg": "Орточону эсептейт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`query` удобен для читаемых условий и умеет ссылаться на переменные через `@`: `df.query(\"age > @min_age\")`. Внутри — те же булевы маски.",
+        "kg": "`query` окууга ыңгайлуу шарттар үчүн жакшы жана `@` аркылуу өзгөрмөлөргө шилтеме жасайт: `df.query(\"age > @min_age\")`. Ичинде ошол эле булева маскалар."
+      },
+      "code": "df.query(\"age > 18\")",
+      "example": "```python\nmin_age = 18\ndf.query(\"age > @min_age\")\n```"
+    },
+    {
+      "id": "pandas-12",
+      "prompt": {
+        "ru": "Как посчитать количество пропусков в каждой колонке?",
+        "kg": "Ар бир колонкадагы пропусктардын санын кантип эсептөө керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "df.isna().sum()",
+            "kg": "df.isna().sum()"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "df.isnull",
+            "kg": "df.isnull"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "df.na_count()",
+            "kg": "df.na_count()"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "df.dropna().sum()",
+            "kg": "df.dropna().sum()"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`isna()` даёт DataFrame из True/False, `sum()` складывает True как 1. По колонкам получится число NaN.",
+        "kg": "`isna()` True/False'тон турган DataFrame берет, `sum()` True'ну 1 катары кошот. Колонкалар боюнча NaN'дардын саны чыгат."
+      },
+      "code": "df.isna().sum()",
+      "example": "```python\ndf.isna().sum()\ndf.isna().mean() * 100   # процент пропусков\n```"
+    },
+    {
+      "id": "pandas-13",
+      "prompt": {
+        "ru": "Что делает `df.dropna()`?",
+        "kg": "`df.dropna()` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Удаляет строки с пропусками",
+            "kg": "Пропусктары бар саптарды өчүрөт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Заполняет пропуски нулями",
+            "kg": "Пропусктарды нөл менен толтурат"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Считает пропуски",
+            "kg": "Пропусктарды эсептейт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Меняет тип",
+            "kg": "Типти өзгөртөт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "По умолчанию удаляет строку, если есть хотя бы один NaN. `how=\"all\"` — только полностью пустые, `subset=[...]` — проверять выбранные колонки.",
+        "kg": "Демейки жок дегенде бир NaN болсо сапты өчүрөт. `how=\"all\"` — толугу менен бошторду гана, `subset=[...]` — тандалган колонкаларды текшерүү."
+      },
+      "code": "df.dropna()",
+      "example": "```python\ndf.dropna()\ndf.dropna(subset=[\"age\", \"salary\"])\ndf.dropna(how=\"all\")\n```"
+    },
+    {
+      "id": "pandas-14",
+      "prompt": {
+        "ru": "Как заполнить пропуски в `age` средним значением?",
+        "kg": "`age` колонкасындагы пропусктарды орточо маани менен кантип толтуруу керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "df[\"age\"] = df[\"age\"].fillna(df[\"age\"].mean())",
+            "kg": "df[\"age\"] = df[\"age\"].fillna(df[\"age\"].mean())"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "df[\"age\"].dropna(df[\"age\"].mean())",
+            "kg": "df[\"age\"].dropna(df[\"age\"].mean())"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "df.fillna(\"age\").mean()",
+            "kg": "df.fillna(\"age\").mean()"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "df[\"age\"] = df[\"age\"].mean()",
+            "kg": "df[\"age\"] = df[\"age\"].mean()"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`fillna(value)` заменяет NaN. Среднее считается по не-NaN значениям. Для категорий чаще используют моду или отдельную категорию `\"unknown\"`.",
+        "kg": "`fillna(value)` NaN'ды алмаштырат. Орточо NaN эмес маанилер боюнча эсептелет. Категориялар үчүн көбүнчө мода же `\"unknown\"` өзүнчө категориясы колдонулат."
+      },
+      "code": "df[\"age\"] = df[\"age\"].fillna(df[\"age\"].mean())",
+      "example": "```python\ndf[\"age\"] = df[\"age\"].fillna(df[\"age\"].mean())\ndf[\"city\"] = df[\"city\"].fillna(\"unknown\")\n```"
+    },
+    {
+      "id": "pandas-15",
+      "prompt": {
+        "ru": "Что делает `df[\"age\"].astype(int)`?",
+        "kg": "`df[\"age\"].astype(int)` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Преобразует тип колонки в int",
+            "kg": "Колонканын тибин int'ке айландырат"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Удаляет колонку",
+            "kg": "Колонканы өчүрөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Сортирует значения",
+            "kg": "Маанилерди иреттейт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Считает сумму",
+            "kg": "Сумманы эсептейт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Если в колонке есть NaN, `astype(int)` упадёт: NaN нельзя превратить в int. Сначала `fillna` или используй nullable `Int64`.",
+        "kg": "Колонкада NaN болсо, `astype(int)` ката берет: NaN'ды int'ке айландырууга болбойт. Адегенде `fillna` же nullable `Int64` колдон."
+      },
+      "code": "df[\"age\"].astype(int)",
+      "example": "```python\ndf[\"age\"] = df[\"age\"].fillna(0).astype(int)\n# или nullable-тип\ndf[\"age\"] = df[\"age\"].astype(\"Int64\")\n```"
+    },
+    {
+      "id": "pandas-16",
+      "prompt": {
+        "ru": "Как отсортировать DataFrame по `salary` по убыванию?",
+        "kg": "DataFrame'ди `salary` боюнча кемүү тартибинде кантип иреттөө керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "df.sort_values(\"salary\", ascending=False)",
+            "kg": "df.sort_values(\"salary\", ascending=False)"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "df.sort(\"salary\", desc=True)",
+            "kg": "df.sort(\"salary\", desc=True)"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "df.order_by(\"salary\")",
+            "kg": "df.order_by(\"salary\")"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "df[\"salary\"].sort()",
+            "kg": "df[\"salary\"].sort()"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`sort_values` сортирует строки по колонке. `ascending=False` — по убыванию. `df[\"salary\"].sort_values()` вернёт только Series, не DataFrame.",
+        "kg": "`sort_values` саптарды колонка боюнча иреттейт. `ascending=False` — кемүү тартипте. `df[\"salary\"].sort_values()` DataFrame эмес, Series гана кайтарат."
+      },
+      "code": "df.sort_values(\"salary\", ascending=False)",
+      "example": "```python\ndf.sort_values(\"salary\", ascending=False)\ndf.sort_values([\"department\", \"salary\"], ascending=[True, False])\n```"
+    },
+    {
+      "id": "pandas-17",
+      "prompt": {
+        "ru": "Как посчитать среднюю зарплату по каждому отделу?",
+        "kg": "Ар бир бөлүм боюнча орточо айлыкты кантип эсептөө керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "df.groupby(\"department\")[\"salary\"].mean()",
+            "kg": "df.groupby(\"department\")[\"salary\"].mean()"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "df.mean(\"department\")",
+            "kg": "df.mean(\"department\")"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "df[\"department\"].mean()",
+            "kg": "df[\"department\"].mean()"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "df.group(\"department\").salary",
+            "kg": "df.group(\"department\").salary"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`groupby` разбивает строки на группы, затем агрегат считает значение в каждой. Результат — Series с индексом department.",
+        "kg": "`groupby` саптарды группаларга бөлөт, анан агрегат ар бир группадагы маанини эсептейт. Натыйжа — индекси department болгон Series."
+      },
+      "code": "df.groupby(\"department\")[\"salary\"].mean()",
+      "example": "```python\ndf.groupby(\"department\")[\"salary\"].mean()\ndf.groupby(\"department\")[\"salary\"].agg([\"mean\", \"median\", \"count\"])\n```"
+    },
+    {
+      "id": "pandas-18",
+      "prompt": {
+        "ru": "Что делает `df.groupby(\"department\").agg({\"salary\": [\"mean\", \"max\"], \"id\": \"count\"})`?",
+        "kg": "`df.groupby(\"department\").agg({\"salary\": [\"mean\", \"max\"], \"id\": \"count\"})` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Считает несколько агрегатов по разным колонкам",
+            "kg": "Ар кайсы колонкалар боюнча бир нече агрегатты эсептейт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Удаляет группы",
+            "kg": "Группаларды өчүрөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Сортирует по department",
+            "kg": "department боюнча иреттейт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Создаёт pivot",
+            "kg": "Pivot түзөт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`agg` принимает словарь: колонка → список функций. Получится MultiIndex-колонка; можно сгладить через `.columns = [\"salary_mean\", ...]`.",
+        "kg": "`agg` сөздүк кабыл алат: колонка → функциялардын тизмеси. MultiIndex колонка пайда болот; `.columns = [\"salary_mean\", ...]` менен тегиздесе болот."
+      },
+      "code": "df.groupby(\"department\").agg({\"salary\": [\"mean\", \"max\"], \"id\": \"count\"})",
+      "example": "```python\nsummary = df.groupby(\"department\").agg({\n    \"salary\": [\"mean\", \"max\"],\n    \"id\": \"count\",\n})\nsummary.columns = [\"salary_mean\", \"salary_max\", \"employees\"]\n```"
+    },
+    {
+      "id": "pandas-19",
+      "prompt": {
+        "ru": "Что делает `df[\"city\"].value_counts()`?",
+        "kg": "`df[\"city\"].value_counts()` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Считает частоту каждого уникального значения",
+            "kg": "Ар бир уникалдуу маанинин жыштыгын эсептейт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Удаляет дубликаты",
+            "kg": "Дубликаттарды өчүрөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Сортирует по алфавиту",
+            "kg": "Алфавит боюнча иреттейт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Считает пропуски",
+            "kg": "Пропусктарды эсептейт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "По умолчанию сортирует по убыванию частоты. `normalize=True` даёт доли, `dropna=False` учитывает NaN.",
+        "kg": "Демейки жыштыктын кемүү тартибинде иреттейт. `normalize=True` үлүштөрдү берет, `dropna=False` NaN'ды эсептейт."
+      },
+      "code": "df[\"city\"].value_counts()",
+      "example": "```python\ndf[\"city\"].value_counts()\ndf[\"city\"].value_counts(normalize=True)\ndf[\"city\"].value_counts(dropna=False)\n```"
+    },
+    {
+      "id": "pandas-20",
+      "prompt": {
+        "ru": "Как соединить `users` и `orders` по `user_id`, сохранив всех пользователей?",
+        "kg": "`users` жана `orders` таблицаларын `user_id` боюнча, бардык колдонуучуларды сактап кантип бириктирүү керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "pd.merge(users, orders, on=\"user_id\", how=\"left\")",
+            "kg": "pd.merge(users, orders, on=\"user_id\", how=\"left\")"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "users.join(orders, on=\"user_id\")",
+            "kg": "users.join(orders, on=\"user_id\")"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "pd.concat([users, orders])",
+            "kg": "pd.concat([users, orders])"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "users.merge(orders, how=\"inner\")",
+            "kg": "users.merge(orders, how=\"inner\")"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`how=\"left\"` сохраняет все строки левой таблицы. `inner` — только совпадения, `outer` — все, `right` — все строки правой.",
+        "kg": "`how=\"left\"` сол таблицанын бардык саптарын сактайт. `inner` — дал келүүлөрдү гана, `outer` — баарын, `right` — оң таблицанын бардык саптарын."
+      },
+      "code": "pd.merge(users, orders, on=\"user_id\", how=\"left\")",
+      "example": "```python\nmerged = pd.merge(\n    users, orders,\n    on=\"user_id\",\n    how=\"left\",\n    suffixes=(\"_user\", \"_order\"),\n)\n```"
+    },
+    {
+      "id": "pandas-21",
+      "prompt": {
+        "ru": "Что делает `pd.concat([df1, df2], ignore_index=True)`?",
+        "kg": "`pd.concat([df1, df2], ignore_index=True)` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Складывает DataFrame друг под другом и перенумеровывает индекс",
+            "kg": "DataFrame'дерди биринин астына бири кошуп, индекси кайра номерлейт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Соединяет по общим колонкам",
+            "kg": "Жалпы колонкалар боюнча бириктирет"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Удаляет дубликаты",
+            "kg": "Дубликаттарды өчүрөт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Считает сумму",
+            "kg": "Сумманы эсептейт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`concat` по умолчанию добавляет строки (`axis=0`). `ignore_index=True` убирает повторяющиеся индексы. Для соединения по ключу нужен `merge`.",
+        "kg": "`concat` демейки саптарды кошот (`axis=0`). `ignore_index=True` кайталанган индекстерди алып салат. Ачкыч боюнча бириктирүү үчүн `merge` керек."
+      },
+      "code": "pd.concat([df1, df2], ignore_index=True)",
+      "example": "```python\nall_rows = pd.concat([df1, df2], ignore_index=True)\nwide = pd.concat([df1, df2], axis=1)\n```"
+    },
+    {
+      "id": "pandas-22",
+      "prompt": {
+        "ru": "Что делает `pivot_table`?",
+        "kg": "`pivot_table` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Строит сводную таблицу: группирует и агрегирует по строкам и колонкам",
+            "kg": "Жыйынтык таблица түзөт: саптар жана колонкалар боюнча группалап, агрегаттайт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Удаляет колонки",
+            "kg": "Колонкаларды өчүрөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Сортирует данные",
+            "kg": "Маалыматты иреттейт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Читает Excel",
+            "kg": "Excel окуйт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Типичный пример: `index=\"department\"`, `columns=\"city\"`, `values=\"salary\"`, `aggfunc=\"mean\"`. Пропуски можно заполнить `fill_value=0`.",
+        "kg": "Типтүү мисал: `index=\"department\"`, `columns=\"city\"`, `values=\"salary\"`, `aggfunc=\"mean\"`. Пропусктарды `fill_value=0` менен толтурса болот."
+      },
+      "code": "df.pivot_table(index=\"department\", columns=\"city\", values=\"salary\", aggfunc=\"mean\")",
+      "example": "```python\npivot = df.pivot_table(\n    index=\"department\",\n    columns=\"city\",\n    values=\"salary\",\n    aggfunc=\"mean\",\n    fill_value=0,\n)\n```"
+    },
+    {
+      "id": "pandas-23",
+      "prompt": {
+        "ru": "Что делает `df[\"salary\"].apply(lambda x: x * 1.1)`?",
+        "kg": "`df[\"salary\"].apply(lambda x: x * 1.1)` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Применяет функцию к каждому значению Series",
+            "kg": "Функцияны Series'тин ар бир маанисине колдонот"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Сортирует значения",
+            "kg": "Маанилерди иреттейт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Удаляет колонку",
+            "kg": "Колонканы өчүрөт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Считает среднее",
+            "kg": "Орточону эсептейт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`apply` гибок, но медленнее векторизованных операций. Для простого умножения лучше `df[\"salary\"] * 1.1`.",
+        "kg": "`apply` ийкемдүү, бирок векторлоштурулган операциялардан жайыраак. Жөнөкөй көбөйтүү үчүн `df[\"salary\"] * 1.1` жакшы."
+      },
+      "code": "df[\"salary\"].apply(lambda x: x * 1.1)",
+      "example": "```python\ndf[\"salary\"] = df[\"salary\"].apply(lambda x: x * 1.1)\n# быстрее\ndf[\"salary\"] = df[\"salary\"] * 1.1\n```"
+    },
+    {
+      "id": "pandas-24",
+      "prompt": {
+        "ru": "Чем `map` отличается от `apply` для Series?",
+        "kg": "Series үчүн `map` `apply` тен эмнеси менен айырмаланат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "map подставляет значения по словарю/функции, apply применяет функцию",
+            "kg": "map сөздүк/функция боюнча маанилерди алмаштырат, apply функцияны колдонот"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "map работает только с числами",
+            "kg": "map сандар менен гана иштейт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "apply нельзя использовать с lambda",
+            "kg": "apply'ды lambda менен колдонсо болбойт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Разницы нет",
+            "kg": "Айырма жок"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`Series.map({\"Bishkek\": \"Бишкек\"})` заменяет значения по ключу, отсутствующие даёт NaN. `apply` вызывает функцию для каждого элемента.",
+        "kg": "`Series.map({\"Bishkek\": \"Бишкек\"})` маанилерди ачкыч боюнча алмаштырат, жоктору NaN болот. `apply` ар бир элемент үчүн функция чакырат."
+      },
+      "code": "df[\"city\"].map({\"Bishkek\": \"Бишкек\"})",
+      "example": "```python\ndf[\"city_kg\"] = df[\"city\"].map({\"Bishkek\": \"Бишкек\", \"Osh\": \"Ош\"})\ndf[\"salary\"] = df[\"salary\"].apply(lambda x: round(x, 2))\n```"
+    },
+    {
+      "id": "pandas-25",
+      "prompt": {
+        "ru": "Как переименовать колонку `name` в `full_name`?",
+        "kg": "`name` колонкасынын атын `full_name` кантип өзгөртүү керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "df.rename(columns={\"name\": \"full_name\"})",
+            "kg": "df.rename(columns={\"name\": \"full_name\"})"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "df.columns[\"name\"] = \"full_name\"",
+            "kg": "df.columns[\"name\"] = \"full_name\""
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "df.rename(\"name\", \"full_name\")",
+            "kg": "df.rename(\"name\", \"full_name\")"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "df[\"full_name\"] = df[\"name\"].rename()",
+            "kg": "df[\"full_name\"] = df[\"name\"].rename()"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`rename` возвращает новый DataFrame, если не указать `inplace=True`. Лучше присваивать результат: `df = df.rename(...)`.",
+        "kg": "`rename` жаңы DataFrame кайтарат, эгер `inplace=True` көрсөтүлбөсө. Натыйжаны дайындоо жакшы: `df = df.rename(...)`."
+      },
+      "code": "df.rename(columns={\"name\": \"full_name\"})",
+      "example": "```python\ndf = df.rename(columns={\"name\": \"full_name\", \"age\": \"user_age\"})\n```"
+    },
+    {
+      "id": "pandas-26",
+      "prompt": {
+        "ru": "Как удалить колонку `temp`?",
+        "kg": "`temp` колонкасын кантип өчүрүү керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "df.drop(columns=[\"temp\"])",
+            "kg": "df.drop(columns=[\"temp\"])"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "df.remove(\"temp\")",
+            "kg": "df.remove(\"temp\")"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "del df.temp",
+            "kg": "del df.temp"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "df.drop(\"temp\", axis=0)",
+            "kg": "df.drop(\"temp\", axis=0)"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`axis=1` или `columns=[...]` — удаление колонки. `axis=0`/`index=[...]` — удаление строк. `inplace=True` меняет DataFrame на месте.",
+        "kg": "`axis=1` же `columns=[...]` — колонканы өчүрүү. `axis=0`/`index=[...]` — саптарды өчүрүү. `inplace=True` DataFrame'ди ордунда өзгөртөт."
+      },
+      "code": "df.drop(columns=[\"temp\"])",
+      "example": "```python\ndf = df.drop(columns=[\"temp\"])\n# или\ndf.drop(columns=[\"temp\"], inplace=True)\n```"
+    },
+    {
+      "id": "pandas-27",
+      "prompt": {
+        "ru": "Что делает `df.drop_duplicates(subset=[\"email\"])`?",
+        "kg": "`df.drop_duplicates(subset=[\"email\"])` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Удаляет строки с повторяющимся email",
+            "kg": "Кайталанган email'и бар саптарды өчүрөт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Удаляет колонку email",
+            "kg": "email колонкасын өчүрөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Считает дубликаты",
+            "kg": "Дубликаттарды эсептейт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Сортирует по email",
+            "kg": "email боюнча иреттейт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`subset` задаёт колонки для проверки. `keep=\"first\"` (по умолчанию) оставляет первое вхождение, `keep=\"last\"` — последнее, `keep=False` — удаляет все.",
+        "kg": "`subset` текшерүү үчүн колонкаларды берет. `keep=\"first\"` (демейки) биринчи кездешүүнү калтырат, `keep=\"last\"` — акыркыны, `keep=False` — баарын өчүрөт."
+      },
+      "code": "df.drop_duplicates(subset=[\"email\"])",
+      "example": "```python\ndf = df.drop_duplicates(subset=[\"email\"])\ndf = df.drop_duplicates(subset=[\"email\"], keep=\"last\")\n```"
+    },
+    {
+      "id": "pandas-28",
+      "prompt": {
+        "ru": "Как преобразовать колонку `date` в datetime?",
+        "kg": "`date` колонкасын datetime'ке кантип айландыруу керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "pd.to_datetime(df[\"date\"])",
+            "kg": "pd.to_datetime(df[\"date\"])"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "df[\"date\"].to_datetime()",
+            "kg": "df[\"date\"].to_datetime()"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "df[\"date\"].astype(datetime)",
+            "kg": "df[\"date\"].astype(datetime)"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "pd.datetime(df[\"date\"])",
+            "kg": "pd.datetime(df[\"date\"])"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`to_datetime` понимает ISO-даты и много форматов. Ошибки можно обработать через `errors=\"coerce\"` — проблемные значения станут NaT.",
+        "kg": "`to_datetime` ISO-күндөрдү жана көп форматтарды түшүнөт. Каталарды `errors=\"coerce\"` менен иштесе болот — көйгөйлүү маанилер NaT болот."
+      },
+      "code": "pd.to_datetime(df[\"date\"])",
+      "example": "```python\ndf[\"date\"] = pd.to_datetime(df[\"date\"])\ndf[\"month\"] = df[\"date\"].dt.month\ndf[\"weekday\"] = df[\"date\"].dt.day_name()\n```"
+    },
+    {
+      "id": "pandas-29",
+      "prompt": {
+        "ru": "Что делает `df[\"date\"].dt.month`?",
+        "kg": "`df[\"date\"].dt.month` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Достаёт номер месяца из datetime-колонки",
+            "kg": "Datetime колонкасынан айдын номерин алат"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Считает количество месяцев",
+            "kg": "Айлардын санын эсептейт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Удаляет дату",
+            "kg": "Күндү өчүрөт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Сортирует по дате",
+            "kg": "Күн боюнча иреттейт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`.dt` — accessor для datetime Series. Доступны `.dt.year`, `.dt.day`, `.dt.dayofweek`, `.dt.hour`, `.dt.to_period(\"M\")`.",
+        "kg": "`.dt` — datetime Series үчүн accessor. `.dt.year`, `.dt.day`, `.dt.dayofweek`, `.dt.hour`, `.dt.to_period(\"M\")` жеткиликтүү."
+      },
+      "code": "df[\"date\"].dt.month",
+      "example": "```python\ndf[\"year\"] = df[\"date\"].dt.year\ndf[\"month\"] = df[\"date\"].dt.month\ndf[\"weekday\"] = df[\"date\"].dt.day_name()\n```"
+    },
+    {
+      "id": "pandas-30",
+      "prompt": {
+        "ru": "Как сохранить DataFrame в CSV без индекса?",
+        "kg": "DataFrame'ди индексиз CSV'ге кантип сактоо керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "df.to_csv(\"out.csv\", index=False)",
+            "kg": "df.to_csv(\"out.csv\", index=False)"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "df.save_csv(\"out.csv\")",
+            "kg": "df.save_csv(\"out.csv\")"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "df.export(\"out.csv\")",
+            "kg": "df.export(\"out.csv\")"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "df.to_csv(\"out.csv\", index=True)",
+            "kg": "df.to_csv(\"out.csv\", index=True)"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`index=False` не пишет индекс в файл. Иначе при повторном чтении появится лишняя колонка `Unnamed: 0`.",
+        "kg": "`index=False` индекси файлга жазбайт. Антпесе кайра окуганда ашыкча `Unnamed: 0` колонкасы пайда болот."
+      },
+      "code": "df.to_csv(\"out.csv\", index=False)",
+      "example": "```python\ndf.to_csv(\"out.csv\", index=False)\ndf.to_csv(\"out.csv\", index=False, encoding=\"utf-8-sig\")\n```"
+    }
+  ]
+}

@@ -9,6 +9,7 @@ import {
   Code2,
   Database,
   Eye,
+  GitBranch,
   Lightbulb,
   Server,
   Sparkles,
@@ -21,6 +22,7 @@ import { useBi } from '../state/AppContext'
 const iconMap = {
   code: Code2,
   function: Code2,
+  'git-branch': GitBranch,
   database: Database,
   terminal: Terminal,
   server: Server,
@@ -110,6 +112,22 @@ export function Markdown({ children }) {
         {children || ''}
       </ReactMarkdown>
     </div>
+  )
+}
+
+export function InlineMarkdown({ children }) {
+  return (
+    <span className="inline-markdown">
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        components={{
+          p: (props) => <span {...props} />,
+          a: (props) => <a {...props} target="_blank" rel="noreferrer" />,
+        }}
+      >
+        {children || ''}
+      </ReactMarkdown>
+    </span>
   )
 }
 

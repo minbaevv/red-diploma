@@ -8,6 +8,7 @@ import {
   Clock,
   Code2,
   Flame,
+  ListChecks,
   Route,
   Target,
 } from 'lucide-react'
@@ -38,6 +39,7 @@ export default function Dashboard() {
 
   const taskMap = new Map((data.tasks || []).map((task) => [task.slug, task]))
   const examMap = new Map(exams.map((exam) => [exam.slug, exam]))
+  const drillMap = new Map((data.drills || []).map((drill) => [drill.slug, drill]))
   const learningPath = (data.paths || [])[0]
   const route = learningPath ? pathStats(learningPath, index) : null
   const guidedStep = route?.current
@@ -263,31 +265,42 @@ export default function Dashboard() {
           subtitle={bi('История проверок и экзаменов.', 'Текшерүүлөр жана экзамендер тарыхы.')}
         />
         <div className="attempt-list">
-          {(data.attempts || []).slice(0, 5).map((attempt) => (
-            <div className="attempt-row" key={attempt.id}>
-              <div className="attempt-icon">
-                {attempt.kind === 'exam' ? <Target size={17} /> : <CheckCircle2 size={17} />}
+          {(data.attempts || []).slice(0, 5).map((attempt) => {
+            const kindTitle =
+              attempt.kind === 'exam'
+                ? examMap.get(attempt.ref)?.title
+                : attempt.kind === 'drill'
+                  ? drillMap.get(attempt.ref)?.title
+                  : taskMap.get(attempt.ref)?.title
+            return (
+              <div className="attempt-row" key={attempt.id}>
+                <div className="attempt-icon">
+                  {attempt.kind === 'exam' ? (
+                    <Target size={17} />
+                  ) : attempt.kind === 'drill' ? (
+                    <ListChecks size={17} />
+                  ) : (
+                    <CheckCircle2 size={17} />
+                  )}
+                </div>
+                <div className="attempt-copy">
+                  <strong>{pick(kindTitle, lang) || attempt.ref}</strong>
+                  <span>
+                    {attempt.kind === 'exam'
+                      ? bi('Экзамен', 'Экзамен')
+                      : attempt.kind === 'drill'
+                        ? bi('Тренажёр', 'Тренажёр')
+                        : attempt.kind === 'theory'
+                          ? bi('Теория', 'Теория')
+                          : bi('Задача', 'Тапшырма')}
+                    {' · '}
+                    {formatDate(attempt.created_at?.slice(0, 10), lang)}
+                  </span>
+                </div>
+                <div className="attempt-score">{attempt.score}/{attempt.max_score}</div>
               </div>
-              <div className="attempt-copy">
-                <strong>
-                  {pick(
-                    attempt.kind === 'exam' ? examMap.get(attempt.ref)?.title : taskMap.get(attempt.ref)?.title,
-                    lang,
-                  ) || attempt.ref}
-                </strong>
-                <span>
-                  {attempt.kind === 'exam'
-                    ? bi('Экзамен', 'Экзамен')
-                    : attempt.kind === 'theory'
-                      ? bi('Теория', 'Теория')
-                      : bi('Задача', 'Тапшырма')}
-                  {' · '}
-                  {formatDate(attempt.created_at?.slice(0, 10), lang)}
-                </span>
-              </div>
-              <div className="attempt-score">{attempt.score}/{attempt.max_score}</div>
-            </div>
-          ))}
+            )
+          })}
           {!(data.attempts || []).length && (
             <div className="attempt-empty">
               {bi('Пока пусто. Начни с первого урока — история появится здесь.', 'Азырынча бош. Биринчи сабактан башта.')}

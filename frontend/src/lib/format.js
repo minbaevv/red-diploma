@@ -59,6 +59,8 @@ export function collectMistakes(attempts = []) {
   const seen = new Set()
   const mistakes = []
   for (const attempt of attempts) {
+    // Drill mistakes are reviewed on the drill page; they have no /task route.
+    if (attempt.kind === 'drill') continue
     const results = attempt.details?.results || []
     for (const result of results) {
       if (result.correct || result.ok || !result.id) continue

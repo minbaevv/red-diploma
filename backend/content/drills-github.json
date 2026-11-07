@@ -1,0 +1,1337 @@
+{
+  "slug": "github",
+  "order": 3,
+  "icon": "git-branch",
+  "accent": "#f472b6",
+  "title": {
+    "ru": "GitHub: 30 команд и сценариев",
+    "kg": "GitHub: 30 буйрук жана сценарий"
+  },
+  "description": {
+    "ru": "Коммиты, ветки, merge/rebase, конфликты, PR, Actions, LFS и релизы. С реальными командами.",
+    "kg": "Коммиттер, веткалар, merge/rebase, жаңжалдар, PR, Actions, LFS жана релиздер. Реалдуу буйруктар менен."
+  },
+  "minutes": 30,
+  "questions": [
+    {
+      "id": "github-01",
+      "prompt": {
+        "ru": "Что делает `git init`?",
+        "kg": "`git init` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Создаёт новый локальный Git-репозиторий",
+            "kg": "Жаңы локалдык Git-репозиторий түзөт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Клонирует репозиторий с GitHub",
+            "kg": "GitHub'тан репозиторийди көчүрөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Отправляет коммиты на сервер",
+            "kg": "Коммиттерди серверге жөнөтөт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Удаляет историю",
+            "kg": "Тарыхты өчүрөт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`git init` создаёт папку `.git` с историей и настройками. Обычно выполняется один раз в корне проекта.",
+        "kg": "`git init` тарых жана жөндөөлөр менен `.git` папкасын түзөт. Адатта долбоордун тамырында бир жолу аткарылат."
+      },
+      "code": "git init",
+      "example": "```bash\nmkdir my-project && cd my-project\ngit init\ngit status\n```"
+    },
+    {
+      "id": "github-02",
+      "prompt": {
+        "ru": "Что делает `git clone git@github.com:user/repo.git`?",
+        "kg": "`git clone git@github.com:user/repo.git` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Скачивает репозиторий вместе с историей",
+            "kg": "Репозиторийди тарыхы менен жүктөйт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Создаёт пустой репозиторий",
+            "kg": "Бош репозиторий түзөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Отправляет изменения",
+            "kg": "Өзгөртүүлөрдү жөнөтөт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Удаляет удалённый репозиторий",
+            "kg": "Алыскы репозиторийди өчүрөт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`clone` создаёт локальную копию и настраивает `origin`. SSH-адрес требует SSH-ключа, HTTPS — логина/токена.",
+        "kg": "`clone` локалдык көчүрмө түзөт жана `origin` ды орнотот. SSH дарек SSH ачкычын, HTTPS логин/токенди талап кылат."
+      },
+      "code": "git clone git@github.com:user/repo.git",
+      "example": "```bash\ngit clone git@github.com:minbaevv/red-diploma.git\ncd red-diploma\ngit remote -v\n```"
+    },
+    {
+      "id": "github-03",
+      "prompt": {
+        "ru": "Что показывает `git status`?",
+        "kg": "`git status` эмнени көрсөтөт?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Изменённые, добавленные и неотслеживаемые файлы",
+            "kg": "Өзгөртүлгөн, кошулган жана көзөмөлдөнбөгөн файлдарды"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Историю коммитов",
+            "kg": "Коммиттердин тарыхын"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Разницу между ветками",
+            "kg": "Веткалардын айырмасын"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Список удалённых репозиториев",
+            "kg": "Алыскы репозиторийлердин тизмесин"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`git status` — главная команда перед коммитом. Она показывает, что попадёт в следующий коммит и что ещё не добавлено.",
+        "kg": "`git status` — коммиттен мурунку негизги буйрук. Ал кийинки коммитке эмне кирерин жана эмне кошула электигин көрсөтөт."
+      },
+      "code": "git status",
+      "example": "```bash\n$ git status\nOn branch main\nChanges not staged for commit:\n  modified:   app.py\nUntracked files:\n  model.pt\n```"
+    },
+    {
+      "id": "github-04",
+      "prompt": {
+        "ru": "Что делает `git add .`?",
+        "kg": "`git add .` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Добавляет изменения из текущей папки в staging area",
+            "kg": "Учурдагы папкадагы өзгөртүүлөрдү staging area'га кошот"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Сразу создаёт коммит",
+            "kg": "Дароо коммит түзөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Отправляет файлы на GitHub",
+            "kg": "Файлдарды GitHub'ка жөнөтөт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Удаляет файлы из Git",
+            "kg": "Файлдарды Git'тен өчүрөт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`git add` готовит изменения к коммиту. `git add .` берёт всё из текущей директории; лучше проверять `git status`, чтобы не добавить секреты.",
+        "kg": "`git add` өзгөртүүлөрдү коммитке даярдайт. `git add .` учурдагы директориядагы баарын алат; секреттерди кошпош үчүн `git status` текшер."
+      },
+      "code": "git add .",
+      "example": "```bash\ngit status\ngit add app.py requirements.txt\ngit add .\ngit status\n```"
+    },
+    {
+      "id": "github-05",
+      "prompt": {
+        "ru": "Что делает `git commit -m \"feat: add predict endpoint\"`?",
+        "kg": "`git commit -m \"feat: add predict endpoint\"` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Создаёт коммит из staged-изменений с сообщением",
+            "kg": "Staged өзгөртүүлөрдөн билдирүү менен коммит түзөт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Отправляет коммит на GitHub",
+            "kg": "Коммитти GitHub'ка жөнөтөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Добавляет файлы в staging",
+            "kg": "Файлдарды staging'ке кошот"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Создаёт новую ветку",
+            "kg": "Жаңы ветка түзөт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Коммит фиксирует только то, что было в staging. `-m` задаёт сообщение. Хорошее сообщение объясняет «что и зачем», а не «изменил файл».",
+        "kg": "Коммит staging'де болгон нерселерди гана бекемдейт. `-m` билдирүүнү берет. Жакшы билдирүү «эмне жана эмне үчүн» деп түшүндүрөт, «файлды өзгөрттүм» эмес."
+      },
+      "code": "git commit -m \"feat: add predict endpoint\"",
+      "example": "```bash\ngit add app.py\ngit commit -m \"feat: add predict endpoint\"\n```"
+    },
+    {
+      "id": "github-06",
+      "prompt": {
+        "ru": "Что показывает `git log --oneline`?",
+        "kg": "`git log --oneline` эмнени көрсөтөт?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Краткую историю коммитов",
+            "kg": "Коммиттердин кыска тарыхын"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Список файлов",
+            "kg": "Файлдардын тизмесин"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Разницу с сервером",
+            "kg": "Сервер менен айырманы"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Настройки Git",
+            "kg": "Git жөндөөлөрүн"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Каждая строка — сокращённый хеш и сообщение. `git log --graph --oneline --all` покажет ветвление.",
+        "kg": "Ар бир сап — кыскартылган хеш жана билдирүү. `git log --graph --oneline --all` бутактанууну көрсөтөт."
+      },
+      "code": "git log --oneline",
+      "example": "```bash\ngit log --oneline\ngit log --graph --oneline --all --decorate\n```"
+    },
+    {
+      "id": "github-07",
+      "prompt": {
+        "ru": "Что показывает `git diff`?",
+        "kg": "`git diff` эмнени көрсөтөт?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Изменения, ещё не добавленные в staging",
+            "kg": "Staging'ге кошула элек өзгөртүүлөрдү"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Историю всех коммитов",
+            "kg": "Бардык коммиттердин тарыхын"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Список веток",
+            "kg": "Веткалардын тизмесин"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Настройки удалённого репозитория",
+            "kg": "Алыскы репозиторийдин жөндөөлөрүн"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`git diff` — рабочая директория против staging. `git diff --staged` — staging против последнего коммита.",
+        "kg": "`git diff` — жумушчу директория staging'ге каршы. `git diff --staged` — staging акыркы коммитке каршы."
+      },
+      "code": "git diff",
+      "example": "```bash\ngit diff\ngit diff --staged\ngit diff HEAD~1\n```"
+    },
+    {
+      "id": "github-08",
+      "prompt": {
+        "ru": "Что делает `git branch` без аргументов?",
+        "kg": "`git branch` аргументсиз эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Показывает локальные ветки и текущую",
+            "kg": "Локалдык веткаларды жана учурдагыны көрсөтөт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Создаёт ветку",
+            "kg": "Ветка түзөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Удаляет ветку",
+            "kg": "Ветканы өчүрөт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Переключает ветку",
+            "kg": "Ветканы алмаштырат"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Текущая ветка помечена `*`. `git branch -a` покажет и удалённые ветки, `git branch -d name` удалит локальную.",
+        "kg": "Учурдагы ветка `*` менен белгиленет. `git branch -a` алыскы веткаларды да көрсөтөт, `git branch -d name` локалдык ветканы өчүрөт."
+      },
+      "code": "git branch",
+      "example": "```bash\ngit branch\ngit branch -a\ngit branch feature/auth\n```"
+    },
+    {
+      "id": "github-09",
+      "prompt": {
+        "ru": "Что делает `git switch -c feature/auth`?",
+        "kg": "`git switch -c feature/auth` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Создаёт ветку и сразу переключается на неё",
+            "kg": "Ветка түзүп, дароо ошого өтөт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Удаляет ветку",
+            "kg": "Ветканы өчүрөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Сливает ветку",
+            "kg": "Ветканы бириктирет"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Отправляет ветку на GitHub",
+            "kg": "Ветканы GitHub'ка жөнөтөт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`-c` = create. Старый эквивалент: `git checkout -b feature/auth`. `switch` безопаснее, потому что не переключает файлы.",
+        "kg": "`-c` = create. Эски эквивалент: `git checkout -b feature/auth`. `switch` коопсуз, анткени файлдарды алмаштырбайт."
+      },
+      "code": "git switch -c feature/auth",
+      "example": "```bash\ngit switch -c feature/auth\n# ... изменения ...\ngit add .\ngit commit -m \"feat: auth\"\n```"
+    },
+    {
+      "id": "github-10",
+      "prompt": {
+        "ru": "Что делает `git merge feature/auth`?",
+        "kg": "`git merge feature/auth` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Вливает изменения ветки feature/auth в текущую ветку",
+            "kg": "feature/auth веткасынын өзгөртүүлөрүн учурдагы веткага кошот"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Удаляет feature/auth",
+            "kg": "feature/auth'ты өчүрөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Создаёт новую ветку",
+            "kg": "Жаңы ветка түзөт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Отправляет изменения на сервер",
+            "kg": "Өзгөртүүлөрдү серверге жөнөтөт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Сначала переключись на ветку-получатель (`git switch main`), потом `git merge feature/auth`. Если истории разошлись, может появиться merge-коммит.",
+        "kg": "Адегенде кабыл алуучу веткага өт (`git switch main`), анан `git merge feature/auth`. Тарыхтар айырмаланса, merge-коммит пайда болушу мүмкүн."
+      },
+      "code": "git merge feature/auth",
+      "example": "```bash\ngit switch main\ngit pull\ngit merge feature/auth\ngit push\n```"
+    },
+    {
+      "id": "github-11",
+      "prompt": {
+        "ru": "Чем `git rebase main` отличается от merge?",
+        "kg": "`git rebase main` merge'ден эмнеси менен айырмаланат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Переписывает коммиты поверх main, делая историю линейной",
+            "kg": "Коммиттерди main үстүнө кайра жазып, тарыхты сызыктуу кылат"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Просто копирует файлы",
+            "kg": "Жөн эле файлдарды көчүрөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Удаляет ветку",
+            "kg": "Ветканы өчүрөт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Отправляет изменения",
+            "kg": "Өзгөртүүлөрдү жөнөтөт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Rebase меняет хеши коммитов. Не делай rebase ветки, которую уже отправили и другие могли забрать. Для публичной истории безопаснее merge.",
+        "kg": "Rebase коммиттердин хештерин өзгөртөт. Башкалар алып кеткен веткага rebase жасаба. Публикалык тарых үчүн merge коопсуз."
+      },
+      "code": "git rebase main",
+      "example": "```bash\ngit switch feature/auth\ngit rebase main\n# при конфликте: исправить, git add, git rebase --continue\n```"
+    },
+    {
+      "id": "github-12",
+      "prompt": {
+        "ru": "Что показывает `git remote -v`?",
+        "kg": "`git remote -v` эмнени көрсөтөт?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "URL удалённых репозиториев",
+            "kg": "Алыскы репозиторийлердин URL'дерин"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Список веток",
+            "kg": "Веткалардын тизмесин"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Историю коммитов",
+            "kg": "Коммиттердин тарыхын"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Размер репозитория",
+            "kg": "Репозиторийдин өлчөмүн"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Обычно есть `origin` — твой репозиторий, и `upstream` — оригинал при fork. `-v` показывает fetch и push URL.",
+        "kg": "Адатта `origin` — сенин репозиторийиң, `upstream` — fork учурундагы оригинал. `-v` fetch жана push URL'дерин көрсөтөт."
+      },
+      "code": "git remote -v",
+      "example": "```bash\n$ git remote -v\norigin  git@github.com:user/repo.git (fetch)\norigin  git@github.com:user/repo.git (push)\n```"
+    },
+    {
+      "id": "github-13",
+      "prompt": {
+        "ru": "Что делает `git push -u origin main`?",
+        "kg": "`git push -u origin main` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Отправляет main на origin и связывает ветки",
+            "kg": "main'ди origin'го жөнөтөт жана веткаларды байланыштырат"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Скачивает main",
+            "kg": "main'ди жүктөйт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Удаляет origin",
+            "kg": "origin'ди өчүрөт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Создаёт локальный коммит",
+            "kg": "Локалдык коммит түзөт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`-u` запоминает upstream, после этого достаточно `git push` и `git pull`. `origin` — имя удалённого репозитория, `main` — ветка.",
+        "kg": "`-u` upstream'ди эстеп калат, андан кийин `git push` жана `git pull` жетишет. `origin` — алыскы репозиторийдин аты, `main` — ветка."
+      },
+      "code": "git push -u origin main",
+      "example": "```bash\ngit push -u origin main\ngit push\n```"
+    },
+    {
+      "id": "github-14",
+      "prompt": {
+        "ru": "Что делает `git pull`?",
+        "kg": "`git pull` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Скачивает изменения и сливает их в текущую ветку",
+            "kg": "Өзгөртүүлөрдү жүктөп, учурдагы веткага бириктирет"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Только отправляет изменения",
+            "kg": "Өзгөртүүлөрдү гана жөнөтөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Создаёт новую ветку",
+            "kg": "Жаңы ветка түзөт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Удаляет локальные изменения",
+            "kg": "Локалдык өзгөртүүлөрдү өчүрөт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`git pull` = `git fetch` + `git merge` (или rebase, если настроено). Если есть локальные незакоммиченные изменения, pull может помешать.",
+        "kg": "`git pull` = `git fetch` + `git merge` (же жөндөөгө жараша rebase). Локалдык коммиттелбеген өзгөртүүлөр болсо, pull тоскоол болушу мүмкүн."
+      },
+      "code": "git pull",
+      "example": "```bash\ngit status\ngit pull\ngit pull --rebase\n```"
+    },
+    {
+      "id": "github-15",
+      "prompt": {
+        "ru": "Чем `git fetch` отличается от `git pull`?",
+        "kg": "`git fetch` `git pull` дан эмнеси менен айырмаланат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "fetch скачивает, но не меняет текущую ветку",
+            "kg": "fetch жүктөйт, бирок учурдагы ветканы өзгөртпөйт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "fetch сразу сливает изменения",
+            "kg": "fetch өзгөртүүлөрдү дароо бириктирет"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "fetch удаляет ветки",
+            "kg": "fetch веткаларды өчүрөт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Разницы нет",
+            "kg": "Айырма жок"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`fetch` обновляет `origin/main`, но твоя `main` остаётся прежней. Потом можно посмотреть `git log HEAD..origin/main` и решить, как сливать.",
+        "kg": "`fetch` `origin/main` ды жаңыртат, бирок сенин `main` эски бойдон калат. Анан `git log HEAD..origin/main` көрүп, кантип бириктирүүнү чечесиң."
+      },
+      "code": "git fetch",
+      "example": "```bash\ngit fetch origin\ngit log --oneline HEAD..origin/main\ngit merge origin/main\n```"
+    },
+    {
+      "id": "github-16",
+      "prompt": {
+        "ru": "Зачем нужен `git stash`?",
+        "kg": "`git stash` эмне үчүн керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Временно убрать незакоммиченные изменения",
+            "kg": "Коммиттелбеген өзгөртүүлөрдү убактылуу алып салуу үчүн"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Удалить последний коммит",
+            "kg": "Акыркы коммитти өчүрүү үчүн"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Создать ветку",
+            "kg": "Ветка түзүү үчүн"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Отправить код на GitHub",
+            "kg": "Кодду GitHub'ка жөнөтүү үчүн"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`git stash` прячет изменения, `git stash pop` возвращает. Полезно, когда нужно срочно переключиться, а коммитить ещё рано.",
+        "kg": "`git stash` өзгөртүүлөрдү жашырат, `git stash pop` кайтарат. Шашылыш ветка алмаштыруу керек, бирок коммит эрте болсо пайдалуу."
+      },
+      "code": "git stash",
+      "example": "```bash\ngit stash\ngit switch main\ngit pull\ngit switch feature/auth\ngit stash pop\n```"
+    },
+    {
+      "id": "github-17",
+      "prompt": {
+        "ru": "Что делает `git reset --soft HEAD~1`?",
+        "kg": "`git reset --soft HEAD~1` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Убирает последний коммит, оставляя изменения в staging",
+            "kg": "Акыркы коммитти алып салат, өзгөртүүлөрдү staging'де калтырат"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Удаляет файлы навсегда",
+            "kg": "Файлдарды биротоло өчүрөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Создаёт коммит",
+            "kg": "Коммит түзөт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Отправляет изменения",
+            "kg": "Өзгөртүүлөрдү жөнөтөт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`--soft` сохраняет изменения и индекс. `--mixed` (по умолчанию) оставляет изменения в рабочей папке, но убирает из staging. `--hard` удаляет всё.",
+        "kg": "`--soft` өзгөртүүлөрдү жана индексти сактайт. `--mixed` (демейки) өзгөртүүлөрдү жумушчу папкада калтырат, бирок staging'ден алат. `--hard` баарын өчүрөт."
+      },
+      "code": "git reset --soft HEAD~1",
+      "example": "```bash\ngit log --oneline -3\ngit reset --soft HEAD~1\ngit status\ngit commit -m \"feat: better message\"\n```"
+    },
+    {
+      "id": "github-18",
+      "prompt": {
+        "ru": "Почему `git reset --hard` опасен?",
+        "kg": "Эмне үчүн `git reset --hard` коркунучтуу?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Он безвозвратно удаляет незакоммиченные изменения",
+            "kg": "Коммиттелбеген өзгөртүүлөрдү кайтарылгыс өчүрөт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Он отправляет код в открытый доступ",
+            "kg": "Кодду ачык жеткиликтүү кылып жөнөтөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Он удаляет удалённый репозиторий",
+            "kg": "Алыскы репозиторийди өчүрөт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Он меняет пароль",
+            "kg": "Сырсөздү өзгөртөт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`--hard` перезаписывает рабочую папку и индекс. Перед ним сделай `git stash` или коммит. Восстановить незакоммиченное почти невозможно.",
+        "kg": "`--hard` жумушчу папканы жана индексти кайра жазат. Мурун `git stash` же коммит жаса. Коммиттелбегенди калыбына келтирүү дээрлик мүмкүн эмес."
+      },
+      "code": "git reset --hard HEAD~1",
+      "example": "```bash\n# Сначала сохранись\ngit stash\ngit reset --hard HEAD~1\n```"
+    },
+    {
+      "id": "github-19",
+      "prompt": {
+        "ru": "Чем `git revert` безопаснее `git reset`?",
+        "kg": "`git revert` `git reset` тен эмнеси менен коопсуз?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Создаёт новый коммит, отменяющий изменения, не переписывая историю",
+            "kg": "Тарыхты кайра жазбай, өзгөртүүлөрдү жокко чыгарган жаңы коммит түзөт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Удаляет все файлы",
+            "kg": "Бардык файлдарды өчүрөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Работает только с тегами",
+            "kg": "Тегдер менен гана иштейт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Не требует Git",
+            "kg": "Git талап кылбайт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`revert` отменяет изменения коммита новым коммитом. Это безопасно для общей ветки, потому что историю никто не переписывает.",
+        "kg": "`revert` коммиттин өзгөртүүлөрүн жаңы коммит менен жокко чыгарат. Бул жалпы ветка үчүн коопсуз, анткени тарыхты эч ким кайра жазбайт."
+      },
+      "code": "git revert HEAD",
+      "example": "```bash\ngit log --oneline -3\ngit revert <commit-hash>\ngit push\n```"
+    },
+    {
+      "id": "github-20",
+      "prompt": {
+        "ru": "Что делает `git tag v1.0.0`?",
+        "kg": "`git tag v1.0.0` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Ставит метку на текущий коммит",
+            "kg": "Учурдагы коммитке белги коет"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Создаёт ветку",
+            "kg": "Ветка түзөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Отправляет коммит",
+            "kg": "Коммитти жөнөтөт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Удаляет коммит",
+            "kg": "Коммитти өчүрөт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Тег — удобная точка релиза. `git push origin v1.0.0` отправит тег на GitHub. Аннотированный тег: `git tag -a v1.0.0 -m \"release\"`.",
+        "kg": "Тег — релиздин ыңгайлуу чекити. `git push origin v1.0.0` тегди GitHub'ка жөнөтөт. Аннотацияланган тег: `git tag -a v1.0.0 -m \"release\"`."
+      },
+      "code": "git tag v1.0.0",
+      "example": "```bash\ngit tag v1.0.0\ngit push origin v1.0.0\ngit tag\n```"
+    },
+    {
+      "id": "github-21",
+      "prompt": {
+        "ru": "Зачем нужен `.gitignore`?",
+        "kg": "`.gitignore` эмне үчүн керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Чтобы Git не отслеживал указанные файлы",
+            "kg": "Git көрсөтүлгөн файлдарды көзөмөлдөбөшү үчүн"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Чтобы удалить файлы с диска",
+            "kg": "Файлдарды дисктен өчүрүү үчүн"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Чтобы зашифровать репозиторий",
+            "kg": "Репозиторийди шифрлөө үчүн"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Чтобы ускорить GitHub Actions",
+            "kg": "GitHub Actions'ты тездетүү үчүн"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Туда добавляют `.venv/`, `__pycache__/`, `data/`, `*.pt`, `.env`. Уже отслеживаемый файл `.gitignore` не уберёт — нужен `git rm --cached`.",
+        "kg": "Ага `.venv/`, `__pycache__/`, `data/`, `*.pt`, `.env` кошулат. Көзөмөлдөнүп жаткан файлды `.gitignore` алып салбайт — `git rm --cached` керек."
+      },
+      "code": ".gitignore",
+      "example": "```gitignore\n.venv/\n__pycache__/\n*.pyc\n.env\ndata/\nmodels/*.pt\n```"
+    },
+    {
+      "id": "github-22",
+      "prompt": {
+        "ru": "Что такое Pull Request?",
+        "kg": "Pull Request деген эмне?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Предложение влить изменения из ветки в другую с обсуждением и проверками",
+            "kg": "Веткадагы өзгөртүүлөрдү башка веткага кошуу сунушу, талкуу жана текшерүүлөр менен"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Команда удаления ветки",
+            "kg": "Ветканы өчүрүү буйругу"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Резервная копия репозитория",
+            "kg": "Репозиторийдин камдык көчүрмөсү"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Тип коммита",
+            "kg": "Коммиттин түрү"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "PR показывает diff, запускает CI, собирает ревью. После approve изменения мержат в main. PR — это не отдельная ветка, а обсуждение изменений.",
+        "kg": "PR diff'ти көрсөтөт, CI иштетет, ревью чогултат. Approve'дан кийин өзгөртүүлөр main'ге merge болот. PR — өзүнчө ветка эмес, өзгөртүүлөрдүн талкуусу."
+      },
+      "code": "git push -u origin feature/auth",
+      "example": "```bash\ngit switch -c feature/auth\ngit push -u origin feature/auth\n# Затем на GitHub: Compare & pull request\n```"
+    },
+    {
+      "id": "github-23",
+      "prompt": {
+        "ru": "Что делает fork на GitHub?",
+        "kg": "GitHub'дагы fork эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Создаёт копию чужого репозитория в твоём аккаунте",
+            "kg": "Башканын репозиторийинин көчүрмөсүн сенин аккаунтуңда түзөт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Удаляет репозиторий",
+            "kg": "Репозиторийди өчүрөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Сливает ветки",
+            "kg": "Веткаларды бириктирет"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Создаёт локальный коммит",
+            "kg": "Локалдык коммит түзөт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Fork нужен, когда у тебя нет прав на запись в оригинал. Ты меняешь свою копию и предлагаешь PR в оригинальный репозиторий.",
+        "kg": "Fork оригиналга жазуу укугу жок болгондо керек. Сен өз көчүрмөңдү өзгөртүп, оригинал репозиторийге PR сунуштайсың."
+      },
+      "code": "git clone git@github.com:your-user/repo.git",
+      "example": "```bash\n# 1. Fork на GitHub\n# 2. Клонируй свою копию\ngit clone git@github.com:your-user/repo.git\n# 3. Добавь оригинал\ngit remote add upstream git@github.com:original/repo.git\n```"
+    },
+    {
+      "id": "github-24",
+      "prompt": {
+        "ru": "Что такое GitHub Actions?",
+        "kg": "GitHub Actions деген эмне?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "CI/CD, который запускает задачи по событиям репозитория",
+            "kg": "Репозиторийдин окуялары боюнча тапшырмаларды иштетүүчү CI/CD"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Редактор кода",
+            "kg": "Код редактору"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Хранилище секретов",
+            "kg": "Секреттердин кампасы"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Тип ветки",
+            "kg": "Ветканын түрү"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Workflow лежит в `.github/workflows/*.yml`. События: `push`, `pull_request`, `workflow_dispatch`. Шаги: checkout, setup-python, install, test.",
+        "kg": "Workflow `.github/workflows/*.yml` ичинде жатат. Окуялар: `push`, `pull_request`, `workflow_dispatch`. Кадамдар: checkout, setup-python, install, test."
+      },
+      "code": ".github/workflows/tests.yml",
+      "example": "```yaml\nname: tests\non: [push, pull_request]\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-python@v5\n        with:\n          python-version: \"3.13\"\n      - run: pip install -r requirements.txt\n      - run: pytest -q\n```"
+    },
+    {
+      "id": "github-25",
+      "prompt": {
+        "ru": "Что означают маркеры `<<<<<<<`, `=======`, `>>>>>>>`?",
+        "kg": "`<<<<<<<`, `=======`, `>>>>>>>` маркерлери эмнени билдирет?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Конфликт слияния: версии двух веток",
+            "kg": "Бириктирүү жаңжалы: эки ветканын версиялары"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Начало и конец файла",
+            "kg": "Файлдын башталышы жана аягы"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Комментарии Python",
+            "kg": "Python комментарийлери"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Теги релиза",
+            "kg": "Релиз тегдери"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Нужно вручную выбрать или объединить код, удалить маркеры, затем `git add` и `git commit` (или `git rebase --continue`).",
+        "kg": "Кодду кол менен тандап же бириктирип, маркерлерди өчүрүп, анан `git add` жана `git commit` (же `git rebase --continue`) керек."
+      },
+      "code": "<<<<<<< HEAD\nx = 1\n=======\nx = 2\n>>>>>>> feature",
+      "example": "```bash\n# Исправь файл, убери маркеры\ngit add app.py\ngit commit -m \"merge: resolve conflict\"\n```"
+    },
+    {
+      "id": "github-26",
+      "prompt": {
+        "ru": "Что делает `git cherry-pick abc1234`?",
+        "kg": "`git cherry-pick abc1234` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Переносит один коммит в текущую ветку",
+            "kg": "Бир коммитти учурдагы веткага көчүрөт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Удаляет коммит",
+            "kg": "Коммитти өчүрөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Создаёт ветку",
+            "kg": "Ветка түзөт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Отправляет коммит",
+            "kg": "Коммитти жөнөтөт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Cherry-pick копирует изменения конкретного коммита, не всю ветку. Удобно для срочного фикса, но может создать дубликаты коммитов.",
+        "kg": "Cherry-pick белгилүү бир коммиттин өзгөртүүлөрүн көчүрөт, бүт ветканы эмес. Шашылыш фикс үчүн ыңгайлуу, бирок коммиттердин дубликаттарын жаратышы мүмкүн."
+      },
+      "code": "git cherry-pick abc1234",
+      "example": "```bash\ngit switch main\ngit cherry-pick abc1234\ngit log --oneline -3\n```"
+    },
+    {
+      "id": "github-27",
+      "prompt": {
+        "ru": "Зачем нужен `git reflog`?",
+        "kg": "`git reflog` эмне үчүн керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Показывает перемещения HEAD и помогает восстановить потерянные коммиты",
+            "kg": "HEAD'тин жылыштарын көрсөтүп, жоголгон коммиттерди калыбына келтирүүгө жардам берет"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Показывает только теги",
+            "kg": "Тегдерди гана көрсөтөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Удаляет историю",
+            "kg": "Тарыхты өчүрөт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Создаёт резервную копию на GitHub",
+            "kg": "GitHub'та камдык көчүрмө түзөт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Даже после `reset --hard` коммит часто есть в reflog. Найди хеш и сделай `git switch -c rescue <hash>`.",
+        "kg": "`reset --hard` дан кийин да коммит көбүнчө reflog'до болот. Хешти таап, `git switch -c rescue <hash>` жаса."
+      },
+      "code": "git reflog",
+      "example": "```bash\ngit reflog\ngit switch -c rescue abc1234\n```"
+    },
+    {
+      "id": "github-28",
+      "prompt": {
+        "ru": "Что делать, если модель весит больше 100 МБ?",
+        "kg": "Модель 100 МБдан чоң болсо эмне кылуу керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Использовать Git LFS, Releases или внешнее хранилище",
+            "kg": "Git LFS, Releases же тышкы сактоочу жайды колдонуу"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Закоммитить как обычно, GitHub сам сожмёт",
+            "kg": "Калыбынча коммиттөө, GitHub өзү кысат"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Переименовать файл в .txt",
+            "kg": "Файлдын атын .txt кылып өзгөртүү"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Удалить .gitignore",
+            "kg": ".gitignore'ду өчүрүү"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "GitHub блокирует файлы >100 МБ в обычном Git. Git LFS хранит большие файлы отдельно, Releases — для артефактов, Hugging Face — для моделей.",
+        "kg": "GitHub жөнөкөй Git'те 100 МБдан чоң файлдарды блоктойт. Git LFS чоң файлдарды өзүнчө сактайт, Releases — артефакттар үчүн, Hugging Face — моделдер үчүн."
+      },
+      "code": "git lfs install\ngit lfs track \"*.pt\"",
+      "example": "```bash\ngit lfs install\ngit lfs track \"*.pt\"\ngit add .gitattributes model.pt\ngit commit -m \"chore: add model via LFS\"\n```"
+    },
+    {
+      "id": "github-29",
+      "prompt": {
+        "ru": "Зачем нужен SSH-ключ для GitHub?",
+        "kg": "GitHub үчүн SSH ачкычы эмне үчүн керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Для аутентификации без ввода пароля при push/pull",
+            "kg": "push/pull учурунда сырсөзсүз аутентификация үчүн"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Для шифрования репозитория",
+            "kg": "Репозиторийди шифрлөө үчүн"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Для создания веток",
+            "kg": "Веткаларды түзүү үчүн"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Для сжатия файлов",
+            "kg": "Файлдарды кысуу үчүн"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Пара ключей: приватный остаётся на машине, публичный добавляется в GitHub → Settings → SSH keys. Проверка: `ssh -T git@github.com`.",
+        "kg": "Ачкычтардын жуп: приватный машинада калат, публичный GitHub → Settings → SSH keys'ке кошулат. Текшерүү: `ssh -T git@github.com`."
+      },
+      "code": "ssh-keygen -t ed25519 -C \"you@example.com\"",
+      "example": "```bash\nssh-keygen -t ed25519 -C \"you@example.com\"\ncat ~/.ssh/id_ed25519.pub\nssh -T git@github.com\n```"
+    },
+    {
+      "id": "github-30",
+      "prompt": {
+        "ru": "Что такое GitHub Release?",
+        "kg": "GitHub Release деген эмне?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Версия проекта с тегом, описанием и файлами для скачивания",
+            "kg": "Тег, сүрөттөмө жана жүктөп алуучу файлдары бар долбоордун версиясы"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Команда удаления репозитория",
+            "kg": "Репозиторийди өчүрүү буйругу"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Тип Pull Request",
+            "kg": "Pull Requestтин түрү"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Ветка для багов",
+            "kg": "Бағдарлар үчүн ветка"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Release привязывается к тегу и может содержать бинарники, модель, changelog. Удобно, когда модель не влезает в Git.",
+        "kg": "Release тегге байланып, бинарниктерди, моделди, changelog'ду камтышы мүмкүн. Модель Git'ке батпаганда ыңгайлуу."
+      },
+      "code": "git tag v1.0.0\ngit push origin v1.0.0",
+      "example": "```bash\ngit tag -a v1.0.0 -m \"First release\"\ngit push origin v1.0.0\n# GitHub → Releases → Draft a new release\n```"
+    }
+  ]
+}

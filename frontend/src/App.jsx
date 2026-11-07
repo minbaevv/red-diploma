@@ -9,6 +9,8 @@ import Practice from './pages/Practice'
 import TaskPage from './pages/TaskPage'
 import Exams from './pages/Exams'
 import ExamPage from './pages/ExamPage'
+import Drills from './pages/Drills'
+import DrillPage from './pages/DrillPage'
 import Mistakes from './pages/Mistakes'
 import NotFound from './pages/NotFound'
 
@@ -25,6 +27,8 @@ export default function App() {
         <Route path="task/:slug" element={<TaskPage />} />
         <Route path="exams" element={<Exams />} />
         <Route path="exam/:slug" element={<ExamPage />} />
+        <Route path="drills" element={<Drills />} />
+        <Route path="drills/:slug" element={<DrillPage />} />
         <Route path="mistakes" element={<Mistakes />} />
         <Route path="*" element={<NotFound />} />
       </Route>
