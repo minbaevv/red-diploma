@@ -29,9 +29,11 @@ The API runs at `http://127.0.0.1:8000`; Vite proxies `/api` on `:5173`.
 - `backend/app/main.py` — API, content loading, code runner, static serving.
 - `backend/app/db.py` — SQLite progress store (`backend/data/red_diploma.db`).
 - `backend/content/*.json` — all lessons, tasks, exams, and routes.
+- `backend/content/drills-*.json` — drill question banks (8 categories, 206 questions).
 - `backend/tests/test_api.py` — API/content invariants.
 - `frontend/src/pages/TaskPage.jsx` — theory/code practice UI and tutorial.
 - `frontend/src/pages/LessonPage.jsx` — lesson reader.
+- `frontend/src/pages/Drills.jsx` / `DrillPage.jsx` — drill catalog and study/exam modes.
 - `frontend/src/pages/PathPage.jsx` / `StartPage.jsx` — guided route.
 - `frontend/src/theme.css` — dark multi-accent design system.
 
@@ -44,12 +46,17 @@ The API runs at `http://127.0.0.1:8000`; Vite proxies `/api` on `:5173`.
   Keep full `tests` and `solution` hidden from the client.
 - Guided route `ml-capstone` has 20 steps in `paths.json`; step links use
   `?path=ml-capstone&step=N`.
+- Drills live in `drills-*.json`; every question needs RU/KG prompt, four
+  options a-d, `correct`, `explanation`, and `example`. The public payload
+  strips `correct`, `explanation`, and `example`.
+- Drill mistakes are reviewed on the drill page and are excluded from the
+  global Mistakes list.
 - `load_content()` is cached with `lru_cache`: restart uvicorn after editing
   content JSON.
 
 ## Verification
 
-- Backend: `py -3.13 -m pytest -q` (currently 13 tests).
+- Backend: `py -3.13 -m pytest -q` (currently 17 tests).
 - Frontend: `npm run build` must pass.
 - UI: check desktop and mobile for horizontal overflow and console errors.
 - Do not claim a content/API change works from reading code alone; hit the API

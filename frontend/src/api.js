@@ -36,6 +36,18 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ answers }),
     }),
+  drills: () => request('/api/drills'),
+  drill: (slug) => request(`/api/drills/${slug}`),
+  checkDrill: (slug, questionId, option) =>
+    request(`/api/drills/${slug}/check`, {
+      method: 'POST',
+      body: JSON.stringify({ question_id: questionId, option }),
+    }),
+  submitDrill: (slug, answers) =>
+    request(`/api/drills/${slug}/submit`, {
+      method: 'POST',
+      body: JSON.stringify({ answers }),
+    }),
   updateSettings: (payload) =>
     request('/api/settings', {
       method: 'POST',

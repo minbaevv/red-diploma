@@ -1,0 +1,1337 @@
+{
+  "slug": "linux",
+  "order": 2,
+  "icon": "terminal",
+  "accent": "#34d399",
+  "title": {
+    "ru": "Linux: 30 команд",
+    "kg": "Linux: 30 буйрук"
+  },
+  "description": {
+    "ru": "Навигация, файлы, права, процессы, сеть, архивы и переменные окружения. С примерами и предупреждениями.",
+    "kg": "Навигация, файлдар, укуктар, процесстер, тармак, архивдер жана айлана-чөйрө өзгөрмөлөрү. Мисалдар жана эскертүүлөр менен."
+  },
+  "minutes": 30,
+  "questions": [
+    {
+      "id": "linux-01",
+      "prompt": {
+        "ru": "Что показывает `pwd`?",
+        "kg": "`pwd` эмнени көрсөтөт?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Полный путь текущей директории",
+            "kg": "Учурдагы директориянын толук жолун"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Список файлов",
+            "kg": "Файлдардын тизмесин"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Имя пользователя",
+            "kg": "Колдонуучунун атын"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Свободное место на диске",
+            "kg": "Дисктеги бош орунду"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`pwd` = print working directory. Полезно, когда потерялся в терминале или пишешь скрипт, зависящий от текущей папки.",
+        "kg": "`pwd` = print working directory. Терминалда адашып калганда же учурдагы папкага көз каранды скрипт жазганда пайдалуу."
+      },
+      "code": "pwd",
+      "example": "```bash\n$ pwd\n/home/aibek/projects/red-diploma\n```"
+    },
+    {
+      "id": "linux-02",
+      "prompt": {
+        "ru": "Что делает `ls -la`?",
+        "kg": "`ls -la` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Показывает все файлы, включая скрытые, в длинном формате",
+            "kg": "Бардык файлдарды, жашыруундарын да, узун форматта көрсөтөт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Удаляет скрытые файлы",
+            "kg": "Жашыруун файлдарды өчүрөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Создаёт файл",
+            "kg": "Файл түзөт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Показывает только директории",
+            "kg": "Директорияларды гана көрсөтөт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`-l` — длинный формат (права, владелец, размер, дата), `-a` — all, включая `.` и `..` и скрытые файлы вроде `.env`.",
+        "kg": "`-l` — узун формат (укуктар, ээси, өлчөмү, күнү), `-a` — all, `.` жана `..`, `.env` сыяктуу жашыруун файлдарды да камтыйт."
+      },
+      "code": "ls -la",
+      "example": "```bash\n$ ls -la\n-rw-r--r--  1 aibek aibek  1240 Nov  4 10:00 app.py\n-rw-------  1 aibek aibek   512 Nov  4 10:00 .env\n```"
+    },
+    {
+      "id": "linux-03",
+      "prompt": {
+        "ru": "Куда перейдёт `cd ..`?",
+        "kg": "`cd ..` кайда өтөт?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "В родительскую директорию",
+            "kg": "Аталык директорияга"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "В домашнюю директорию",
+            "kg": "Үй директориясына"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "В корень `/`",
+            "kg": "Тамыр `/` га"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "В предыдущую директорию",
+            "kg": "Мурунку директорияга"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`..` — родительская директория. Домашняя — `cd ~` или просто `cd`, корень — `cd /`, назад — `cd -`.",
+        "kg": "`..` — аталык директория. Үй — `cd ~` же жөн эле `cd`, тамыр — `cd /`, артка — `cd -`."
+      },
+      "code": "cd ..",
+      "example": "```bash\n$ pwd\n/home/aibek/projects/red-diploma\n$ cd ..\n$ pwd\n/home/aibek/projects\n```"
+    },
+    {
+      "id": "linux-04",
+      "prompt": {
+        "ru": "Что делает `mkdir -p data/raw/images`?",
+        "kg": "`mkdir -p data/raw/images` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Создаёт всю цепочку директорий, если их нет",
+            "kg": "Бар болбосо, бүт директориялардын чынжырын түзөт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Создаёт только `data`",
+            "kg": "`data` гана түзөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Удаляет пустые директории",
+            "kg": "Бош директорияларды өчүрөт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Копирует директорию",
+            "kg": "Директорияны көчүрөт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`-p` создаёт родительские папки и не падает, если директория уже существует. Без `-p` команда потребует, чтобы `data/raw` уже была.",
+        "kg": "`-p` ата-эне папкаларды түзөт жана директория бар болсо ката бербейт. `-p` жок болсо, `data/raw` мурунтан бар болушун талап кылат."
+      },
+      "code": "mkdir -p data/raw/images",
+      "example": "```bash\nmkdir -p data/raw/images\nmkdir -p models checkpoints logs\n```"
+    },
+    {
+      "id": "linux-05",
+      "prompt": {
+        "ru": "Как скопировать директорию `src` в `backup`?",
+        "kg": "`src` директориясын `backup` кантип көчүрүү керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "cp -r src backup",
+            "kg": "cp -r src backup"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "cp src backup",
+            "kg": "cp src backup"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "copy -r src backup",
+            "kg": "copy -r src backup"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "mv -r src backup",
+            "kg": "mv -r src backup"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`cp -r` рекурсивно копирует директорию. Без `-r` `cp` скажет, что `src` — директория и откажется.",
+        "kg": "`cp -r` директорияны рекурсивдүү көчүрөт. `-r` жок болсо `cp` `src` директория деп ката берет."
+      },
+      "code": "cp -r src backup",
+      "example": "```bash\ncp -r src backup\ncp -r src backup_$(date +%Y%m%d)\n```"
+    },
+    {
+      "id": "linux-06",
+      "prompt": {
+        "ru": "Чем `mv old.txt new.txt` отличается от `cp`?",
+        "kg": "`mv old.txt new.txt` `cp` тен эмнеси менен айырмаланат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "mv перемещает или переименовывает, cp оставляет оригинал",
+            "kg": "mv жылдырат же атын өзгөртөт, cp оригиналды калтырат"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "mv только копирует",
+            "kg": "mv гана көчүрөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "cp удаляет оригинал",
+            "kg": "cp оригиналды өчүрөт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Разницы нет",
+            "kg": "Айырма жок"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`mv` — move: файл исчезает со старого места. Если новое имя в той же папке — это переименование.",
+        "kg": "`mv` — move: файл эски ордунан жоголот. Жаңы ат ошол эле папкада болсо — бул атын өзгөртүү."
+      },
+      "code": "mv old.txt new.txt",
+      "example": "```bash\nmv old.txt new.txt          # переименовать\nmv report.pdf ~/Documents/  # переместить\n```"
+    },
+    {
+      "id": "linux-07",
+      "prompt": {
+        "ru": "Почему `rm -rf /` считается опасной командой?",
+        "kg": "Эмне үчүн `rm -rf /` коркунучтуу команда деп эсептелет?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Она рекурсивно и без подтверждения удаляет файлы",
+            "kg": "Ал рекурсивдүү жана ырастоосуз файлдарды өчүрөт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Она копирует все файлы",
+            "kg": "Ал бардык файлдарды көчүрөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Она меняет права доступа",
+            "kg": "Ал укуктарды өзгөртөт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Она создаёт архив",
+            "kg": "Ал архив түзөт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`rm -r` рекурсивно удаляет, `-f` — force, без вопросов. Всегда проверяй путь дважды. Для удаления лучше использовать `rm -i` или сначала `ls`.",
+        "kg": "`rm -r` рекурсивдүү өчүрөт, `-f` — force, суроосуз. Жолду эки жолу текшер. Өчүрүү үчүн `rm -i` же адегенде `ls` колдон."
+      },
+      "code": "rm -rf /",
+      "example": "```bash\n# Сначала посмотреть, что удалится\nls -la build/\n# Потом удалить\nrm -rf build/\n```"
+    },
+    {
+      "id": "linux-08",
+      "prompt": {
+        "ru": "Что делает `cat app.log`?",
+        "kg": "`cat app.log` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Выводит содержимое файла в терминал",
+            "kg": "Файлдын мазмунун терминалга чыгарат"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Создаёт файл",
+            "kg": "Файл түзөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Ищет слово в файле",
+            "kg": "Файлдан сөз издейт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Удаляет файл",
+            "kg": "Файлды өчүрөт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`cat` хорош для коротких файлов. Для больших логов используй `less`, `head`, `tail` или `grep`.",
+        "kg": "`cat` кыска файлдар үчүн жакшы. Чоң логдор үчүн `less`, `head`, `tail` же `grep` колдон."
+      },
+      "code": "cat app.log",
+      "example": "```bash\ncat requirements.txt\ncat app.log | tail -n 50\n```"
+    },
+    {
+      "id": "linux-09",
+      "prompt": {
+        "ru": "Зачем нужен `less app.log`?",
+        "kg": "`less app.log` эмне үчүн керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Постранично просматривать файл и искать внутри",
+            "kg": "Файлды барак боюнча көрүп, ичинен издөө үчүн"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Удалить файл",
+            "kg": "Файлды өчүрүү үчүн"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Создать файл",
+            "kg": "Файл түзүү үчүн"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Сжать файл",
+            "kg": "Файлды кысуу үчүн"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "В `less` работают `/текст` для поиска, `n` — следующее совпадение, `q` — выход. Файл не загружается в память целиком.",
+        "kg": "`less` ичинде `/текст` издөө, `n` — кийинки дал келүү, `q` — чыгуу. Файл толугу менен эстутумга жүктөлбөйт."
+      },
+      "code": "less app.log",
+      "example": "```bash\nless app.log\n# /ERROR  — искать\n# n       — следующее совпадение\n# q       — выход\n```"
+    },
+    {
+      "id": "linux-10",
+      "prompt": {
+        "ru": "Что покажет `tail -n 20 app.log`?",
+        "kg": "`tail -n 20 app.log` эмнени көрсөтөт?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Последние 20 строк файла",
+            "kg": "Файлдын акыркы 20 сабын"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Первые 20 строк",
+            "kg": "Биринчи 20 сабын"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "20-ю строку",
+            "kg": "20-сабын"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Размер файла",
+            "kg": "Файлдын өлчөмүн"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`tail` — конец файла, `head` — начало. `tail -f app.log` следит за логом в реальном времени.",
+        "kg": "`tail` — файлдын аягы, `head` — башталышы. `tail -f app.log` логду реалдуу убакытта көзөмөлдөйт."
+      },
+      "code": "tail -n 20 app.log",
+      "example": "```bash\ntail -n 20 app.log\ntail -f app.log   # следить в реальном времени\nhead -n 20 app.log\n```"
+    },
+    {
+      "id": "linux-11",
+      "prompt": {
+        "ru": "Что делает `grep -i \"error\" app.log`?",
+        "kg": "`grep -i \"error\" app.log` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Ищет error без учёта регистра",
+            "kg": "error'ду регистрди эске албай издейт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Удаляет строки с error",
+            "kg": "error бар саптарды өчүрөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Считает файлы",
+            "kg": "Файлдарды эсептейт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Создаёт error.log",
+            "kg": "error.log түзөт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`-i` — ignore case, поэтому найдутся `ERROR`, `Error`, `error`. `-n` добавит номера строк, `-c` посчитает совпадения.",
+        "kg": "`-i` — ignore case, ошондуктан `ERROR`, `Error`, `error` табылат. `-n` саптардын номерин кошот, `-c` дал келүүлөрдү эсептейт."
+      },
+      "code": "grep -i \"error\" app.log",
+      "example": "```bash\ngrep -i -n \"error\" app.log\ngrep -c \"ERROR\" app.log\n```"
+    },
+    {
+      "id": "linux-12",
+      "prompt": {
+        "ru": "Как найти все Python-файлы в текущей папке и подпапках?",
+        "kg": "Учурдагы папкада жана анын ичиндеги бардык Python файлдарын кантип табуу керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "find . -name \"*.py\"",
+            "kg": "find . -name \"*.py\""
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "find . -type python",
+            "kg": "find . -type python"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "grep \"*.py\" .",
+            "kg": "grep \"*.py\" ."
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "ls -R \"*.py\"",
+            "kg": "ls -R \"*.py\""
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`find .` ищет начиная с текущей директории, `-name` — по имени, кавычки защищают `*` от раскрытия shell.",
+        "kg": "`find .` учурдагы директориядан баштап издейт, `-name` — аты боюнча, тырмактар `*` ты shell'ден коргойт."
+      },
+      "code": "find . -name \"*.py\"",
+      "example": "```bash\nfind . -name \"*.py\"\nfind . -type f -name \"*.py\" -not -path \"./.venv/*\"\n```"
+    },
+    {
+      "id": "linux-13",
+      "prompt": {
+        "ru": "Что делает `chmod +x train.sh`?",
+        "kg": "`chmod +x train.sh` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Добавляет право на выполнение",
+            "kg": "Аткаруу укугун кошот"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Делает файл только для чтения",
+            "kg": "Файлды окууга гана жарактуу кылат"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Меняет владельца",
+            "kg": "Ээсин өзгөртөт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Удаляет файл",
+            "kg": "Файлды өчүрөт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "После `chmod +x` скрипт можно запустить как `./train.sh`. Без этого будет `Permission denied`.",
+        "kg": "`chmod +x` дан кийин скриптти `./train.sh` деп иштетсе болот. Ансыз `Permission denied` болот."
+      },
+      "code": "chmod +x train.sh",
+      "example": "```bash\nchmod +x train.sh\n./train.sh\n```"
+    },
+    {
+      "id": "linux-14",
+      "prompt": {
+        "ru": "Что означает `chmod 755 app.py`?",
+        "kg": "`chmod 755 app.py` эмнени билдирет?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Владелец: rwx, группа: r-x, остальные: r-x",
+            "kg": "Ээси: rwx, группа: r-x, калгандар: r-x"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Все: rwx",
+            "kg": "Баары: rwx"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Владелец: rw-, группа: rw-, остальные: rw-",
+            "kg": "Ээси: rw-, группа: rw-, калгандар: rw-"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Файл только для чтения",
+            "kg": "Файл окууга гана"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Цифры: r=4, w=2, x=1. 7=4+2+1 (rwx), 5=4+1 (r-x). 755 — типично для исполняемых файлов и директорий.",
+        "kg": "Сандар: r=4, w=2, x=1. 7=4+2+1 (rwx), 5=4+1 (r-x). 755 — аткарылуучу файлдар жана директориялар үчүн типтүү."
+      },
+      "code": "chmod 755 app.py",
+      "example": "```bash\nchmod 755 train.sh\nchmod 644 config.json   # rw-r--r--\nchmod 600 .env          # rw-------\n```"
+    },
+    {
+      "id": "linux-15",
+      "prompt": {
+        "ru": "Что делает `chown aibek:developers app.py`?",
+        "kg": "`chown aibek:developers app.py` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Меняет владельца на aibek и группу на developers",
+            "kg": "Ээсин aibek'ке, группаны developers'ке өзгөртөт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Даёт всем права на запись",
+            "kg": "Баарына жазуу укугун берет"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Удаляет группу developers",
+            "kg": "developers группасын өчүрөт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Копирует файл",
+            "kg": "Файлды көчүрөт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`chown user:group file` требует прав root или ownership. Обычно используется с `sudo`.",
+        "kg": "`chown user:group file` root укугун же ээлик укугун талап кылат. Көбүнчө `sudo` менен колдонулат."
+      },
+      "code": "chown aibek:developers app.py",
+      "example": "```bash\nsudo chown aibek:developers app.py\nsudo chown -R aibek:aibek /var/www/app\n```"
+    },
+    {
+      "id": "linux-16",
+      "prompt": {
+        "ru": "Что показывает `ps aux`?",
+        "kg": "`ps aux` эмнени көрсөтөт?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Все запущенные процессы",
+            "kg": "Иштеп жаткан бардык процесстерди"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Свободную память",
+            "kg": "Бош эстутумду"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Открытые порты",
+            "kg": "Ачык портторду"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Историю команд",
+            "kg": "Буйруктардын тарыхын"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`ps aux` — снимок процессов. Для поиска: `ps aux | grep python`. Для интерактивного просмотра — `top` или `htop`.",
+        "kg": "`ps aux` — процесстердин сүрөтү. Издөө үчүн: `ps aux | grep python`. Интерактивдүү көрүү үчүн — `top` же `htop`."
+      },
+      "code": "ps aux",
+      "example": "```bash\nps aux | grep python\nps aux --sort=-%mem | head\n```"
+    },
+    {
+      "id": "linux-17",
+      "prompt": {
+        "ru": "Что делает `kill -9 1234`?",
+        "kg": "`kill -9 1234` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Принудительно завершает процесс с PID 1234",
+            "kg": "PID 1234 процессин күч менен токтотот"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Удаляет файл 1234",
+            "kg": "1234 файлын өчүрөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Меняет приоритет",
+            "kg": "Приоритетти өзгөртөт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Запускает процесс",
+            "kg": "Процессти иштетет"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`-9` — SIGKILL, процесс не может перехватить и корректно завершиться. Сначала пробуй `kill 1234` (SIGTERM), потом `-9`.",
+        "kg": "`-9` — SIGKILL, процесс кармап калып туура бүтө албайт. Адегенде `kill 1234` (SIGTERM), анан `-9` аракет кыл."
+      },
+      "code": "kill -9 1234",
+      "example": "```bash\nkill 1234      # вежливо, SIGTERM\nkill -9 1234   # принудительно, SIGKILL\n```"
+    },
+    {
+      "id": "linux-18",
+      "prompt": {
+        "ru": "Что показывает `df -h`?",
+        "kg": "`df -h` эмнени көрсөтөт?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Занятое и свободное место на файловых системах",
+            "kg": "Файл системаларындагы ээленген жана бош орунду"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Размер текущей папки",
+            "kg": "Учурдагы папканын өлчөмүн"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Использование RAM",
+            "kg": "RAM колдонулушун"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Список процессов",
+            "kg": "Процесстердин тизмесин"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`-h` — human-readable: KB, MB, GB. `df` показывает разделы, `du` — размер папок и файлов.",
+        "kg": "`-h` — human-readable: KB, MB, GB. `df` бөлүмдөрдү, `du` — папкалардын жана файлдардын өлчөмүн көрсөтөт."
+      },
+      "code": "df -h",
+      "example": "```bash\n$ df -h\nFilesystem      Size  Used Avail Use% Mounted on\n/dev/sda1        50G   32G   16G  67% /\n```"
+    },
+    {
+      "id": "linux-19",
+      "prompt": {
+        "ru": "Что делает `du -sh data/`?",
+        "kg": "`du -sh data/` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Показывает общий размер папки data в удобном виде",
+            "kg": "data папкасынын жалпы өлчөмүн ыңгайлуу форматта көрсөтөт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Удаляет папку data",
+            "kg": "data папкасын өчүрөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Считает файлы в data",
+            "kg": "data ичиндеги файлдарды эсептейт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Копирует data",
+            "kg": "dataны көчүрөт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`-s` — summary, только итог, `-h` — human-readable. `du -sh *` покажет размер каждого элемента в текущей папке.",
+        "kg": "`-s` — summary, жалпы гана, `-h` — human-readable. `du -sh *` учурдагы папкадагы ар бир элементтин өлчөмүн көрсөтөт."
+      },
+      "code": "du -sh data/",
+      "example": "```bash\ndu -sh data/\ndu -sh * | sort -h\n```"
+    },
+    {
+      "id": "linux-20",
+      "prompt": {
+        "ru": "Что показывает `free -h`?",
+        "kg": "`free -h` эмнени көрсөтөт?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Использование оперативной памяти и swap",
+            "kg": "Оперативдик эстутумдун жана swap'тын колдонулушун"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Свободное место на диске",
+            "kg": "Дисктеги бош орунду"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Загрузку CPU",
+            "kg": "CPU жүктөмүн"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Сетевые интерфейсы",
+            "kg": "Тармак интерфейстерин"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Смотри на `available`, а не только `free`: Linux использует свободную память под кэш. `-h` — человекочитаемый формат.",
+        "kg": "`available` ге көңүл бур, `free` ге гана эмес: Linux бош эстутумду кэш үчүн колдонот. `-h` — окууга ыңгайлуу формат."
+      },
+      "code": "free -h",
+      "example": "```bash\n$ free -h\n              total        used        free      shared  buff/cache   available\nMem:           15Gi       7.2Gi       1.1Gi       300Mi       7.4Gi        7.8Gi\nSwap:         2.0Gi       0.0Gi       2.0Gi\n```"
+    },
+    {
+      "id": "linux-21",
+      "prompt": {
+        "ru": "Что делает `uname -a`?",
+        "kg": "`uname -a` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Показывает ядро, архитектуру и версию системы",
+            "kg": "Ядрону, архитектураны жана системанын версиясын көрсөтөт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Показывает пользователя",
+            "kg": "Колдонуучуну көрсөтөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Показывает IP",
+            "kg": "IP'ни көрсөтөт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Очищает экран",
+            "kg": "Экранды тазалайт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`uname -a` — всё сразу. `uname -r` — версия ядра, `uname -m` — архитектура (x86_64, arm64).",
+        "kg": "`uname -a` — баарын бирге. `uname -r` — ядронун версиясы, `uname -m` — архитектура (x86_64, arm64)."
+      },
+      "code": "uname -a",
+      "example": "```bash\n$ uname -a\nLinux host 6.8.0-45-generic #45-Ubuntu SMP x86_64 GNU/Linux\n```"
+    },
+    {
+      "id": "linux-22",
+      "prompt": {
+        "ru": "Зачем нужен `sudo`?",
+        "kg": "`sudo` эмне үчүн керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Выполнить команду с правами root",
+            "kg": "Буйрукту root укугу менен аткаруу үчүн"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Создать пользователя",
+            "kg": "Колдонуучу түзүү үчүн"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Установить пароль",
+            "kg": "Сырсөз орнотуу үчүн"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Запустить Python",
+            "kg": "Python иштетүү үчүн"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`sudo` повышает права на одну команду через sudoers. Не запускай `sudo pip install` без необходимости — можно сломать системные пакеты.",
+        "kg": "`sudo` sudoers аркылуу бир буйрукка укукту көтөрөт. Керек болбосо `sudo pip install` иштетпе — системалык пакеттерди бузушу мүмкүн."
+      },
+      "code": "sudo apt update",
+      "example": "```bash\nsudo apt update\nsudo systemctl restart nginx\n```"
+    },
+    {
+      "id": "linux-23",
+      "prompt": {
+        "ru": "Что делает `sudo apt update && sudo apt install -y nginx`?",
+        "kg": "`sudo apt update && sudo apt install -y nginx` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Обновляет список пакетов и ставит nginx без вопросов",
+            "kg": "Пакеттердин тизмесин жаңыртат жана nginx'ти суроосуз орнотот"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Удаляет nginx",
+            "kg": "nginx'ти өчүрөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Обновляет ядро",
+            "kg": "Ядрону жаңыртат"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Запускает nginx",
+            "kg": "nginx'ти иштетет"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`apt update` обновляет индексы, `apt install` ставит пакет, `-y` подтверждает. `&&` выполнит вторую команду только при успехе первой.",
+        "kg": "`apt update` индекстерди жаңыртат, `apt install` пакетти орнотот, `-y` ырастайт. `&&` экинчи буйрукту биринчиси ийгиликтүү болсо гана аткарат."
+      },
+      "code": "sudo apt update && sudo apt install -y nginx",
+      "example": "```bash\nsudo apt update\nsudo apt install -y python3-pip nginx\n```"
+    },
+    {
+      "id": "linux-24",
+      "prompt": {
+        "ru": "Что делает `systemctl status nginx`?",
+        "kg": "`systemctl status nginx` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Показывает состояние службы nginx",
+            "kg": "nginx кызматынын абалын көрсөтөт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Устанавливает nginx",
+            "kg": "nginx'ти орнотот"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Удаляет nginx",
+            "kg": "nginx'ти өчүрөт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Открывает сайт nginx",
+            "kg": "nginx сайтын ачат"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`systemctl start/stop/restart/enable/disable` управляют службой. `enable` включает автозапуск при загрузке.",
+        "kg": "`systemctl start/stop/restart/enable/disable` кызматты башкарат. `enable` жүктөөдө автоматтык иштөөнү күйгүзөт."
+      },
+      "code": "systemctl status nginx",
+      "example": "```bash\nsudo systemctl status nginx\nsudo systemctl restart nginx\nsudo systemctl enable nginx\n```"
+    },
+    {
+      "id": "linux-25",
+      "prompt": {
+        "ru": "Что делает `ssh aibek@192.168.1.10`?",
+        "kg": "`ssh aibek@192.168.1.10` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Открывает удалённый shell на сервере",
+            "kg": "Серверде алыскы shell ачат"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Копирует файл",
+            "kg": "Файлды көчүрөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Запускает локальный сервер",
+            "kg": "Локалдык серверди иштетет"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Скачивает сайт",
+            "kg": "Сайтты жүктөйт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "SSH — шифрованное подключение к удалённой машине. Порт по умолчанию 22: `ssh -p 2222 user@host`.",
+        "kg": "SSH — алыскы машинага шифрленген туташуу. Демейки порт 22: `ssh -p 2222 user@host`."
+      },
+      "code": "ssh aibek@192.168.1.10",
+      "example": "```bash\nssh aibek@192.168.1.10\nssh -p 2222 aibek@server.example.com\n```"
+    },
+    {
+      "id": "linux-26",
+      "prompt": {
+        "ru": "Как скопировать файл на удалённый сервер по SSH?",
+        "kg": "Файлды SSH аркылуу алыскы серверге кантип көчүрүү керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "scp model.pt aibek@server:/home/aibek/models/",
+            "kg": "scp model.pt aibek@server:/home/aibek/models/"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "cp model.pt aibek@server:/home/aibek/models/",
+            "kg": "cp model.pt aibek@server:/home/aibek/models/"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "ssh-copy model.pt aibek@server",
+            "kg": "ssh-copy model.pt aibek@server"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "upload model.pt server",
+            "kg": "upload model.pt server"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`scp` использует SSH. Синтаксис: `scp источник пользователь@хост:путь`. Для больших файлов лучше `rsync -avz`.",
+        "kg": "`scp` SSH колдонот. Синтаксис: `scp булак колдонуучу@хост:жол`. Чоң файлдар үчүн `rsync -avz` жакшы."
+      },
+      "code": "scp model.pt aibek@server:/home/aibek/models/",
+      "example": "```bash\nscp model.pt aibek@server:/home/aibek/models/\nscp -r data/ aibek@server:/home/aibek/\nrsync -avz model.pt aibek@server:/home/aibek/models/\n```"
+    },
+    {
+      "id": "linux-27",
+      "prompt": {
+        "ru": "Что делает `tar -czf archive.tar.gz data/`?",
+        "kg": "`tar -czf archive.tar.gz data/` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Создаёт сжатый gzip-архив папки data",
+            "kg": "data папкасынын gzip менен кысылган архивин түзөт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Распаковывает архив",
+            "kg": "Архивди ачат"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Удаляет data",
+            "kg": "dataны өчүрөт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Копирует data",
+            "kg": "dataны көчүрөт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`-c` create, `-z` gzip, `-f` file. Распаковка: `tar -xzf archive.tar.gz`. `-v` покажет список файлов.",
+        "kg": "`-c` create, `-z` gzip, `-f` file. Ачуу: `tar -xzf archive.tar.gz`. `-v` файлдардын тизмесин көрсөтөт."
+      },
+      "code": "tar -czf archive.tar.gz data/",
+      "example": "```bash\ntar -czf archive.tar.gz data/\ntar -xzf archive.tar.gz\nls -lh archive.tar.gz\n```"
+    },
+    {
+      "id": "linux-28",
+      "prompt": {
+        "ru": "Что делает `curl -I https://example.com`?",
+        "kg": "`curl -I https://example.com` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Запрашивает только HTTP-заголовки",
+            "kg": "HTTP заголовокторун гана сурайт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Скачивает весь сайт",
+            "kg": "Бүт сайтты жүктөйт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Открывает браузер",
+            "kg": "Браузерди ачат"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Проверяет DNS",
+            "kg": "DNS'ти текшерет"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`-I` отправляет HEAD-запрос. Удобно проверять статус, редиректы и заголовки API. Для тела ответа — `curl URL`.",
+        "kg": "`-I` HEAD-суроо жөнөтөт. Статус, редиректтер жана API заголовокторун текшерүү үчүн ыңгайлуу. Жооптун денеси үчүн — `curl URL`."
+      },
+      "code": "curl -I https://example.com",
+      "example": "```bash\ncurl -I https://example.com\ncurl -s https://api.example.com/health\ncurl -X POST -H \"Content-Type: application/json\" -d '{\"x\":1}' https://api.example.com/predict\n```"
+    },
+    {
+      "id": "linux-29",
+      "prompt": {
+        "ru": "Что делает `python app.py > out.log 2>&1`?",
+        "kg": "`python app.py > out.log 2>&1` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Перенаправляет stdout и stderr в out.log",
+            "kg": "stdout жана stderr'ди out.log'го багыттайт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Запускает два процесса",
+            "kg": "Эки процесс иштетет"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Читает out.log",
+            "kg": "out.log'ду окуйт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Удаляет out.log",
+            "kg": "out.log'ду өчүрөт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`>` перезаписывает файл, `>>` дописывает. `2>&1` отправляет stderr туда же, куда stdout. Порядок важен: `> out.log 2>&1`.",
+        "kg": "`>` файлды кайра жазат, `>>` кошот. `2>&1` stderr'ди stdout менен бир жерге жөнөтөт. Тартип маанилүү: `> out.log 2>&1`."
+      },
+      "code": "python app.py > out.log 2>&1",
+      "example": "```bash\npython app.py > out.log 2>&1\npython app.py >> out.log 2>&1   # дописать\n```"
+    },
+    {
+      "id": "linux-30",
+      "prompt": {
+        "ru": "Что делает `export API_KEY=secret`?",
+        "kg": "`export API_KEY=secret` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Создаёт переменную окружения для дочерних процессов",
+            "kg": "Балдар процесстер үчүн айлана-чөйрө өзгөрмөсүн түзөт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Записывает секрет в файл",
+            "kg": "Секретти файлга жазат"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Устанавливает пароль пользователя",
+            "kg": "Колдонуучунун сырсөзүн орнотот"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Удаляет переменную",
+            "kg": "Өзгөрмөнү өчүрөт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`export` делает переменную видимой для процессов, запущенных из этого shell. Она не сохраняется после перезапуска — для этого нужен `.bashrc` или `.env`.",
+        "kg": "`export` өзгөрмөнү ушул shell'ден иштетилген процесстерге көрүнүктүү кылат. Ал кайра жүктөөдөн кийин сакталбайт — бул үчүн `.bashrc` же `.env` керек."
+      },
+      "code": "export API_KEY=secret",
+      "example": "```bash\nexport API_KEY=secret\nexport MODEL_PATH=/home/aibek/models/model.pt\npython app.py\n```"
+    }
+  ]
+}

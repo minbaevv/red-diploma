@@ -12,6 +12,7 @@ from pydantic import BaseModel, Field
 from . import content
 from .config import settings
 from .db import (
+    best_drill_scores,
     best_scores,
     create_note,
     delete_note,
@@ -59,6 +60,15 @@ class CompleteRequest(BaseModel):
 
 class ExamSubmitRequest(BaseModel):
     answers: dict[str, Any] = Field(default_factory=dict)
+
+
+class DrillCheckRequest(BaseModel):
+    question_id: str = Field(min_length=1, max_length=64)
+    option: str = Field(pattern="^[abcd]$")
+
+
+class DrillSubmitRequest(BaseModel):
+    answers: dict[str, str] = Field(default_factory=dict)
 
 
 class SettingsRequest(BaseModel):
@@ -110,6 +120,24 @@ def _module_summary(module: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _drill_summary(
+    drill: dict[str, Any], scores: dict[str, dict[str, float]]
+) -> dict[str, Any]:
+    record = scores.get(drill["slug"], {})
+    return {
+        "slug": drill["slug"],
+        "order": drill.get("order", 0),
+        "icon": drill.get("icon", "book"),
+        "accent": drill.get("accent", "#E63946"),
+        "title": drill["title"],
+        "description": drill.get("description", {"ru": "", "kg": ""}),
+        "minutes": drill.get("minutes", 20),
+        "question_count": len(drill.get("questions", [])),
+        "best_percent": record.get("best_percent", 0),
+        "attempts": record.get("attempts", 0),
+    }
+
+
 def _progress_map() -> dict[str, dict[str, Any]]:
     return {
         f"{item['item_type']}:{item['item_id']}": item for item in list_progress()
@@ -132,6 +160,21 @@ def _stats(progress: dict[str, dict[str, Any]], exams: list[dict[str, Any]]) -> 
     best = best_scores()
     exam_points = sum(best.get(exam["slug"], 0) for exam in exams)
     exam_max = sum(float(exam.get("points", 0)) for exam in exams)
+    drill_scores = best_drill_scores()
+    drills = content.drills()
+    drills_done = len([drill for drill in drills if drill["slug"] in drill_scores])
+    drill_questions = sum(len(drill.get("questions", [])) for drill in drills)
+    drill_average = (
+        round(
+            sum(
+                drill_scores.get(drill["slug"], {}).get("best_percent", 0)
+                for drill in drills
+            )
+            / len(drills)
+        )
+        if drills
+        else 0
+    )
     lesson_ratio = lessons_done / total_lessons if total_lessons else 0
     task_ratio = tasks_done / total_tasks if total_tasks else 0
     exam_ratio = exam_points / exam_max if exam_max else 0
@@ -145,6 +188,10 @@ def _stats(progress: dict[str, dict[str, Any]], exams: list[dict[str, Any]]) -> 
         "exam_max": exam_max,
         "readiness": min(100, readiness),
         "red": exam_points >= 80,
+        "drills_done": drills_done,
+        "total_drills": len(drills),
+        "drill_questions": drill_questions,
+        "drill_average": drill_average,
     }
 
 
@@ -158,6 +205,7 @@ def bootstrap() -> dict[str, Any]:
     progress = _progress_map()
     exams = content.exams()
     best = best_scores()
+    drill_scores = best_drill_scores()
     modules = [_module_summary(module) for module in content.modules()]
     tasks = [_task_public(task) for task in content.tasks()]
     exam_summaries = [
@@ -173,11 +221,15 @@ def bootstrap() -> dict[str, Any]:
         }
         for exam in exams
     ]
+    drill_summaries = [
+        _drill_summary(drill, drill_scores) for drill in content.drills()
+    ]
     return {
         "meta": content.meta(),
         "modules": modules,
         "tasks": tasks,
         "exams": exam_summaries,
+        "drills": drill_summaries,
         "paths": content.paths(),
         "progress": list(progress.values()),
         "attempts": list_attempts(30),
@@ -406,6 +458,95 @@ def exam_submit(slug: str, payload: ExamSubmitRequest) -> dict[str, Any]:
         "max_score": max_score,
         "percent": percent,
         "red": percent >= 80,
+        "results": results,
+    }
+
+
+@app.get("/api/drills")
+def drill_list() -> list[dict[str, Any]]:
+    scores = best_drill_scores()
+    return [_drill_summary(drill, scores) for drill in content.drills()]
+
+
+@app.get("/api/drills/{slug}")
+def drill_detail(slug: str) -> dict[str, Any]:
+    drill = content.drill_by_slug(slug)
+    if drill is None:
+        raise HTTPException(status_code=404, detail="Drill not found")
+    return {"drill": content.public_drill(drill)}
+
+
+@app.post("/api/drills/{slug}/check")
+def drill_check(slug: str, payload: DrillCheckRequest) -> dict[str, Any]:
+    found = content.drill_question(slug, payload.question_id)
+    if found is None:
+        raise HTTPException(status_code=404, detail="Drill question not found")
+    _, question = found
+    return {
+        "id": question["id"],
+        "correct": payload.option == question["correct"],
+        "selected": payload.option,
+        "correct_answer": question["correct"],
+        "explanation": question.get("explanation", {"ru": "", "kg": ""}),
+        "example": question.get("example", ""),
+    }
+
+
+@app.post("/api/drills/{slug}/submit")
+def drill_submit(slug: str, payload: DrillSubmitRequest) -> dict[str, Any]:
+    drill = content.drill_by_slug(slug)
+    if drill is None:
+        raise HTTPException(status_code=404, detail="Drill not found")
+
+    questions = drill.get("questions", [])
+    correct_count = 0
+    results: list[dict[str, Any]] = []
+    for question in questions:
+        selected = payload.answers.get(question["id"])
+        correct = selected == question["correct"]
+        if correct:
+            correct_count += 1
+        results.append(
+            {
+                "id": question["id"],
+                "prompt": question.get("prompt", {"ru": "", "kg": ""}),
+                "selected": selected,
+                "correct": correct,
+                "correct_answer": question["correct"],
+                "explanation": question.get("explanation", {"ru": "", "kg": ""}),
+                "example": question.get("example", ""),
+            }
+        )
+
+    total = len(questions)
+    percent = round(correct_count / total * 100) if total else 0
+    upsert_progress("drill", slug, "done", percent, increment_attempts=True)
+    record_attempt(
+        kind="drill",
+        ref=slug,
+        score=correct_count,
+        max_score=total,
+        details={
+            "percent": percent,
+            "correct_count": correct_count,
+            "total": total,
+            "results": [
+                {
+                    "id": result["id"],
+                    "correct": result["correct"],
+                    "selected": result["selected"],
+                }
+                for result in results
+            ],
+        },
+    )
+    best = best_drill_scores().get(slug, {})
+    return {
+        "score": correct_count,
+        "max_score": total,
+        "percent": percent,
+        "best_percent": best.get("best_percent", percent),
+        "attempts": best.get("attempts", 1),
         "results": results,
     }
 

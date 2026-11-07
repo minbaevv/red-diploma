@@ -1,0 +1,985 @@
+{
+  "slug": "fastapi",
+  "order": 7,
+  "icon": "server",
+  "accent": "#fb7185",
+  "title": {
+    "ru": "FastAPI: 22 вопроса",
+    "kg": "FastAPI: 22 суроо"
+  },
+  "description": {
+    "ru": "Маршруты, Pydantic, тело запроса, ошибки, upload, CORS, lifespan и TestClient. С кодом для каждого ответа.",
+    "kg": "Маршруттар, Pydantic, суроо денеси, каталар, upload, CORS, lifespan жана TestClient. Ар бир жооп үчүн код менен."
+  },
+  "minutes": 25,
+  "questions": [
+    {
+      "id": "fastapi-01",
+      "prompt": {
+        "ru": "Какие пакеты нужны, чтобы запустить FastAPI-приложение через uvicorn?",
+        "kg": "FastAPI колдонмосун uvicorn аркылуу иштетүү үчүн кайсы пакеттер керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "fastapi и uvicorn",
+            "kg": "fastapi жана uvicorn"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "django и gunicorn",
+            "kg": "django жана gunicorn"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "flask и waitress",
+            "kg": "flask жана waitress"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "pandas и numpy",
+            "kg": "pandas жана numpy"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`fastapi` даёт фреймворк, `uvicorn` — ASGI-сервер. Для загрузки файлов дополнительно нужен `python-multipart`.",
+        "kg": "`fastapi` фреймворкту берет, `uvicorn` — ASGI серверди. Файл жүктөө үчүн кошумча `python-multipart` керек."
+      },
+      "code": "pip install fastapi uvicorn[standard]",
+      "example": "```bash\npip install fastapi \"uvicorn[standard]\" python-multipart\n```"
+    },
+    {
+      "id": "fastapi-02",
+      "prompt": {
+        "ru": "Как создать FastAPI-приложение?",
+        "kg": "FastAPI колдонмосун кантип түзүү керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "app = FastAPI()",
+            "kg": "app = FastAPI()"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "app = fastapi()",
+            "kg": "app = fastapi()"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "app = FastAPI.create()",
+            "kg": "app = FastAPI.create()"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "app = new FastAPI",
+            "kg": "app = new FastAPI"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`app` — ASGI-приложение. Именно его uvicorn ищет по строке `module:app`.",
+        "kg": "`app` — ASGI колдонмо. Uvicorn аны `module:app` сабы боюнча издейт."
+      },
+      "code": "from fastapi import FastAPI\napp = FastAPI()",
+      "example": "```python\nfrom fastapi import FastAPI\n\napp = FastAPI(title=\"Red Diploma API\")\n```"
+    },
+    {
+      "id": "fastapi-03",
+      "prompt": {
+        "ru": "Как запустить приложение из `main.py` с автоперезагрузкой?",
+        "kg": "`main.py` дан автоматтык кайра жүктөө менен колдонмоны кантип иштетүү керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "uvicorn main:app --reload",
+            "kg": "uvicorn main:app --reload"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "python main.py --fastapi",
+            "kg": "python main.py --fastapi"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "fastapi run main",
+            "kg": "fastapi run main"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "uvicorn app.main",
+            "kg": "uvicorn app.main"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`main` — модуль, `app` — объект FastAPI. `--reload` перезапускает сервер при изменении кода; в продакшене его не используют.",
+        "kg": "`main` — модуль, `app` — FastAPI объекти. `--reload` код өзгөргөндө серверди кайра иштетет; продакшнда колдонулбайт."
+      },
+      "code": "uvicorn main:app --reload",
+      "example": "```bash\nuvicorn main:app --reload --host 127.0.0.1 --port 8000\n```"
+    },
+    {
+      "id": "fastapi-04",
+      "prompt": {
+        "ru": "Как объявить GET-маршрут `/health`?",
+        "kg": "`/health` GET маршрутун кантип жарыялоо керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "@app.get(\"/health\")",
+            "kg": "@app.get(\"/health\")"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "@app.route(\"/health\")",
+            "kg": "@app.route(\"/health\")"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "@app.GET(\"/health\")",
+            "kg": "@app.GET(\"/health\")"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "@get(\"/health\")",
+            "kg": "@get(\"/health\")"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Декоратор `@app.get(path)` регистрирует обработчик. Функция под ним вызывается при GET-запросе.",
+        "kg": "`@app.get(path)` декоратору обработчикди каттайт. Анын астындагы функция GET суроосунда чакырылат."
+      },
+      "code": "@app.get(\"/health\")",
+      "example": "```python\n@app.get(\"/health\")\ndef health():\n    return {\"status\": \"ok\"}\n```"
+    },
+    {
+      "id": "fastapi-05",
+      "prompt": {
+        "ru": "Как объявить POST-маршрут `/predict`?",
+        "kg": "`/predict` POST маршрутун кантип жарыялоо керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "@app.post(\"/predict\")",
+            "kg": "@app.post(\"/predict\")"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "@app.get(\"/predict\")",
+            "kg": "@app.get(\"/predict\")"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "@app.put(\"/predict\")",
+            "kg": "@app.put(\"/predict\")"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "@app.route(\"/predict\", method=\"POST\")",
+            "kg": "@app.route(\"/predict\", method=\"POST\")"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`post` — для создания/отправки данных. GET не должен менять состояние и не подходит для загрузки файла.",
+        "kg": "`post` — маалымат түзүү/жөнөтүү үчүн. GET абалды өзгөртпөшү керек жана файл жүктөө үчүн жараксыз."
+      },
+      "code": "@app.post(\"/predict\")",
+      "example": "```python\n@app.post(\"/predict\")\ndef predict():\n    return {\"class\": \"cat\", \"confidence\": 0.97}\n```"
+    },
+    {
+      "id": "fastapi-06",
+      "prompt": {
+        "ru": "Как получить `item_id` из пути `/items/{item_id}`?",
+        "kg": "`/items/{item_id}` жолунан `item_id` кантип алуу керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "def read_item(item_id: int):",
+            "kg": "def read_item(item_id: int):"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "def read_item(): item_id = request.path",
+            "kg": "def read_item(): item_id = request.path"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "def read_item(id):",
+            "kg": "def read_item(id):"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "def read_item(query: str):",
+            "kg": "def read_item(query: str):"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Имя параметра функции должно совпадать с именем в фигурных скобках. Аннотация `int` включает валидацию: `/items/abc` даст 422.",
+        "kg": "Функция параметринин аты фигуралык кашадагы ат менен дал келиши керек. `int` аннотациясы валидацияны кошот: `/items/abc` 422 берет."
+      },
+      "code": "@app.get(\"/items/{item_id}\")\ndef read_item(item_id: int): ...",
+      "example": "```python\n@app.get(\"/items/{item_id}\")\ndef read_item(item_id: int):\n    return {\"item_id\": item_id}\n```"
+    },
+    {
+      "id": "fastapi-07",
+      "prompt": {
+        "ru": "Как объявить необязательный query-параметр `q`?",
+        "kg": "`q` милдеттүү эмес query параметрин кантип жарыялоо керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "def search(q: str = \"\"):",
+            "kg": "def search(q: str = \"\"):"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "def search(q):",
+            "kg": "def search(q):"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "def search(q: str):",
+            "kg": "def search(q: str):"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "def search(path: str = \"q\"):",
+            "kg": "def search(path: str = \"q\"):"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Параметр функции, которого нет в пути, FastAPI считает query-параметром. Значение по умолчанию делает его необязательным.",
+        "kg": "Функция параметри жолдо жок болсо, FastAPI аны query параметри деп эсептейт. Демейки маани аны милдеттүү эмес кылат."
+      },
+      "code": "def search(q: str = \"\"): ...",
+      "example": "```python\n@app.get(\"/search\")\ndef search(q: str = \"\", limit: int = 10):\n    return {\"q\": q, \"limit\": limit}\n```"
+    },
+    {
+      "id": "fastapi-08",
+      "prompt": {
+        "ru": "Зачем нужен `BaseModel` из Pydantic?",
+        "kg": "Pydantic'тин `BaseModel` эмне үчүн керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Описывает схему тела запроса и валидирует данные",
+            "kg": "Суроо денесинин схемасын сүрөттөп, маалыматты валидациялайт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Создаёт базу данных",
+            "kg": "Маалымат базасын түзөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Запускает uvicorn",
+            "kg": "Uvicorn иштетет"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Рисует графики",
+            "kg": "Графиктерди тартат"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Класс с аннотациями полей становится JSON-схемой. FastAPI проверяет типы и возвращает 422 с деталями при ошибке.",
+        "kg": "Аннотацияланган талаалары бар класс JSON схема болуп калат. FastAPI типтерди текшерип, ката болсо 422 жана деталдарды кайтарат."
+      },
+      "code": "class Item(BaseModel): ...",
+      "example": "```python\nfrom pydantic import BaseModel\n\nclass Item(BaseModel):\n    name: str\n    price: float\n    in_stock: bool = True\n```"
+    },
+    {
+      "id": "fastapi-09",
+      "prompt": {
+        "ru": "Как принять JSON-тело запроса в POST-обработчике?",
+        "kg": "POST обработчигинде JSON суроо денесин кантип кабыл алуу керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "def create(item: Item):",
+            "kg": "def create(item: Item):"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "def create(request):",
+            "kg": "def create(request):"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "def create(body: dict = None):",
+            "kg": "def create(body: dict = None):"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "def create(item: str):",
+            "kg": "def create(item: str):"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Параметр с типом `BaseModel` FastAPI читает из тела. Для `dict` тоже сработает, но без валидации и документации.",
+        "kg": "`BaseModel` тибиндеги параметрди FastAPI дене синтетикалык окуйт. `dict` да иштейт, бирок валидация жана документация жок."
+      },
+      "code": "def create(item: Item): ...",
+      "example": "```python\n@app.post(\"/items\")\ndef create(item: Item):\n    return {\"name\": item.name, \"price\": item.price}\n```"
+    },
+    {
+      "id": "fastapi-10",
+      "prompt": {
+        "ru": "Как вернуть 404, если объект не найден?",
+        "kg": "Объект табылбаса, 404 кантип кайтаруу керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "raise HTTPException(status_code=404, detail=\"Not found\")",
+            "kg": "raise HTTPException(status_code=404, detail=\"Not found\")"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "return 404",
+            "kg": "return 404"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "return {\"error\": 404}",
+            "kg": "return {\"error\": 404}"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "sys.exit(404)",
+            "kg": "sys.exit(404)"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`HTTPException` прерывает обработчик и формирует корректный JSON-ответ с кодом. `return 404` вернёт тело `404` со статусом 200.",
+        "kg": "`HTTPException` обработчикди токтотуп, код менен туура JSON жооп түзөт. `return 404` статус 200 менен `404` денесин кайтарат."
+      },
+      "code": "raise HTTPException(status_code=404, detail=\"Not found\")",
+      "example": "```python\nfrom fastapi import HTTPException\n\n@app.get(\"/items/{item_id}\")\ndef get_item(item_id: int):\n    if item_id not in items:\n        raise HTTPException(status_code=404, detail=\"Item not found\")\n    return items[item_id]\n```"
+    },
+    {
+      "id": "fastapi-11",
+      "prompt": {
+        "ru": "Как указать статус 201 для создания ресурса?",
+        "kg": "Ресурс түзүү үчүн 201 статусун кантип көрсөтүү керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "@app.post(\"/items\", status_code=201)",
+            "kg": "@app.post(\"/items\", status_code=201)"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "@app.post(\"/items\", code=201)",
+            "kg": "@app.post(\"/items\", code=201)"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "return 201",
+            "kg": "return 201"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "@app.status(201).post(\"/items\")",
+            "kg": "@app.status(201).post(\"/items\")"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`status_code` задаёт код успешного ответа. 201 Created — правильный код после создания ресурса.",
+        "kg": "`status_code` ийгиликтүү жооптун кодун берет. 201 Created — ресурс түзүлгөндөн кийин туура код."
+      },
+      "code": "@app.post(\"/items\", status_code=201)",
+      "example": "```python\n@app.post(\"/items\", status_code=201)\ndef create(item: Item):\n    return {\"id\": 1, **item.model_dump()}\n```"
+    },
+    {
+      "id": "fastapi-12",
+      "prompt": {
+        "ru": "Зачем нужен `response_model`?",
+        "kg": "`response_model` эмне үчүн керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Описывает и фильтрует схему ответа",
+            "kg": "Жооптун схемасын сүрөттөп, фильтрлейт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Принимает тело запроса",
+            "kg": "Суроо денесин кабыл алат"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Запускает сервер",
+            "kg": "Серверди иштетет"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Создаёт БД",
+            "kg": "Маалымат базасын түзөт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Например, `response_model=ItemOut` скроет поля, которых нет в модели, и добавит их в OpenAPI. Это защита от утечки `password_hash`.",
+        "kg": "Мисалы, `response_model=ItemOut` модельде жок талааларды жашырат жана OpenAPI'ге кошот. Бул `password_hash` агып кетишинен коргойт."
+      },
+      "code": "response_model=ItemOut",
+      "example": "```python\nclass ItemOut(BaseModel):\n    id: int\n    name: str\n\n@app.get(\"/items/{item_id}\", response_model=ItemOut)\ndef get_item(item_id: int):\n    return db_item  # лишние поля будут отброшены\n```"
+    },
+    {
+      "id": "fastapi-13",
+      "prompt": {
+        "ru": "Когда использовать `async def`, а когда обычный `def`?",
+        "kg": "Кайсы учурда `async def`, кайсы учурда жөнөкөй `def` колдонуу керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "async для await-операций, def для блокирующего кода",
+            "kg": "async await операциялары үчүн, def блоктоп турган код үчүн"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Всегда только async",
+            "kg": "Дайыма async гана"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Всегда только def",
+            "kg": "Дайыма def гана"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Разницы нет",
+            "kg": "Айырма жок"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`async def` работает в event loop; внутри можно `await` (httpx, asyncpg). Обычный `def` FastAPI выполняет в threadpool, чтобы не блокировать loop.",
+        "kg": "`async def` event loop'то иштейт; ичинде `await` (httpx, asyncpg) болот. Жөнөкөй `def` FastAPI threadpool'до аткарат, loop'ту блокирлебейт."
+      },
+      "code": "async def read(): ...",
+      "example": "```python\n@app.get(\"/async\")\nasync def read_async():\n    data = await fetch_from_api()\n    return data\n\n@app.get(\"/sync\")\ndef read_sync():\n    return heavy_blocking_call()\n```"
+    },
+    {
+      "id": "fastapi-14",
+      "prompt": {
+        "ru": "Зачем нужен `Depends`?",
+        "kg": "`Depends` эмне үчүн керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Для внедрения зависимостей: БД, текущий пользователь, настройки",
+            "kg": "Көз карандылыктарды киргизүү үчүн: БД, учурдагы колдонуучу, жөндөөлөр"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Для создания таблиц",
+            "kg": "Таблицаларды түзүү үчүн"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Для графиков",
+            "kg": "Графиктер үчүн"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Для установки пакетов",
+            "kg": "Пакеттерди орнотуу үчүн"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Зависимость — функция, которую FastAPI вызывает перед обработчиком. Результат подставляется в параметр. Удобно для авторизации и сессии БД.",
+        "kg": "Көз карандылык — FastAPI обработчиктен мурун чакырган функция. Натыйжа параметрге коюлат. Авторизация жана БД сессиясы үчүн ыңгайлуу."
+      },
+      "code": "def get_db(): ...\ndef endpoint(db=Depends(get_db)): ...",
+      "example": "```python\nfrom fastapi import Depends\n\ndef get_current_user(token: str = \"\"):\n    return {\"user\": \"aibek\"}\n\n@app.get(\"/me\")\ndef me(user=Depends(get_current_user)):\n    return user\n```"
+    },
+    {
+      "id": "fastapi-15",
+      "prompt": {
+        "ru": "Что нужно для загрузки файла через `UploadFile`?",
+        "kg": "`UploadFile` аркылуу файл жүктөө үчүн эмне керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Параметр UploadFile = File(...) и пакет python-multipart",
+            "kg": "UploadFile = File(...) параметри жана python-multipart пакети"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Только UploadFile, больше ничего",
+            "kg": "Только UploadFile, башка эч нерсе"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Только JSON BaseModel",
+            "kg": "JSON BaseModel гана"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Только CORS",
+            "kg": "CORS гана"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`UploadFile` даёт `await file.read()`, `filename`, `content_type`. `File(...)` обязателен для multipart. Без `python-multipart` FastAPI выдаст ошибку.",
+        "kg": "`UploadFile` `await file.read()`, `filename`, `content_type` берет. Multipart үчүн `File(...)` милдеттүү. `python-multipart` жок болсо FastAPI ката берет."
+      },
+      "code": "file: UploadFile = File(...)",
+      "example": "```python\nfrom fastapi import File, UploadFile\n\n@app.post(\"/upload\")\nasync def upload(file: UploadFile = File(...)):\n    content = await file.read()\n    return {\"filename\": file.filename, \"size\": len(content)}\n```"
+    },
+    {
+      "id": "fastapi-16",
+      "prompt": {
+        "ru": "Зачем нужен CORS middleware?",
+        "kg": "CORS middleware эмне үчүн керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Чтобы браузер разрешал запросы с другого origin",
+            "kg": "Браузер башка origin'ден суроолорго уруксат бериши үчүн"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Чтобы шифровать пароли",
+            "kg": "Сырсөздөрдү шифрлөө үчүн"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Чтобы ускорить БД",
+            "kg": "БД'ны тездетүү үчүн"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Чтобы создавать файлы",
+            "kg": "Файлдарды түзүү үчүн"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Vite на `:5173` и API на `:8000` — разные origin. Без CORS браузер заблокирует ответ, даже если сервер его вернул.",
+        "kg": "Vite `:5173` жана API `:8000` — башка origin'дер. CORS жок болсо браузер жоопту блоктойт, сервер кайтарса да."
+      },
+      "code": "app.add_middleware(CORSMiddleware, ...)",
+      "example": "```python\nfrom fastapi.middleware.cors import CORSMiddleware\n\napp.add_middleware(\n    CORSMiddleware,\n    allow_origins=[\"http://127.0.0.1:5173\"],\n    allow_methods=[\"*\"],\n    allow_headers=[\"*\"],\n)\n```"
+    },
+    {
+      "id": "fastapi-17",
+      "prompt": {
+        "ru": "Зачем нужен `APIRouter`?",
+        "kg": "`APIRouter` эмне үчүн керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Чтобы разбивать маршруты по модулям",
+            "kg": "Маршруттарды модулдарга бөлүү үчүн"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Чтобы создать БД",
+            "kg": "БД түзүү үчүн"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Чтобы рисовать графики",
+            "kg": "Графиктерди тартуу үчүн"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Чтобы установить uvicorn",
+            "kg": "Uvicorn орнотуу үчүн"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Роутер собирает связанные эндпоинты, затем `app.include_router(router, prefix=\"/api\")`. Так проект не превращается в один огромный `main.py`.",
+        "kg": "Роутер байланышкан эндпоинттерди чогултат, анан `app.include_router(router, prefix=\"/api\")`. Ошентип долбоор бир чоң `main.py` болуп кетпейт."
+      },
+      "code": "router = APIRouter()\napp.include_router(router)",
+      "example": "```python\nfrom fastapi import APIRouter\n\nrouter = APIRouter(prefix=\"/items\", tags=[\"items\"])\n\n@router.get(\"/\")\ndef list_items():\n    return []\n\napp.include_router(router)\n```"
+    },
+    {
+      "id": "fastapi-18",
+      "prompt": {
+        "ru": "Зачем нужен `lifespan`?",
+        "kg": "`lifespan` эмне үчүн керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Для загрузки модели/подключения к БД при старте и очистки при остановке",
+            "kg": "Стартта модель/БД байланышын жүктөө жана токтоодо тазалоо үчүн"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Для создания маршрута",
+            "kg": "Маршрут түзүү үчүн"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Для валидации JSON",
+            "kg": "JSON валидациялоо үчүн"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Для CORS",
+            "kg": "CORS үчүн"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Код до `yield` выполняется при старте, после — при остановке. Модель загружай один раз, а не на каждый запрос.",
+        "kg": "`yield` га чейинки код стартта, андан кийинкиси токтоодо аткарылат. Моделди ар бир суроодо эмес, бир жолу жүктө."
+      },
+      "code": "lifespan=lifespan",
+      "example": "```python\nfrom contextlib import asynccontextmanager\n\n@asynccontextmanager\nasync def lifespan(app):\n    app.state.model = load_model()\n    yield\n    app.state.model = None\n\napp = FastAPI(lifespan=lifespan)\n```"
+    },
+    {
+      "id": "fastapi-19",
+      "prompt": {
+        "ru": "Как тестировать FastAPI-приложение без запуска сервера?",
+        "kg": "FastAPI колдонмосун серверди иштетпестен кантип тесттөө керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Использовать TestClient",
+            "kg": "TestClient колдонуу"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Запускать uvicorn в тесте",
+            "kg": "Тестте uvicorn иштетүү"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Использовать curl",
+            "kg": "curl колдонуу"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Открыть /docs",
+            "kg": "/docs ачуу"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`TestClient(app)` работает через ASGI и не требует сети. Он поднимает lifespan и позволяет проверять статусы и JSON.",
+        "kg": "`TestClient(app)` ASGI аркылуу иштейт жана тармак талап кылбайт. Ал lifespan'ды көтөрүп, статустарды жана JSON'ду текшерүүгө мүмкүндүк берет."
+      },
+      "code": "client = TestClient(app)",
+      "example": "```python\nfrom fastapi.testclient import TestClient\nfrom main import app\n\nclient = TestClient(app)\n\ndef test_health():\n    response = client.get(\"/health\")\n    assert response.status_code == 200\n    assert response.json() == {\"status\": \"ok\"}\n```"
+    },
+    {
+      "id": "fastapi-20",
+      "prompt": {
+        "ru": "Где FastAPI автоматически показывает Swagger UI?",
+        "kg": "FastAPI Swagger UI'ды кайда автоматтык көрсөтөт?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "/docs",
+            "kg": "/docs"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "/swagger",
+            "kg": "/swagger"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "/api",
+            "kg": "/api"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "/openapi",
+            "kg": "/openapi"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`/docs` — интерактивный Swagger UI, `/redoc` — ReDoc, `/openapi.json` — схема. Это удобно для ручной проверки API.",
+        "kg": "`/docs` — интерактивдүү Swagger UI, `/redoc` — ReDoc, `/openapi.json` — схема. API'ни кол менен текшерүү үчүн ыңгайлуу."
+      },
+      "code": "GET /docs",
+      "example": "```text\nhttp://127.0.0.1:8000/docs\nhttp://127.0.0.1:8000/redoc\nhttp://127.0.0.1:8000/openapi.json\n```"
+    },
+    {
+      "id": "fastapi-21",
+      "prompt": {
+        "ru": "Что вернёт FastAPI, если тело запроса не соответствует Pydantic-модели?",
+        "kg": "Суроо денеси Pydantic моделине туура келбесе, FastAPI эмне кайтарат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "422 Unprocessable Entity с деталями ошибки",
+            "kg": "422 Unprocessable Entity жана ката деталдары"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "200 OK",
+            "kg": "200 OK"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "500 Internal Server Error",
+            "kg": "500 Internal Server Error"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Ничего",
+            "kg": "Эч нерсе"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Валидация происходит до вызова обработчика. Ответ содержит `loc`, `msg`, `type` — это удобно для отладки клиента.",
+        "kg": "Валидация обработчик чакырылганга чейин болот. Жоопто `loc`, `msg`, `type` бар — клиентти отладкалоо үчүн ыңгайлуу."
+      },
+      "code": "422 Unprocessable Entity",
+      "example": "```json\n{\n  \"detail\": [\n    {\n      \"loc\": [\"body\", \"price\"],\n      \"msg\": \"Input should be a valid number\",\n      \"type\": \"float_parsing\"\n    }\n  ]\n}\n```"
+    },
+    {
+      "id": "fastapi-22",
+      "prompt": {
+        "ru": "Что можно возвращать из обработчика FastAPI?",
+        "kg": "FastAPI обработчигинен эмнени кайтарууга болот?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "dict, list, Pydantic-модель, JSONResponse и другие Response",
+            "kg": "dict, list, Pydantic модель, JSONResponse жана башка Response'тор"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Только строку",
+            "kg": "Текст гана"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Только число",
+            "kg": "Сан гана"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Только None",
+            "kg": "None гана"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "FastAPI сериализует dict/list/Pydantic в JSON. Для полного контроля над статусом и заголовками используй `JSONResponse`.",
+        "kg": "FastAPI dict/list/Pydantic'ти JSON'го сериализациялайт. Статус жана заголовокторду толук көзөмөлдөө үчүн `JSONResponse` колдон."
+      },
+      "code": "return {...}",
+      "example": "```python\nfrom fastapi.responses import JSONResponse\n\n@app.get(\"/custom\")\ndef custom():\n    return JSONResponse(\n        status_code=202,\n        content={\"status\": \"accepted\"},\n    )\n```"
+    }
+  ]
+}

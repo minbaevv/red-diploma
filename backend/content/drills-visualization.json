@@ -1,0 +1,985 @@
+{
+  "slug": "visualization",
+  "order": 6,
+  "icon": "chart",
+  "accent": "#22d3ee",
+  "title": {
+    "ru": "Визуализация: matplotlib и seaborn",
+    "kg": "Визуалдаштыруу: matplotlib жана seaborn"
+  },
+  "description": {
+    "ru": "Линии, scatter, гистограммы, boxplot, subplots, heatmap и pairplot. Учись читать графики, а не только строить.",
+    "kg": "Сызыктар, scatter, гистограммалар, boxplot, subplots, heatmap жана pairplot. Графиктерди түзүүнү гана эмес, окууну да үйрөн."
+  },
+  "minutes": 25,
+  "questions": [
+    {
+      "id": "viz-01",
+      "prompt": {
+        "ru": "Как импортировать matplotlib для построения графиков?",
+        "kg": "Графиктерди түзүү үчүн matplotlib'ти кантип импорттоо керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "import matplotlib.pyplot as plt",
+            "kg": "import matplotlib.pyplot as plt"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "import matplotlib as plt",
+            "kg": "import matplotlib as plt"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "from matplotlib import plot",
+            "kg": "from matplotlib import plot"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "import plt",
+            "kg": "import plt"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`pyplot` — модуль с функциями `plot`, `scatter`, `hist`, `show`. Псевдоним `plt` — общепринятое соглашение.",
+        "kg": "`pyplot` — `plot`, `scatter`, `hist`, `show` функциялары бар модуль. `plt` псевдонимы жалпы кабыл алынган конвенция."
+      },
+      "code": "import matplotlib.pyplot as plt",
+      "example": "```python\nimport matplotlib.pyplot as plt\n\nplt.plot([1, 2, 3], [4, 5, 6])\nplt.show()\n```"
+    },
+    {
+      "id": "viz-02",
+      "prompt": {
+        "ru": "Что делает `plt.figure(figsize=(10, 6))`?",
+        "kg": "`plt.figure(figsize=(10, 6))` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Создаёт фигуру размером 10×6 дюймов",
+            "kg": "10×6 дюйм өлчөмүндө фигура түзөт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Создаёт 10 графиков",
+            "kg": "10 график түзөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Меняет данные",
+            "kg": "Маалыматтарды өзгөртөт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Сохраняет график",
+            "kg": "Графикти сактайт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`figsize` задаёт размер в дюймах, а не в пикселях. Итоговые пиксели зависят от `dpi` при сохранении.",
+        "kg": "`figsize` дюйм менен өлчөмдү берет, пиксел менен эмес. Акыркы пикселдер сактоодо `dpi` га көз каранды."
+      },
+      "code": "plt.figure(figsize=(10, 6))",
+      "example": "```python\nplt.figure(figsize=(10, 6))\nplt.plot(x, y)\nplt.show()\n```"
+    },
+    {
+      "id": "viz-03",
+      "prompt": {
+        "ru": "Как построить линейный график `x` от `y`?",
+        "kg": "`x` тен `y` ге сызыктуу график кантип түзүү керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "plt.plot(x, y)",
+            "kg": "plt.plot(x, y)"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "plt.line(x, y)",
+            "kg": "plt.line(x, y)"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "plt.scatter(x, y)",
+            "kg": "plt.scatter(x, y)"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "plt.bar(x, y)",
+            "kg": "plt.bar(x, y)"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`plot` соединяет точки линиями. `scatter` — точки, `bar` — столбцы, `hist` — распределение.",
+        "kg": "`plot` чекиттерди сызыктар менен бириктирет. `scatter` — чекиттер, `bar` — мамычалар, `hist` — бөлүштүрүү."
+      },
+      "code": "plt.plot(x, y)",
+      "example": "```python\nplt.plot(x, y, marker=\"o\", label=\"train loss\")\nplt.show()\n```"
+    },
+    {
+      "id": "viz-04",
+      "prompt": {
+        "ru": "Когда лучше использовать `scatter`, а не `plot`?",
+        "kg": "Кайсы учурда `plot` эмес, `scatter` колдонуш керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Когда важна связь двух числовых переменных без соединения точек",
+            "kg": "Эки сандык өзгөрмөнүн байланышы маанилүү болуп, чекиттерди бириктирбесе"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Когда нужен временной ряд",
+            "kg": "Убакыт катары керек болгондо"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Когда нужна гистограмма",
+            "kg": "Гистограмма керек болгондо"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Когда нужен boxplot",
+            "kg": "Boxplot керек болгондо"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`scatter` показывает облако точек и корреляцию. `plot` лучше для временных рядов и функций, где порядок точек важен.",
+        "kg": "`scatter` чекиттер булутун жана корреляцияны көрсөтөт. `plot` убакыт катарлары жана функциялар үчүн жакшы, мында чекиттердин тартиби маанилүү."
+      },
+      "code": "plt.scatter(x, y)",
+      "example": "```python\nplt.scatter(df[\"age\"], df[\"salary\"], alpha=0.6)\nplt.xlabel(\"age\")\nplt.ylabel(\"salary\")\nplt.show()\n```"
+    },
+    {
+      "id": "viz-05",
+      "prompt": {
+        "ru": "Что показывает `plt.hist(values, bins=30)`?",
+        "kg": "`plt.hist(values, bins=30)` эмнени көрсөтөт?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Распределение значений по 30 интервалам",
+            "kg": "Маанилердин 30 интервал боюнча бөлүштүрүлүшүн"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Линию тренда",
+            "kg": "Тренд сызыгын"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Корреляцию",
+            "kg": "Корреляцияны"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Выбросы",
+            "kg": "Ыргытууларды"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Гистограмма считает, сколько значений попало в каждый bin. По ней видно форму распределения, пики и хвосты.",
+        "kg": "Гистограмма ар бир bin'ге канча маани түшкөнүн эсептейт. Андан бөлүштүрүүнүн формасы, чокулар жана куйруктар көрүнөт."
+      },
+      "code": "plt.hist(values, bins=30)",
+      "example": "```python\nplt.hist(df[\"salary\"], bins=30, edgecolor=\"black\")\nplt.xlabel(\"salary\")\nplt.show()\n```"
+    },
+    {
+      "id": "viz-06",
+      "prompt": {
+        "ru": "Когда используют `plt.bar`?",
+        "kg": "`plt.bar` качан колдонулат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Для сравнения категорий по высоте",
+            "kg": "Категорияларды бийиктик боюнча салыштыруу үчүн"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Для плотности вероятности",
+            "kg": "Ыктымалдык тыгыздыгы үчүн"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Для корреляционной матрицы",
+            "kg": "Корреляция матрицасы үчүн"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Для временного ряда",
+            "kg": "Убакыт катары үчүн"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`bar` — категориальные сравнения: продажи по городам, количество по классам. `hist` — распределение числовой переменной.",
+        "kg": "`bar` — категориалдык салыштыруулар: шаарлар боюнча сатуулар, класстар боюнча сан. `hist` — сандык өзгөрмөнүн бөлүштүрүлүшү."
+      },
+      "code": "plt.bar(categories, values)",
+      "example": "```python\nplt.bar(df[\"city\"], df[\"sales\"])\nplt.xticks(rotation=45)\nplt.show()\n```"
+    },
+    {
+      "id": "viz-07",
+      "prompt": {
+        "ru": "Как построить boxplot одного числового столбца?",
+        "kg": "Бир сандык колонканын boxplot'ун кантип түзүү керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "plt.boxplot(df[\"salary\"])",
+            "kg": "plt.boxplot(df[\"salary\"])"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "plt.box(df[\"salary\"])",
+            "kg": "plt.box(df[\"salary\"])"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "plt.hist(df[\"salary\"])",
+            "kg": "plt.hist(df[\"salary\"])"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "plt.plot(df[\"salary\"])",
+            "kg": "plt.plot(df[\"salary\"])"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`plt.boxplot` принимает массив/список значений. Для сравнения групп удобнее seaborn: `sns.boxplot(x=\"department\", y=\"salary\", data=df)`.",
+        "kg": "`plt.boxplot` массив/тизмени кабыл алат. Группаларды салыштыруу үчүн seaborn ыңгайлуу: `sns.boxplot(x=\"department\", y=\"salary\", data=df)`."
+      },
+      "code": "plt.boxplot(df[\"salary\"])",
+      "example": "```python\nplt.boxplot(df[\"salary\"])\nplt.ylabel(\"salary\")\nplt.show()\n```"
+    },
+    {
+      "id": "viz-08",
+      "prompt": {
+        "ru": "Что показывает boxplot?",
+        "kg": "Boxplot эмнени көрсөтөт?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Медиану, Q1/Q3, IQR, усы и выбросы",
+            "kg": "Медиананы, Q1/Q3, IQR, муруттарды жана ыргытууларды"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Только среднее",
+            "kg": "Орточону гана"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Только максимум",
+            "kg": "Максимумду гана"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Корреляцию",
+            "kg": "Корреляцияны"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Ящик — от Q1 (25%) до Q3 (75%), линия внутри — медиана. Усы — до 1.5×IQR, точки за ними — выбросы. Среднее boxplot не показывает.",
+        "kg": "Куту — Q1 (25%) ден Q3 (75%) ке чейин, ичиндеги сызык — медиана. Муруттар — 1.5×IQR ге чейин, андан тышкары чекиттер — ыргытуулар. Boxplot орточону көрсөтпөйт."
+      },
+      "code": "plt.boxplot(data)",
+      "example": "```python\n# Q1=25%, Q2=median, Q3=75%\n# IQR = Q3 - Q1\n# whiskers = 1.5 * IQR\nplt.boxplot(df[\"salary\"])\nplt.show()\n```"
+    },
+    {
+      "id": "viz-09",
+      "prompt": {
+        "ru": "О чём говорит длинный верхний ус и много точек сверху на boxplot?",
+        "kg": "Boxplot'то узун жогорку мурут жана үстүндө көп чекиттер эмнени билдирет?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Распределение с правым хвостом и выбросами",
+            "kg": "Оң куйруктуу бөлүштүрүү жана ыргытуулар"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Все значения одинаковые",
+            "kg": "Бардык маанилер бирдей"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Данных нет",
+            "kg": "Маалымат жок"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Распределение строго симметрично",
+            "kg": "Бөлүштүрүү так симметриялуу"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Длинный хвост вправо — правосторонняя асимметрия: есть большие значения, которые растягивают распределение. Проверь их отдельно, прежде чем удалять.",
+        "kg": "Оңго узун куйрук — оң жакка асимметрия: бөлүштүрүүнү созгон чоң маанилер бар. Аларды өчүрүүдөн мурун өзүнчө текшер."
+      },
+      "code": "sns.boxplot(x=df['salary'])",
+      "example": "```python\nimport seaborn as sns\nsns.boxplot(x=df[\"salary\"])\nplt.show()\n```"
+    },
+    {
+      "id": "viz-10",
+      "prompt": {
+        "ru": "Что делает `fig, axes = plt.subplots(2, 2)`?",
+        "kg": "`fig, axes = plt.subplots(2, 2)` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Создаёт фигуру с сеткой 2×2 из осей",
+            "kg": "2×2 октор тору бар фигура түзөт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Создаёт 2 графика",
+            "kg": "2 график түзөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Удаляет графики",
+            "kg": "Графиктерди өчүрөт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Сохраняет график",
+            "kg": "Графикти сактайт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`axes` — массив осей. Обращение: `axes[0, 0]`, `axes[0, 1]` и т.д. `axes.flat` позволяет перебрать все в цикле.",
+        "kg": "`axes` — октордун массиви. Кайрылуу: `axes[0, 0]`, `axes[0, 1]` ж.б. `axes.flat` баарын циклде айлантууга мүмкүндүк берет."
+      },
+      "code": "fig, axes = plt.subplots(2, 2)",
+      "example": "```python\nfig, axes = plt.subplots(2, 2, figsize=(10, 8))\naxes[0, 0].plot(x, y)\naxes[0, 1].hist(values)\naxes[1, 0].scatter(x, z)\naxes[1, 1].bar(cats, counts)\nplt.tight_layout()\nplt.show()\n```"
+    },
+    {
+      "id": "viz-11",
+      "prompt": {
+        "ru": "Как подписать оси и график?",
+        "kg": "Окторду жана графикти кантип белгилөө керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "plt.xlabel(\"x\"); plt.ylabel(\"y\"); plt.title(\"...\")",
+            "kg": "plt.xlabel(\"x\"); plt.ylabel(\"y\"); plt.title(\"...\")"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "plt.x(\"x\"); plt.y(\"y\"); plt.name(\"...\")",
+            "kg": "plt.x(\"x\"); plt.y(\"y\"); plt.name(\"...\")"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "plt.label_x(\"x\"); plt.label_y(\"y\")",
+            "kg": "plt.label_x(\"x\"); plt.label_y(\"y\")"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "plt.caption(\"...\")",
+            "kg": "plt.caption(\"...\")"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Подписи делают график понятным без чтения кода. Для нескольких осей: `ax.set_xlabel`, `ax.set_ylabel`, `ax.set_title`.",
+        "kg": "Белгилер графикти кодду окубастан түшүнүүгө жардам берет. Бир нече октор үчүн: `ax.set_xlabel`, `ax.set_ylabel`, `ax.set_title`."
+      },
+      "code": "plt.xlabel(\"x\"); plt.ylabel(\"y\"); plt.title(\"...\")",
+      "example": "```python\nplt.plot(x, y)\nplt.xlabel(\"Эпоха\")\nplt.ylabel(\"Loss\")\nplt.title(\"Кривая обучения\")\nplt.show()\n```"
+    },
+    {
+      "id": "viz-12",
+      "prompt": {
+        "ru": "Зачем нужен `plt.legend()`?",
+        "kg": "`plt.legend()` эмне үчүн керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Показывает подписи линий/точек",
+            "kg": "Сызыктардын/чекиттердин белгилерин көрсөтөт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Меняет цвет",
+            "kg": "Түстү өзгөртөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Сохраняет график",
+            "kg": "Графикти сактайт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Удаляет оси",
+            "kg": "Окторду өчүрөт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Легенда берёт текст из `label=` у каждого `plot`/`scatter`. Без `label` легенда будет пустой.",
+        "kg": "Легенда ар бир `plot`/`scatter` үчүн `label=` текстти алат. `label` жок болсо легенда бош болот."
+      },
+      "code": "plt.legend()",
+      "example": "```python\nplt.plot(x, train_loss, label=\"train\")\nplt.plot(x, val_loss, label=\"val\")\nplt.legend()\nplt.show()\n```"
+    },
+    {
+      "id": "viz-13",
+      "prompt": {
+        "ru": "Что делает `plt.grid(True)`?",
+        "kg": "`plt.grid(True)` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Включает сетку на графике",
+            "kg": "Графикте торду күйгүзөт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Удаляет график",
+            "kg": "Графикти өчүрөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Меняет данные",
+            "kg": "Маалыматтарды өзгөртөт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Добавляет легенду",
+            "kg": "Легенда кошот"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Сетка помогает читать значения. Не злоупотребляй: на перегруженных графиках она мешает.",
+        "kg": "Тор маанилерди окууга жардам берет. Ашыкча колдонбо: толуп кеткен графиктерде тоскоол болот."
+      },
+      "code": "plt.grid(True)",
+      "example": "```python\nplt.plot(x, y)\nplt.grid(True, alpha=0.3)\nplt.show()\n```"
+    },
+    {
+      "id": "viz-14",
+      "prompt": {
+        "ru": "Зачем нужен `plt.tight_layout()`?",
+        "kg": "`plt.tight_layout()` эмне үчүн керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Автоматически раздвигает подграфики, чтобы подписи не перекрывались",
+            "kg": "Белгилер капталбашы үчүн подграфиктерди автоматтык түрдө ажыратат"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Удаляет подписи",
+            "kg": "Белгилерди өчүрөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Сохраняет файл",
+            "kg": "Файлды сактайт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Меняет размер данных",
+            "kg": "Маалыматтын өлчөмүн өзгөртөт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Особенно полезен при `subplots`. Альтернатива — `constrained_layout=True` при создании фигуры.",
+        "kg": "`subplots` учурунда өзгөчө пайдалуу. Альтернатива — фигура түзүүдө `constrained_layout=True`."
+      },
+      "code": "plt.tight_layout()",
+      "example": "```python\nfig, axes = plt.subplots(2, 2)\n# ... графики ...\nplt.tight_layout()\nplt.show()\n```"
+    },
+    {
+      "id": "viz-15",
+      "prompt": {
+        "ru": "Как сохранить график в файл?",
+        "kg": "Графикти файлга кантип сактоо керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "plt.savefig(\"plot.png\", dpi=150)",
+            "kg": "plt.savefig(\"plot.png\", dpi=150)"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "plt.save(\"plot.png\")",
+            "kg": "plt.save(\"plot.png\")"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "plt.export(\"plot.png\")",
+            "kg": "plt.export(\"plot.png\")"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "plt.write(\"plot.png\")",
+            "kg": "plt.write(\"plot.png\")"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`savefig` сохраняет текущую фигуру. `dpi` управляет качеством. Вызывай до `plt.show()`, иначе можно получить пустой файл.",
+        "kg": "`savefig` учурдагы фигураны сактайт. `dpi` сапатты башкарат. `plt.show()` дан мурун чакыр, антпесе бош файл алышың мүмкүн."
+      },
+      "code": "plt.savefig(\"plot.png\", dpi=150)",
+      "example": "```python\nplt.plot(x, y)\nplt.savefig(\"plot.png\", dpi=150, bbox_inches=\"tight\")\nplt.show()\n```"
+    },
+    {
+      "id": "viz-16",
+      "prompt": {
+        "ru": "Что делает `plt.show()`?",
+        "kg": "`plt.show()` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Показывает фигуру в окне/ноутбуке",
+            "kg": "Фигураны терезеде/ноутбукта көрсөтөт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Сохраняет фигуру",
+            "kg": "Фигураны сактайт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Создаёт данные",
+            "kg": "Маалымат түзөт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Закрывает Python",
+            "kg": "Python'ду жабат"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "В Jupyter графики часто отображаются автоматически, но `show()` делает намерение явным. В скрипте без `show()` окно может не появиться.",
+        "kg": "Jupyter'де графиктер көбүнчө автоматтык көрүнөт, бирок `show()` ниетти ачык кылат. Скриптте `show()` жок болсо терезе чыкпашы мүмкүн."
+      },
+      "code": "plt.show()",
+      "example": "```python\nplt.plot(x, y)\nplt.show()\n```"
+    },
+    {
+      "id": "viz-17",
+      "prompt": {
+        "ru": "Зачем нужен `sns.set_theme()`?",
+        "kg": "`sns.set_theme()` эмне үчүн керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Задаёт единый стиль графиков seaborn",
+            "kg": "Seaborn графиктеринин бирдиктүү стилин берет"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Загружает данные",
+            "kg": "Маалымат жүктөйт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Обучает модель",
+            "kg": "Моделди үйрөтөт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Удаляет выбросы",
+            "kg": "Ыргытууларды өчүрөт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Меняет палитру, сетку, шрифты и размеры. Вызывают один раз в начале ноутбука.",
+        "kg": "Палитраны, торду, шрифттерди жана өлчөмдөрдү өзгөртөт. Ноутбуктун башында бир жолу чакырылат."
+      },
+      "code": "sns.set_theme()",
+      "example": "```python\nimport seaborn as sns\nimport matplotlib.pyplot as plt\n\nsns.set_theme(style=\"darkgrid\")\n```"
+    },
+    {
+      "id": "viz-18",
+      "prompt": {
+        "ru": "Чем `sns.histplot` удобнее `plt.hist`?",
+        "kg": "`sns.histplot` `plt.hist` тен эмнеси менен ыңгайлуу?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Умеет сразу строить распределение по группам через hue",
+            "kg": "hue аркылуу группалар боюнча бөлүштүрүүнү дароо түзө алат"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Работает без данных",
+            "kg": "Маалыматсыз иштейт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Не требует импорта",
+            "kg": "Импорт талап кылбайт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Строит только boxplot",
+            "kg": "Boxplot гана түзөт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`sns.histplot(data=df, x=\"salary\", hue=\"department\")` сразу сравнивает распределения. `kde=True` добавляет оценку плотности.",
+        "kg": "`sns.histplot(data=df, x=\"salary\", hue=\"department\")` бөлүштүрүүлөрдү дароо салыштырат. `kde=True` тыгыздык баасын кошот."
+      },
+      "code": "sns.histplot(data=df, x=\"salary\", hue=\"department\")",
+      "example": "```python\nsns.histplot(data=df, x=\"salary\", hue=\"department\", kde=True)\nplt.show()\n```"
+    },
+    {
+      "id": "viz-19",
+      "prompt": {
+        "ru": "Как сравнить распределение зарплат по отделам с помощью seaborn?",
+        "kg": "Seaborn менен бөлүмдөр боюнча айлыктын бөлүштүрүлүшүн кантип салыштыруу керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "sns.boxplot(x=\"department\", y=\"salary\", data=df)",
+            "kg": "sns.boxplot(x=\"department\", y=\"salary\", data=df)"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "sns.boxplot(x=\"salary\", data=df)",
+            "kg": "sns.boxplot(x=\"salary\", data=df)"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "plt.boxplot(\"department\", \"salary\")",
+            "kg": "plt.boxplot(\"department\", \"salary\")"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "sns.histplot(x=\"department\", y=\"salary\")",
+            "kg": "sns.histplot(x=\"department\", y=\"salary\")"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`x` — категория, `y` — числовая переменная. `hue` добавит ещё одно измерение, но не перегружай график.",
+        "kg": "`x` — категория, `y` — сандык өзгөрмө. `hue` дагы бир өлчөмдү кошот, бирок графикти ашыкча толтурба."
+      },
+      "code": "sns.boxplot(x=\"department\", y=\"salary\", data=df)",
+      "example": "```python\nsns.boxplot(x=\"department\", y=\"salary\", data=df)\nplt.xticks(rotation=30)\nplt.show()\n```"
+    },
+    {
+      "id": "viz-20",
+      "prompt": {
+        "ru": "Как построить тепловую карту корреляций?",
+        "kg": "Корреляциялардын жылуулук картасын кантип түзүү керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "sns.heatmap(df.corr(numeric_only=True), annot=True, cmap=\"coolwarm\")",
+            "kg": "sns.heatmap(df.corr(numeric_only=True), annot=True, cmap=\"coolwarm\")"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "sns.heatmap(df)",
+            "kg": "sns.heatmap(df)"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "plt.corr(df)",
+            "kg": "plt.corr(df)"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "sns.corrplot(df)",
+            "kg": "sns.corrplot(df)"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`df.corr()` считает матрицу корреляций. `annot=True` пишет значения, `cmap` задаёт цвета. Для нечисловых колонок используй `numeric_only=True`.",
+        "kg": "`df.corr()` корреляция матрицасын эсептейт. `annot=True` маанилерди жазат, `cmap` түстөрдү берет. Сандык эмес колонкалар үчүн `numeric_only=True` колдон."
+      },
+      "code": "sns.heatmap(df.corr(numeric_only=True), annot=True, cmap=\"coolwarm\")",
+      "example": "```python\nplt.figure(figsize=(10, 8))\nsns.heatmap(df.corr(numeric_only=True), annot=True, cmap=\"coolwarm\", fmt=\".2f\")\nplt.show()\n```"
+    },
+    {
+      "id": "viz-21",
+      "prompt": {
+        "ru": "Что делает `sns.pairplot(df)`?",
+        "kg": "`sns.pairplot(df)` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Строит попарные scatter-графики и распределения",
+            "kg": "Жуп-жуп scatter графиктерин жана бөлүштүрүүлөрдү түзөт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Строит один boxplot",
+            "kg": "Бир boxplot түзөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Считает корреляцию",
+            "kg": "Корреляцияны эсептейт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Удаляет выбросы",
+            "kg": "Ыргытууларды өчүрөт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Быстрый обзор всех числовых пар. `hue=\"class\"` раскрасит по категории. На больших данных работает медленно — сначала возьми подмножество колонок.",
+        "kg": "Бардык сандык жуптарды тез карап чыгуу. `hue=\"class\"` категория боюнча боет. Чоң маалыматта жай иштейт — адегенде колонкалардын подмножествосун ал."
+      },
+      "code": "sns.pairplot(df)",
+      "example": "```python\nsns.pairplot(df[[\"age\", \"salary\", \"experience\"]], hue=\"department\")\nplt.show()\n```"
+    },
+    {
+      "id": "viz-22",
+      "prompt": {
+        "ru": "Чем `violinplot` отличается от `boxplot`?",
+        "kg": "`violinplot` `boxplot` тен эмнеси менен айырмаланат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Violin показывает плотность распределения, boxplot — квартили и выбросы",
+            "kg": "Violin бөлүштүрүүнүн тыгыздыгын, boxplot кварталдарды жана ыргытууларды көрсөтөт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Violin только для текста",
+            "kg": "Violin текст үчүн гана"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Boxplot не показывает медиану",
+            "kg": "Boxplot медиананы көрсөтпөйт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Разницы нет",
+            "kg": "Айырма жок"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Violin полезен, когда распределение multimodal (две вершины). Boxplot компактнее и лучше для сравнения многих групп.",
+        "kg": "Violin бөлүштүрүү multimodal (эки чоку) болгондо пайдалуу. Boxplot компактараак жана көп группаларды салыштыруу үчүн жакшы."
+      },
+      "code": "sns.violinplot(x=\"department\", y=\"salary\", data=df)",
+      "example": "```python\nsns.violinplot(x=\"department\", y=\"salary\", data=df, inner=\"quart\")\nplt.show()\n```"
+    }
+  ]
+}

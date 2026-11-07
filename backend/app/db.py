@@ -174,6 +174,24 @@ def best_scores() -> dict[str, float]:
     return {row["ref"]: float(row["best"] or 0) for row in rows}
 
 
+def best_drill_scores() -> dict[str, dict[str, float]]:
+    with closing(connect()) as connection:
+        rows = connection.execute(
+            """
+            SELECT item_id, score, attempts
+            FROM progress
+            WHERE item_type = 'drill'
+            """
+        ).fetchall()
+    return {
+        row["item_id"]: {
+            "best_percent": float(row["score"] or 0),
+            "attempts": int(row["attempts"] or 0),
+        }
+        for row in rows
+    }
+
+
 def list_notes() -> list[dict[str, Any]]:
     with closing(connect()) as connection:
         rows = connection.execute(

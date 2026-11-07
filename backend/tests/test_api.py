@@ -190,3 +190,135 @@ def test_settings_roundtrip(client: TestClient):
         "exam_date": "2026-12-15",
         "student_name": "Aibek",
     }
+
+
+def test_drills_content_structure():
+    drills = content.drills()
+    assert [drill["slug"] for drill in drills] == [
+        "sql",
+        "linux",
+        "github",
+        "pandas",
+        "transforms",
+        "visualization",
+        "fastapi",
+        "python",
+    ]
+    counts = {drill["slug"]: len(drill["questions"]) for drill in drills}
+    assert counts == {
+        "sql": 30,
+        "linux": 30,
+        "github": 30,
+        "pandas": 30,
+        "transforms": 20,
+        "visualization": 22,
+        "fastapi": 22,
+        "python": 22,
+    }
+    question_ids: list[str] = []
+    for drill in drills:
+        assert set(drill["title"]) == {"ru", "kg"}
+        assert set(drill["description"]) == {"ru", "kg"}
+        for question in drill["questions"]:
+            question_ids.append(question["id"])
+            assert set(question["prompt"]) == {"ru", "kg"}
+            assert set(question["explanation"]) == {"ru", "kg"}
+            assert isinstance(question["example"], str) and question["example"].strip()
+            assert question["correct"] in "abcd"
+            assert [option["id"] for option in question["options"]] == [
+                "a",
+                "b",
+                "c",
+                "d",
+            ]
+            for option in question["options"]:
+                assert set(option["text"]) == {"ru", "kg"}
+                assert option["text"]["ru"].strip()
+                assert option["text"]["kg"].strip()
+    assert len(question_ids) == 206
+    assert len(question_ids) == len(set(question_ids))
+
+
+def test_drills_endpoint_hides_answers(client: TestClient):
+    response = client.get("/api/drills")
+    assert response.status_code == 200
+    summaries = response.json()
+    assert len(summaries) == 8
+    assert sum(item["question_count"] for item in summaries) == 206
+    assert all(item["best_percent"] == 0 for item in summaries)
+
+    detail = client.get("/api/drills/sql")
+    assert detail.status_code == 200
+    questions = detail.json()["drill"]["questions"]
+    assert len(questions) == 30
+    for question in questions:
+        assert "correct" not in question
+        assert "explanation" not in question
+        assert "example" not in question
+        assert len(question["options"]) == 4
+
+
+def test_drill_check_reveals_feedback_after_answer(client: TestClient):
+    question = content.drill_by_slug("sql")["questions"][0]
+    correct = question["correct"]
+    wrong = next(letter for letter in "abcd" if letter != correct)
+
+    right = client.post(
+        "/api/drills/sql/check",
+        json={"question_id": question["id"], "option": correct},
+    )
+    assert right.status_code == 200
+    assert right.json()["correct"] is True
+    assert right.json()["correct_answer"] == correct
+    assert right.json()["explanation"] == question["explanation"]
+    assert right.json()["example"] == question.get("example", "")
+
+    wrong_response = client.post(
+        "/api/drills/sql/check",
+        json={"question_id": question["id"], "option": wrong},
+    )
+    assert wrong_response.status_code == 200
+    assert wrong_response.json()["correct"] is False
+    assert wrong_response.json()["correct_answer"] == correct
+
+    missing = client.post(
+        "/api/drills/sql/check",
+        json={"question_id": "missing", "option": correct},
+    )
+    assert missing.status_code == 404
+
+
+def test_drill_submit_scores_and_keeps_best(client: TestClient):
+    drill = content.drill_by_slug("python")
+    answers = {question["id"]: question["correct"] for question in drill["questions"]}
+    first = client.post("/api/drills/python/submit", json={"answers": answers})
+    assert first.status_code == 200
+    payload = first.json()
+    assert payload["score"] == 22
+    assert payload["max_score"] == 22
+    assert payload["percent"] == 100
+    assert payload["best_percent"] == 100
+    assert len(payload["results"]) == 22
+    assert all(result["correct"] for result in payload["results"])
+
+    first_id = drill["questions"][0]["id"]
+    partial = dict(answers)
+    partial[first_id] = next(
+        letter for letter in "abcd" if letter != drill["questions"][0]["correct"]
+    )
+    second = client.post("/api/drills/python/submit", json={"answers": partial})
+    assert second.status_code == 200
+    assert second.json()["percent"] < 100
+    assert second.json()["best_percent"] == 100
+
+    bootstrap = client.get("/api/bootstrap").json()
+    summary = next(item for item in bootstrap["drills"] if item["slug"] == "python")
+    assert summary["best_percent"] == 100
+    assert summary["attempts"] == 2
+    assert bootstrap["stats"]["drills_done"] == 1
+    assert bootstrap["stats"]["total_drills"] == 8
+    assert bootstrap["stats"]["drill_questions"] == 206
+
+    attempts = client.get("/api/attempts").json()
+    drill_attempts = [attempt for attempt in attempts if attempt["kind"] == "drill"]
+    assert len(drill_attempts) == 2

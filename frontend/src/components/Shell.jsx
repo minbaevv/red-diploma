@@ -8,6 +8,7 @@ import {
   Dumbbell,
   GraduationCap,
   LayoutDashboard,
+  ListChecks,
   Menu,
   Settings,
   Trophy,
@@ -23,6 +24,7 @@ const nav = [
   { to: '/learn', icon: BookOpen, ru: 'Обучение', kg: 'Окуу' },
   { to: '/practice', icon: Dumbbell, ru: 'Практика', kg: 'Практика' },
   { to: '/exams', icon: Trophy, ru: 'Экзамены', kg: 'Экзамендер' },
+  { to: '/drills', icon: ListChecks, ru: 'Тренажёр', kg: 'Тренажёр' },
   { to: '/mistakes', icon: AlertTriangle, ru: 'Ошибки', kg: 'Каталар' },
 ]
 
@@ -32,12 +34,14 @@ const titles = {
   '/learn': { ru: 'Обучение', kg: 'Окуу' },
   '/practice': { ru: 'Практика', kg: 'Практика' },
   '/exams': { ru: 'Экзамены', kg: 'Экзамендер' },
+  '/drills': { ru: 'Тренажёр', kg: 'Тренажёр' },
   '/mistakes': { ru: 'Разбор ошибок', kg: 'Каталарды талдоо' },
 }
 
 function pageTitle(pathname, bi) {
   if (titles[pathname]) return bi(titles[pathname].ru, titles[pathname].kg)
   if (pathname.startsWith('/exam/')) return bi('Экзамен', 'Экзамен')
+  if (pathname.startsWith('/drills/')) return bi('Тренажёр', 'Тренажёр')
   if (pathname.startsWith('/task/')) return bi('Задача', 'Тапшырма')
   if (pathname.startsWith('/lesson/')) return bi('Урок', 'Сабак')
   if (pathname.startsWith('/learn/')) return bi('Модуль', 'Модуль')

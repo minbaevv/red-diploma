@@ -49,12 +49,20 @@ def load_content() -> dict[str, Any]:
         *_read("tasks-theory-extra-ml-capstone.json"),
         *_read("tasks-theory-extra-exam.json"),
     ]
+    drills = sorted(
+        (
+            _read(path.name)
+            for path in sorted(settings.content_path.parent.glob("drills-*.json"))
+        ),
+        key=lambda drill: drill.get("order", 0),
+    )
     exams = _read("exams.json")
     paths = _read("paths.json")
     data = {
         "meta": _read("meta.json"),
         "modules": modules,
         "tasks": [*code_tasks, *theory_tasks, *extra_code, *extra_theory],
+        "drills": drills,
         "exams": exams,
         "paths": paths,
     }
@@ -144,6 +152,53 @@ def _validate(data: dict[str, Any]) -> None:
         if len(step_keys) != len(set(step_keys)):
             raise ContentError(f"path {path['slug']} has duplicate steps")
 
+    drills = data.get("drills")
+    if not isinstance(drills, list) or not drills:
+        raise ContentError("drills must be a non-empty list")
+    drill_slugs = [drill["slug"] for drill in drills]
+    if len(drill_slugs) != len(set(drill_slugs)):
+        raise ContentError("duplicate drill slugs")
+    question_ids: list[str] = []
+    for drill in drills:
+        slug = drill.get("slug", "?")
+        if not isinstance(drill.get("questions"), list) or not drill["questions"]:
+            raise ContentError(f"drill {slug} must have questions")
+        for question in drill["questions"]:
+            question_id = question.get("id")
+            if not question_id:
+                raise ContentError(f"drill {slug} has a question without id")
+            question_ids.append(question_id)
+            options = question.get("options")
+            if not isinstance(options, list) or len(options) != 4:
+                raise ContentError(f"drill {slug} question {question_id}: need 4 options")
+            if [option.get("id") for option in options] != ["a", "b", "c", "d"]:
+                raise ContentError(
+                    f"drill {slug} question {question_id}: options must be a-d"
+                )
+            if question.get("correct") not in {"a", "b", "c", "d"}:
+                raise ContentError(
+                    f"drill {slug} question {question_id}: bad correct option"
+                )
+            for field in ("prompt", "explanation"):
+                text = question.get(field)
+                if not isinstance(text, dict) or not text.get("ru") or not text.get("kg"):
+                    raise ContentError(
+                        f"drill {slug} question {question_id}: incomplete {field}"
+                    )
+            example = question.get("example")
+            if not isinstance(example, str) or not example.strip():
+                raise ContentError(
+                    f"drill {slug} question {question_id}: missing example"
+                )
+            for option in options:
+                text = option.get("text")
+                if not isinstance(text, dict) or not text.get("ru") or not text.get("kg"):
+                    raise ContentError(
+                        f"drill {slug} question {question_id}: incomplete option {option.get('id')}"
+                    )
+    if len(question_ids) != len(set(question_ids)):
+        raise ContentError("duplicate drill question ids")
+
 
 def modules() -> list[dict[str, Any]]:
     return load_content()["modules"]
@@ -155,6 +210,10 @@ def tasks() -> list[dict[str, Any]]:
 
 def exams() -> list[dict[str, Any]]:
     return load_content()["exams"]
+
+
+def drills() -> list[dict[str, Any]]:
+    return load_content()["drills"]
 
 
 def paths() -> list[dict[str, Any]]:
@@ -175,6 +234,20 @@ def task_by_slug(slug: str) -> dict[str, Any] | None:
 
 def exam_by_slug(slug: str) -> dict[str, Any] | None:
     return next((exam for exam in exams() if exam["slug"] == slug), None)
+
+
+def drill_by_slug(slug: str) -> dict[str, Any] | None:
+    return next((drill for drill in drills() if drill["slug"] == slug), None)
+
+
+def drill_question(slug: str, question_id: str) -> tuple[dict[str, Any], dict[str, Any]] | None:
+    drill = drill_by_slug(slug)
+    if drill is None:
+        return None
+    for question in drill.get("questions", []):
+        if question["id"] == question_id:
+            return drill, question
+    return None
 
 
 def path_by_slug(slug: str) -> dict[str, Any] | None:
@@ -207,3 +280,15 @@ def public_exam(exam: dict[str, Any]) -> dict[str, Any]:
         item = {key: value for key, value in question.items() if key != "correct"}
         questions.append(item)
     return {**exam, "questions": questions}
+
+
+def public_drill(drill: dict[str, Any]) -> dict[str, Any]:
+    questions = []
+    for question in drill.get("questions", []):
+        item = {
+            key: value
+            for key, value in question.items()
+            if key not in {"correct", "explanation", "example"}
+        }
+        questions.append(item)
+    return {**drill, "questions": questions}

@@ -1,0 +1,1337 @@
+{
+  "slug": "sql",
+  "order": 1,
+  "icon": "database",
+  "accent": "#60a5fa",
+  "title": {
+    "ru": "SQL: 30 команд",
+    "kg": "SQL: 30 буйрук"
+  },
+  "description": {
+    "ru": "SELECT, WHERE, JOIN, GROUP BY, подзапросы, индексы и транзакции. Каждый вопрос — с примером запроса.",
+    "kg": "SELECT, WHERE, JOIN, GROUP BY, подзапростор, индекстер жана транзакциялар. Ар бир суроо — суроо мисалы менен."
+  },
+  "minutes": 30,
+  "questions": [
+    {
+      "id": "sql-01",
+      "prompt": {
+        "ru": "Что вернёт запрос `SELECT * FROM users;`?",
+        "kg": "`SELECT * FROM users;` суроосу эмнени кайтарат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Все колонки и все строки таблицы users",
+            "kg": "users таблицасынын бардык колонкалары жана бардык саптары"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Только первую строку",
+            "kg": "Биринчи сап гана"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Только колонку id",
+            "kg": "id колонкасы гана"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Количество строк",
+            "kg": "Саптардын саны"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`*` означает «все колонки». Без `WHERE` запрос вернёт все строки. На больших таблицах лучше перечислять нужные колонки явно.",
+        "kg": "`*` «бардык колонкалар» дегенди билдирет. `WHERE` жок болсо, суроо бардык саптарды кайтарат. Чоң таблицаларда керектүү колонкаларды ачык жазуу жакшы."
+      },
+      "code": "SELECT * FROM users;",
+      "example": "```sql\n-- Все пользователи\nSELECT * FROM users;\n\n-- Лучше явно указать колонки\nSELECT id, name, email FROM users;\n```"
+    },
+    {
+      "id": "sql-02",
+      "prompt": {
+        "ru": "Как выбрать только колонки `name` и `age`?",
+        "kg": "`name` жана `age` колонкаларын гана кантип тандоо керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "SELECT name, age FROM users;",
+            "kg": "SELECT name, age FROM users;"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "SELECT * FROM users WHERE name, age;",
+            "kg": "SELECT * FROM users WHERE name, age;"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "SELECT users(name, age);",
+            "kg": "SELECT users(name, age);"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "SELECT name AND age FROM users;",
+            "kg": "SELECT name AND age FROM users;"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Колонки перечисляются через запятую после `SELECT`. `WHERE` фильтрует строки, а не выбирает колонки.",
+        "kg": "Колонкалар `SELECT` дан кийин үтүр менен жазылат. `WHERE` саптарды фильтрлейт, колонкаларды тандабайт."
+      },
+      "code": "SELECT name, age FROM users;",
+      "example": "```sql\nSELECT name, age\nFROM users;\n```"
+    },
+    {
+      "id": "sql-03",
+      "prompt": {
+        "ru": "Как дать колонке `name` псевдоним `username`?",
+        "kg": "`name` колонкасына `username` деген псевдонимди кантип берүү керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "SELECT name AS username FROM users;",
+            "kg": "SELECT name AS username FROM users;"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "SELECT name TO username FROM users;",
+            "kg": "SELECT name TO username FROM users;"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "SELECT username = name FROM users;",
+            "kg": "SELECT username = name FROM users;"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "RENAME name AS username FROM users;",
+            "kg": "RENAME name AS username FROM users;"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`AS` задаёт псевдоним только для вывода. Он не переименовывает колонку в таблице.",
+        "kg": "`AS` псевдонимди берүү үчүн гана колдонулат. Ал таблицадагы колонканын атын өзгөртпөйт."
+      },
+      "code": "SELECT name AS username FROM users;",
+      "example": "```sql\nSELECT name AS username, age AS user_age\nFROM users;\n```"
+    },
+    {
+      "id": "sql-04",
+      "prompt": {
+        "ru": "Как получить список уникальных городов?",
+        "kg": "Уникалдуу шаарлардын тизмесин кантип алуу керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "SELECT UNIQUE city FROM users;",
+            "kg": "SELECT UNIQUE city FROM users;"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "SELECT DISTINCT city FROM users;",
+            "kg": "SELECT DISTINCT city FROM users;"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "SELECT city FROM users GROUP city;",
+            "kg": "SELECT city FROM users GROUP city;"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "SELECT ONLY city FROM users;",
+            "kg": "SELECT ONLY city FROM users;"
+          }
+        }
+      ],
+      "correct": "b",
+      "explanation": {
+        "ru": "`DISTINCT` убирает повторяющиеся значения из результата. `UNIQUE` — это ограничение таблицы, а не оператор `SELECT`.",
+        "kg": "`DISTINCT` натыйжадагы кайталанган маанилерди алып салат. `UNIQUE` — таблицанын чектөөсү, `SELECT` оператору эмес."
+      },
+      "code": "SELECT DISTINCT city FROM users;",
+      "example": "```sql\nSELECT DISTINCT city\nFROM users;\n```"
+    },
+    {
+      "id": "sql-05",
+      "prompt": {
+        "ru": "Как выбрать пользователей старше 18 лет?",
+        "kg": "18 жаштан улуу колдонуучуларды кантип тандоо керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "SELECT * FROM users WHERE age > 18;",
+            "kg": "SELECT * FROM users WHERE age > 18;"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "SELECT * FROM users IF age > 18;",
+            "kg": "SELECT * FROM users IF age > 18;"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "SELECT * FROM users WHERE age GREATER 18;",
+            "kg": "SELECT * FROM users WHERE age GREATER 18;"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "SELECT * FROM users HAVING age > 18;",
+            "kg": "SELECT * FROM users HAVING age > 18;"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`WHERE` фильтрует строки до агрегации. Операторы сравнения: `>`, `<`, `>=`, `<=`, `=`, `<>` или `!=`.",
+        "kg": "`WHERE` саптарды агрегацияга чейин фильтрлейт. Салыштыруу операторлору: `>`, `<`, `>=`, `<=`, `=`, `<>` же `!=`."
+      },
+      "code": "SELECT * FROM users WHERE age > 18;",
+      "example": "```sql\nSELECT id, name, age\nFROM users\nWHERE age > 18;\n```"
+    },
+    {
+      "id": "sql-06",
+      "prompt": {
+        "ru": "Что найдёт условие `name LIKE 'A%'`?",
+        "kg": "`name LIKE 'A%'` шарты эмнени табат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Имена, начинающиеся на A",
+            "kg": "A тамгасы менен башталган аттар"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Имена, заканчивающиеся на A",
+            "kg": "A тамгасы менен бүткөн аттар"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Имена, содержащие A в середине",
+            "kg": "Ортосунда A бар аттар"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Ровно имя A",
+            "kg": "Так A деген ат"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`%` заменяет любое количество символов. `A%` — начинается с A, `%A` — заканчивается на A, `%A%` — содержит A.",
+        "kg": "`%` каалаган сандагы белгилерди алмаштырат. `A%` — A менен башталат, `%A` — A менен бүтөт, `%A%` — A бар."
+      },
+      "code": "SELECT * FROM users WHERE name LIKE 'A%';",
+      "example": "```sql\n-- Начинается на A\nSELECT name FROM users WHERE name LIKE 'A%';\n\n-- Заканчивается на A\nSELECT name FROM users WHERE name LIKE '%A';\n```"
+    },
+    {
+      "id": "sql-07",
+      "prompt": {
+        "ru": "Как выбрать пользователей с id 1, 2 или 3?",
+        "kg": "id 1, 2 же 3 болгон колдонуучуларды кантип тандоо керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "SELECT * FROM users WHERE id = (1, 2, 3);",
+            "kg": "SELECT * FROM users WHERE id = (1, 2, 3);"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "SELECT * FROM users WHERE id IN (1, 2, 3);",
+            "kg": "SELECT * FROM users WHERE id IN (1, 2, 3);"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "SELECT * FROM users WHERE id BETWEEN 1 OR 3;",
+            "kg": "SELECT * FROM users WHERE id BETWEEN 1 OR 3;"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "SELECT * FROM users WHERE id ANY 1, 2, 3;",
+            "kg": "SELECT * FROM users WHERE id ANY 1, 2, 3;"
+          }
+        }
+      ],
+      "correct": "b",
+      "explanation": {
+        "ru": "`IN` проверяет вхождение в список. Это короче, чем цепочка `id = 1 OR id = 2 OR id = 3`.",
+        "kg": "`IN` тизмеге кирүүнү текшерет. Бул `id = 1 OR id = 2 OR id = 3` чынжырынан кыска."
+      },
+      "code": "SELECT * FROM users WHERE id IN (1, 2, 3);",
+      "example": "```sql\nSELECT * FROM users\nWHERE id IN (1, 2, 3);\n```"
+    },
+    {
+      "id": "sql-08",
+      "prompt": {
+        "ru": "Что выбирает `WHERE age BETWEEN 18 AND 25`?",
+        "kg": "`WHERE age BETWEEN 18 AND 25` эмнени тандайт?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Возраст от 18 до 25 включительно",
+            "kg": "18ден 25ке чейин, эки чекти кошкондо"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Только 18 и 25",
+            "kg": "18 жана 25 гана"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Возраст больше 18 и меньше 25, не включая границы",
+            "kg": "18ден чоң жана 25тен кичине, чектерди кошпой"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Возраст 18 или 25",
+            "kg": "18 же 25"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`BETWEEN a AND b` включает обе границы. Для дат и чисел это важно: `BETWEEN '2026-01-01' AND '2026-01-31'`.",
+        "kg": "`BETWEEN a AND b` эки чекти тең камтыйт. Күн жана сандар үчүн бул маанилүү: `BETWEEN '2026-01-01' AND '2026-01-31'`."
+      },
+      "code": "SELECT * FROM users WHERE age BETWEEN 18 AND 25;",
+      "example": "```sql\nSELECT * FROM users\nWHERE age BETWEEN 18 AND 25;\n```"
+    },
+    {
+      "id": "sql-09",
+      "prompt": {
+        "ru": "Как найти строки, где `email` равен NULL?",
+        "kg": "`email` NULL болгон саптарды кантип табуу керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "SELECT * FROM users WHERE email = NULL;",
+            "kg": "SELECT * FROM users WHERE email = NULL;"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "SELECT * FROM users WHERE email IS NULL;",
+            "kg": "SELECT * FROM users WHERE email IS NULL;"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "SELECT * FROM users WHERE email == NULL;",
+            "kg": "SELECT * FROM users WHERE email == NULL;"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "SELECT * FROM users WHERE NULL = email;",
+            "kg": "SELECT * FROM users WHERE NULL = email;"
+          }
+        }
+      ],
+      "correct": "b",
+      "explanation": {
+        "ru": "NULL — это отсутствие значения. Сравнение `= NULL` даёт NULL, а не TRUE. Используй `IS NULL` и `IS NOT NULL`.",
+        "kg": "NULL — маанинин жоктугу. `= NULL` салыштыруусу TRUE эмес, NULL берет. `IS NULL` жана `IS NOT NULL` колдон."
+      },
+      "code": "SELECT * FROM users WHERE email IS NULL;",
+      "example": "```sql\nSELECT * FROM users WHERE email IS NULL;\n\nSELECT * FROM users WHERE email IS NOT NULL;\n```"
+    },
+    {
+      "id": "sql-10",
+      "prompt": {
+        "ru": "Как отсортировать пользователей по зарплате от большей к меньшей?",
+        "kg": "Колдонуучуларды айлык боюнча чоңдон кичинеге кантип иреттөө керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "SELECT * FROM users ORDER BY salary ASC;",
+            "kg": "SELECT * FROM users ORDER BY salary ASC;"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "SELECT * FROM users ORDER BY salary DESC;",
+            "kg": "SELECT * FROM users ORDER BY salary DESC;"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "SELECT * FROM users SORT salary DESC;",
+            "kg": "SELECT * FROM users SORT salary DESC;"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "SELECT * FROM users GROUP BY salary DESC;",
+            "kg": "SELECT * FROM users GROUP BY salary DESC;"
+          }
+        }
+      ],
+      "correct": "b",
+      "explanation": {
+        "ru": "`ORDER BY ... DESC` сортирует по убыванию, `ASC` — по возрастанию (по умолчанию). `GROUP BY` группирует, а не сортирует.",
+        "kg": "`ORDER BY ... DESC` чоңдон кичинеге, `ASC` — кичинеден чоңго (демейки). `GROUP BY` иреттөө эмес, группалоо."
+      },
+      "code": "SELECT * FROM users ORDER BY salary DESC;",
+      "example": "```sql\nSELECT name, salary\nFROM users\nORDER BY salary DESC;\n```"
+    },
+    {
+      "id": "sql-11",
+      "prompt": {
+        "ru": "Как получить только первые 5 строк?",
+        "kg": "Биринчи 5 сапты гана кантип алуу керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "SELECT * FROM users LIMIT 5;",
+            "kg": "SELECT * FROM users LIMIT 5;"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "SELECT * FROM users TOP 5;",
+            "kg": "SELECT * FROM users TOP 5;"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "SELECT * FROM users FIRST 5;",
+            "kg": "SELECT * FROM users FIRST 5;"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "SELECT 5 FROM users;",
+            "kg": "SELECT 5 FROM users;"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`LIMIT n` ограничивает число строк. В SQL Server используют `TOP`, в Oracle — `FETCH FIRST`. Всегда добавляй `ORDER BY`, иначе «первые» строки не определены.",
+        "kg": "`LIMIT n` саптардын санын чектейт. SQL Serverде `TOP`, Oracleдо `FETCH FIRST` колдонулат. Дайыма `ORDER BY` кош, антпесе «биринчи» саптар аныкталбайт."
+      },
+      "code": "SELECT * FROM users LIMIT 5;",
+      "example": "```sql\nSELECT name, salary\nFROM users\nORDER BY salary DESC\nLIMIT 5;\n```"
+    },
+    {
+      "id": "sql-12",
+      "prompt": {
+        "ru": "Что вернёт `SELECT COUNT(*) FROM users;`?",
+        "kg": "`SELECT COUNT(*) FROM users;` эмнени кайтарат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Количество строк в users",
+            "kg": "users таблицасындагы саптардын саны"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Количество колонок",
+            "kg": "Колонкалардын саны"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Сумму всех id",
+            "kg": "Бардык id'лердин суммасы"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Первую строку",
+            "kg": "Биринчи сап"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`COUNT(*)` считает строки, включая строки с NULL. `COUNT(column)` считает только не-NULL значения этой колонки.",
+        "kg": "`COUNT(*)` саптарды, NULL бар саптарды да эсептейт. `COUNT(column)` ошол колонканын NULL эмес маанилерин гана эсептейт."
+      },
+      "code": "SELECT COUNT(*) FROM users;",
+      "example": "```sql\nSELECT COUNT(*) AS total_users FROM users;\n\nSELECT COUNT(email) AS with_email FROM users;\n```"
+    },
+    {
+      "id": "sql-13",
+      "prompt": {
+        "ru": "Как посчитать среднюю зарплату?",
+        "kg": "Орточо айлыкты кантип эсептөө керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "SELECT AVG(salary) FROM users;",
+            "kg": "SELECT AVG(salary) FROM users;"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "SELECT MEAN(salary) FROM users;",
+            "kg": "SELECT MEAN(salary) FROM users;"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "SELECT SUM(salary) / COUNT(*) FROM users;",
+            "kg": "SELECT SUM(salary) / COUNT(*) FROM users;"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "SELECT MEDIAN(salary) FROM users;",
+            "kg": "SELECT MEDIAN(salary) FROM users;"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`AVG` игнорирует NULL. `SUM/COUNT(*)` тоже даст число, но при NULL в salary результат может отличаться от `AVG`.",
+        "kg": "`AVG` NULL'дарды этибарга албайт. `SUM/COUNT(*)` да сан берет, бирок salary'де NULL болсо натыйжа `AVG` дан айырмаланышы мүмкүн."
+      },
+      "code": "SELECT AVG(salary) FROM users;",
+      "example": "```sql\nSELECT AVG(salary) AS avg_salary\nFROM users;\n```"
+    },
+    {
+      "id": "sql-14",
+      "prompt": {
+        "ru": "Как посчитать количество сотрудников в каждом отделе?",
+        "kg": "Ар бир бөлүмдөгү кызматкерлердин санын кантип эсептөө керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "SELECT department, COUNT(*) FROM users GROUP BY department;",
+            "kg": "SELECT department, COUNT(*) FROM users GROUP BY department;"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "SELECT department, COUNT(*) FROM users ORDER BY department;",
+            "kg": "SELECT department, COUNT(*) FROM users ORDER BY department;"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "SELECT COUNT(department) FROM users;",
+            "kg": "SELECT COUNT(department) FROM users;"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "SELECT department, SUM(*) FROM users;",
+            "kg": "SELECT department, SUM(*) FROM users;"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`GROUP BY` собирает строки в группы. В `SELECT` можно выводить только группируемые колонки и агрегаты.",
+        "kg": "`GROUP BY` саптарды группаларга чогултат. `SELECT` те группалоочу колонкаларды жана агрегаттарды гана чыгарууга болот."
+      },
+      "code": "SELECT department, COUNT(*) FROM users GROUP BY department;",
+      "example": "```sql\nSELECT department, COUNT(*) AS employees\nFROM users\nGROUP BY department;\n```"
+    },
+    {
+      "id": "sql-15",
+      "prompt": {
+        "ru": "Чем `HAVING` отличается от `WHERE`?",
+        "kg": "`HAVING` `WHERE` тен эмнеси менен айырмаланат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "HAVING фильтрует группы после GROUP BY, WHERE — строки до агрегации",
+            "kg": "HAVING GROUP BY'дан кийин группаларды, WHERE агрегацияга чейин саптарды фильтрлейт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "HAVING быстрее WHERE",
+            "kg": "HAVING WHERE'ден тезирээк"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "WHERE нельзя использовать с числами",
+            "kg": "WHERE'ди сандар менен колдонсо болбойт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Это одно и то же",
+            "kg": "Бул бирдей нерсе"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Порядок: `FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY → LIMIT`. Условие на агрегат (`COUNT(*) > 5`) идёт в `HAVING`.",
+        "kg": "Тартип: `FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY → LIMIT`. Агрегатка шарт (`COUNT(*) > 5`) `HAVING` ге жазылат."
+      },
+      "code": "SELECT department, COUNT(*) AS total\nFROM users\nGROUP BY department\nHAVING COUNT(*) > 5;",
+      "example": "```sql\nSELECT department, COUNT(*) AS total\nFROM users\nGROUP BY department\nHAVING COUNT(*) > 5;\n```"
+    },
+    {
+      "id": "sql-16",
+      "prompt": {
+        "ru": "Как соединить `orders` и `users` по `user_id`?",
+        "kg": "`orders` жана `users` таблицаларын `user_id` боюнча кантип бириктирүү керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "SELECT * FROM orders JOIN users ON orders.user_id = users.id;",
+            "kg": "SELECT * FROM orders JOIN users ON orders.user_id = users.id;"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "SELECT * FROM orders JOIN users WHERE orders.user_id = users.id;",
+            "kg": "SELECT * FROM orders JOIN users WHERE orders.user_id = users.id;"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "SELECT * FROM orders, users;",
+            "kg": "SELECT * FROM orders, users;"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "SELECT * FROM orders MERGE users;",
+            "kg": "SELECT * FROM orders MERGE users;"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Условие соединения пишется в `ON`. `JOIN` без `ON` в старом синтаксисе даёт декартово произведение.",
+        "kg": "Бириктирүү шарты `ON` го жазылат. `ON` жок `JOIN` эски синтаксисте декарттык көбөйтүүнү берет."
+      },
+      "code": "SELECT * FROM orders JOIN users ON orders.user_id = users.id;",
+      "example": "```sql\nSELECT o.id, o.total, u.name\nFROM orders AS o\nJOIN users AS u ON u.id = o.user_id;\n```"
+    },
+    {
+      "id": "sql-17",
+      "prompt": {
+        "ru": "Чем `LEFT JOIN` отличается от `INNER JOIN`?",
+        "kg": "`LEFT JOIN` `INNER JOIN` тен эмнеси менен айырмаланат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "LEFT JOIN сохраняет все строки левой таблицы, даже без совпадений",
+            "kg": "LEFT JOIN сол таблицанын бардык саптарын, дал келбесе да сактайт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "LEFT JOIN возвращает только совпадения",
+            "kg": "LEFT JOIN дал келүүлөрдү гана кайтарат"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "LEFT JOIN нельзя использовать с WHERE",
+            "kg": "LEFT JOIN'ди WHERE менен колдонсо болбойт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "LEFT JOIN сортирует по левой колонке",
+            "kg": "LEFT JOIN сол колонка боюнча иреттейт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "В `LEFT JOIN` несовпавшие строки правой таблицы заполняются NULL. Это нужно для «все пользователи и их заказы, если есть».",
+        "kg": "`LEFT JOIN` да дал келбеген оң таблицанын саптары NULL менен толтурулат. Бул «бардык колдонуучулар жана алардын заказдары, эгер бар болсо» үчүн керек."
+      },
+      "code": "SELECT u.name, o.total\nFROM users AS u\nLEFT JOIN orders AS o ON o.user_id = u.id;",
+      "example": "```sql\nSELECT u.name, o.total\nFROM users AS u\nLEFT JOIN orders AS o ON o.user_id = u.id;\n```"
+    },
+    {
+      "id": "sql-18",
+      "prompt": {
+        "ru": "Где указывается условие соединения таблиц?",
+        "kg": "Таблицаларды бириктирүү шарты кайда жазылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "В ON",
+            "kg": "ON ичинде"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "В WHERE",
+            "kg": "WHERE ичинде"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "В GROUP BY",
+            "kg": "GROUP BY ичинде"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "В HAVING",
+            "kg": "HAVING ичинде"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Условие связи `ON a.id = b.a_id` относится к соединению. `WHERE` — для фильтрации уже соединённых строк.",
+        "kg": "`ON a.id = b.a_id` байланыш шарты бириктирүүгө тиешелүү. `WHERE` — бириктирилген саптарды фильтрлөө үчүн."
+      },
+      "code": "SELECT * FROM a JOIN b ON a.id = b.a_id;",
+      "example": "```sql\nSELECT *\nFROM orders AS o\nJOIN users AS u ON u.id = o.user_id\nWHERE o.total > 1000;\n```"
+    },
+    {
+      "id": "sql-19",
+      "prompt": {
+        "ru": "Чем `UNION` отличается от `UNION ALL`?",
+        "kg": "`UNION` `UNION ALL` дан эмнеси менен айырмаланат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "UNION удаляет дубликаты, UNION ALL оставляет все строки",
+            "kg": "UNION дубликаттарды алып салат, UNION ALL бардык саптарды калтырат"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "UNION ALL удаляет дубликаты",
+            "kg": "UNION ALL дубликаттарды алып салат"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "UNION работает только с числами",
+            "kg": "UNION сандар менен гана иштейт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Разницы нет",
+            "kg": "Айырма жок"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`UNION` делает дополнительную сортировку/удаление дубликатов и медленнее. `UNION ALL` быстрее, если дубликаты допустимы.",
+        "kg": "`UNION` кошумча иреттөө/дубликаттарды өчүрүү жасайт жана жайыраак. Дубликаттар жараса, `UNION ALL` тезирээк."
+      },
+      "code": "SELECT city FROM users\nUNION ALL\nSELECT city FROM companies;",
+      "example": "```sql\nSELECT city FROM users\nUNION\nSELECT city FROM companies;\n```"
+    },
+    {
+      "id": "sql-20",
+      "prompt": {
+        "ru": "Как выбрать пользователей с зарплатой выше средней?",
+        "kg": "Айлыгы орточодон жогору колдонуучуларды кантип тандоо керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "SELECT * FROM users WHERE salary > (SELECT AVG(salary) FROM users);",
+            "kg": "SELECT * FROM users WHERE salary > (SELECT AVG(salary) FROM users);"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "SELECT * FROM users WHERE salary > AVG(salary);",
+            "kg": "SELECT * FROM users WHERE salary > AVG(salary);"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "SELECT * FROM users HAVING salary > AVG(salary);",
+            "kg": "SELECT * FROM users HAVING salary > AVG(salary);"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "SELECT AVG(salary) FROM users WHERE salary > salary;",
+            "kg": "SELECT AVG(salary) FROM users WHERE salary > salary;"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Подзапрос в `WHERE` вычисляет среднее один раз. Агрегат нельзя использовать в `WHERE` напрямую — нужен подзапрос или `HAVING` с группировкой.",
+        "kg": "`WHERE` ичиндеги подзапрос орточону бир жолу эсептейт. Агрегатты `WHERE` де түз колдонсо болбойт — подзапрос же группалоо менен `HAVING` керек."
+      },
+      "code": "SELECT * FROM users WHERE salary > (SELECT AVG(salary) FROM users);",
+      "example": "```sql\nSELECT name, salary\nFROM users\nWHERE salary > (SELECT AVG(salary) FROM users);\n```"
+    },
+    {
+      "id": "sql-21",
+      "prompt": {
+        "ru": "Что делает `EXISTS`?",
+        "kg": "`EXISTS` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Проверяет, вернул ли подзапрос хотя бы одну строку",
+            "kg": "Подзапрос жок дегенде бир сап кайтарганын текшерет"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Считает количество строк",
+            "kg": "Саптардын санын эсептейт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Удаляет дубликаты",
+            "kg": "Дубликаттарды алып салат"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Создаёт таблицу",
+            "kg": "Таблица түзөт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`EXISTS (subquery)` возвращает TRUE, если подзапрос непустой. Часто используется с коррелированным подзапросом.",
+        "kg": "`EXISTS (subquery)` подзапрос бош эмес болсо TRUE кайтарат. Көбүнчө корреляцияланган подзапрос менен колдонулат."
+      },
+      "code": "SELECT * FROM users u\nWHERE EXISTS (\n  SELECT 1 FROM orders o WHERE o.user_id = u.id\n);",
+      "example": "```sql\nSELECT name\nFROM users AS u\nWHERE EXISTS (\n  SELECT 1 FROM orders AS o WHERE o.user_id = u.id\n);\n```"
+    },
+    {
+      "id": "sql-22",
+      "prompt": {
+        "ru": "Как вывести `adult`, если возраст >= 18, иначе `minor`?",
+        "kg": "Жашы >= 18 болсо `adult`, антпесе `minor` кантип чыгаруу керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "SELECT CASE WHEN age >= 18 THEN 'adult' ELSE 'minor' END FROM users;",
+            "kg": "SELECT CASE WHEN age >= 18 THEN 'adult' ELSE 'minor' END FROM users;"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "SELECT IF age >= 18 THEN 'adult' ELSE 'minor' FROM users;",
+            "kg": "SELECT IF age >= 18 THEN 'adult' ELSE 'minor' FROM users;"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "SELECT age >= 18 ? 'adult' : 'minor' FROM users;",
+            "kg": "SELECT age >= 18 ? 'adult' : 'minor' FROM users;"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "SELECT SWITCH(age) FROM users;",
+            "kg": "SELECT SWITCH(age) FROM users;"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`CASE WHEN ... THEN ... ELSE ... END` — стандартный SQL. `IF` есть в MySQL, но не переносится на все СУБД.",
+        "kg": "`CASE WHEN ... THEN ... ELSE ... END` — стандарттуу SQL. `IF` MySQL'де бар, бирок бардык СУБД'ге көчпөйт."
+      },
+      "code": "SELECT CASE WHEN age >= 18 THEN 'adult' ELSE 'minor' END FROM users;",
+      "example": "```sql\nSELECT name,\n       CASE\n         WHEN age >= 18 THEN 'adult'\n         ELSE 'minor'\n       END AS category\nFROM users;\n```"
+    },
+    {
+      "id": "sql-23",
+      "prompt": {
+        "ru": "Как добавить пользователя?",
+        "kg": "Колдонуучуну кантип кошуу керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "INSERT INTO users (name, age) VALUES ('Aibek', 20);",
+            "kg": "INSERT INTO users (name, age) VALUES ('Aibek', 20);"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "ADD INTO users (name, age) VALUES ('Aibek', 20);",
+            "kg": "ADD INTO users (name, age) VALUES ('Aibek', 20);"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "INSERT users SET name='Aibek', age=20;",
+            "kg": "INSERT users SET name='Aibek', age=20;"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "CREATE ROW users (name, age) VALUES ('Aibek', 20);",
+            "kg": "CREATE ROW users (name, age) VALUES ('Aibek', 20);"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`INSERT INTO table (columns) VALUES (values)` — стандартный синтаксис. Порядок значений должен совпадать с порядком колонок.",
+        "kg": "`INSERT INTO table (columns) VALUES (values)` — стандарттуу синтаксис. Маанилердин тартиби колонкалардын тартибине дал келиши керек."
+      },
+      "code": "INSERT INTO users (name, age) VALUES ('Aibek', 20);",
+      "example": "```sql\nINSERT INTO users (name, age, email)\nVALUES ('Aibek', 20, 'aibek@example.com');\n```"
+    },
+    {
+      "id": "sql-24",
+      "prompt": {
+        "ru": "Как изменить возраст пользователя с id = 5?",
+        "kg": "id = 5 болгон колдонуучунун жашын кантип өзгөртүү керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "UPDATE users SET age = 21 WHERE id = 5;",
+            "kg": "UPDATE users SET age = 21 WHERE id = 5;"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "UPDATE users age = 21 WHERE id = 5;",
+            "kg": "UPDATE users age = 21 WHERE id = 5;"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "SET users.age = 21 WHERE id = 5;",
+            "kg": "SET users.age = 21 WHERE id = 5;"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "MODIFY users SET age = 21 WHERE id = 5;",
+            "kg": "MODIFY users SET age = 21 WHERE id = 5;"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`UPDATE` меняет строки, `WHERE` выбирает какие. Без `WHERE` изменятся все строки — это частая опасная ошибка.",
+        "kg": "`UPDATE` саптарды өзгөртөт, `WHERE` кайсыларын тандайт. `WHERE` жок болсо бардык саптар өзгөрөт — бул көп кездешкен коркунучтуу ката."
+      },
+      "code": "UPDATE users SET age = 21 WHERE id = 5;",
+      "example": "```sql\nUPDATE users\nSET age = 21\nWHERE id = 5;\n```"
+    },
+    {
+      "id": "sql-25",
+      "prompt": {
+        "ru": "Как удалить пользователя с id = 5?",
+        "kg": "id = 5 болгон колдонуучуну кантип өчүрүү керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "DELETE FROM users WHERE id = 5;",
+            "kg": "DELETE FROM users WHERE id = 5;"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "DELETE users WHERE id = 5;",
+            "kg": "DELETE users WHERE id = 5;"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "REMOVE FROM users WHERE id = 5;",
+            "kg": "REMOVE FROM users WHERE id = 5;"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "DROP ROW users WHERE id = 5;",
+            "kg": "DROP ROW users WHERE id = 5;"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`DELETE FROM ... WHERE ...` удаляет строки. `DROP TABLE` удаляет всю таблицу, `TRUNCATE` — все строки без условия.",
+        "kg": "`DELETE FROM ... WHERE ...` саптарды өчүрөт. `DROP TABLE` бүт таблицаны, `TRUNCATE` шартсыз бардык саптарды өчүрөт."
+      },
+      "code": "DELETE FROM users WHERE id = 5;",
+      "example": "```sql\nDELETE FROM users\nWHERE id = 5;\n```"
+    },
+    {
+      "id": "sql-26",
+      "prompt": {
+        "ru": "Что делает `PRIMARY KEY`?",
+        "kg": "`PRIMARY KEY` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Уникально идентифицирует строку и запрещает NULL",
+            "kg": "Сапты уникалдуу аныктайт жана NULL'га жол бербейт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Разрешает дубликаты",
+            "kg": "Дубликаттарга жол берет"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Создаёт индекс только для текста",
+            "kg": "Текст үчүн гана индекс түзөт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Удаляет строки",
+            "kg": "Саптарды өчүрөт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`PRIMARY KEY` = `UNIQUE` + `NOT NULL` для одной или нескольких колонок. В таблице может быть только один первичный ключ.",
+        "kg": "`PRIMARY KEY` = бир же бир нече колонка үчүн `UNIQUE` + `NOT NULL`. Таблицада бир гана баштапкы ачкыч болушу мүмкүн."
+      },
+      "code": "CREATE TABLE users (\n  id INTEGER PRIMARY KEY,\n  name TEXT NOT NULL\n);",
+      "example": "```sql\nCREATE TABLE users (\n  id INTEGER PRIMARY KEY,\n  name TEXT NOT NULL,\n  email TEXT UNIQUE\n);\n```"
+    },
+    {
+      "id": "sql-27",
+      "prompt": {
+        "ru": "Зачем нужен `FOREIGN KEY`?",
+        "kg": "`FOREIGN KEY` эмне үчүн керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Гарантирует, что значение существует в связанной таблице",
+            "kg": "Маани байланышкан таблицада бар экенин кепилдейт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Ускоряет любой SELECT",
+            "kg": "Каалаган SELECT'ти тездетет"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Шифрует данные",
+            "kg": "Маалыматты шифрлейт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Создаёт резервную копию",
+            "kg": "Камдык көчүрмө түзөт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`FOREIGN KEY (user_id) REFERENCES users(id)` не даёт вставить заказ с несуществующим пользователем. Это ссылочная целостность.",
+        "kg": "`FOREIGN KEY (user_id) REFERENCES users(id)` жок колдонуучу менен заказ кошууга жол бербейт. Бул шилтеме бүтүндүгү."
+      },
+      "code": "CREATE TABLE orders (\n  id INTEGER PRIMARY KEY,\n  user_id INTEGER REFERENCES users(id)\n);",
+      "example": "```sql\nCREATE TABLE orders (\n  id INTEGER PRIMARY KEY,\n  user_id INTEGER NOT NULL REFERENCES users(id),\n  total REAL NOT NULL\n);\n```"
+    },
+    {
+      "id": "sql-28",
+      "prompt": {
+        "ru": "Зачем создавать индекс?",
+        "kg": "Индекс эмне үчүн түзүлөт?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Чтобы ускорить поиск и фильтрацию по колонке",
+            "kg": "Колонка боюнча издөөнү жана фильтрлөөнү тездетүү үчүн"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Чтобы запретить NULL",
+            "kg": "NULL'га тыюу салуу үчүн"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Чтобы удалить дубликаты",
+            "kg": "Дубликаттарды өчүрүү үчүн"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Чтобы создать новую таблицу",
+            "kg": "Жаңы таблица түзүү үчүн"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Индекс ускоряет `WHERE`, `JOIN` и `ORDER BY` по колонке, но замедляет вставку/обновление и занимает место. Индексируй то, по чему реально ищешь.",
+        "kg": "Индекс колонка боюнча `WHERE`, `JOIN` жана `ORDER BY` түн тездетет, бирок кошуу/жаңыртууну жайлатат жана орун ээлейт. Чынында издей турган нерсеңди индексте."
+      },
+      "code": "CREATE INDEX idx_users_email ON users(email);",
+      "example": "```sql\nCREATE INDEX idx_users_email ON users(email);\n\n-- Проверка плана запроса\nEXPLAIN SELECT * FROM users WHERE email = 'a@b.c';\n```"
+    },
+    {
+      "id": "sql-29",
+      "prompt": {
+        "ru": "Что делает `ROLLBACK` в транзакции?",
+        "kg": "Транзакциядагы `ROLLBACK` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Отменяет изменения с начала транзакции",
+            "kg": "Транзакция башталгандан берки өзгөртүүлөрдү жокко чыгарат"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Сохраняет изменения навсегда",
+            "kg": "Өзгөртүүлөрдү биротоло сактайт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Удаляет таблицу",
+            "kg": "Таблицаны өчүрөт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Создаёт точку восстановления",
+            "kg": "Калыбына келтирүү чекитин түзөт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`BEGIN` начинает транзакцию, `COMMIT` фиксирует, `ROLLBACK` отменяет. Это нужно для атомарных операций: например, списание и зачисление денег.",
+        "kg": "`BEGIN` транзакцияны баштайт, `COMMIT` бекемдейт, `ROLLBACK` жокко чыгарат. Бул атомардык операциялар үчүн керек: мисалы, акчаны алуу жана кошуу."
+      },
+      "code": "BEGIN;\nUPDATE accounts SET balance = balance - 100 WHERE id = 1;\nUPDATE accounts SET balance = balance + 100 WHERE id = 2;\nCOMMIT;",
+      "example": "```sql\nBEGIN;\nUPDATE accounts SET balance = balance - 100 WHERE id = 1;\nUPDATE accounts SET balance = balance + 100 WHERE id = 2;\nCOMMIT;\n-- При ошибке: ROLLBACK;\n```"
+    },
+    {
+      "id": "sql-30",
+      "prompt": {
+        "ru": "Что делает `ROW_NUMBER() OVER (PARTITION BY department ORDER BY salary DESC)`?",
+        "kg": "`ROW_NUMBER() OVER (PARTITION BY department ORDER BY salary DESC)` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Нумерует строки внутри каждого отдела по убыванию зарплаты",
+            "kg": "Ар бир бөлүмдүн ичиндеги саптарды айлыктын кемүү тартибинде номерлейт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Считает общее количество отделов",
+            "kg": "Бөлүмдөрдүн жалпы санын эсептейт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Сортирует всю таблицу",
+            "kg": "Бүт таблицаны иреттейт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Удаляет дубликаты",
+            "kg": "Дубликаттарды алып салат"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Оконная функция считает номер в рамках `PARTITION` (группы), не схлопывая строки. Часто используют для «топ-1 в каждой группе» через подзапрос и `WHERE rn = 1`.",
+        "kg": "Терезе функциясы `PARTITION` (группа) ичинде номерди эсептейт, саптарды жыйнаштырбайт. Көбүнчө «ар бир группадагы топ-1» үчүн подзапрос жана `WHERE rn = 1` менен колдонулат."
+      },
+      "code": "SELECT name, department, salary,\n       ROW_NUMBER() OVER (PARTITION BY department ORDER BY salary DESC) AS rn\nFROM users;",
+      "example": "```sql\nSELECT name, department, salary, rn\nFROM (\n  SELECT name, department, salary,\n         ROW_NUMBER() OVER (\n           PARTITION BY department\n           ORDER BY salary DESC\n         ) AS rn\n  FROM users\n) AS ranked\nWHERE rn = 1;\n```"
+    }
+  ]
+}

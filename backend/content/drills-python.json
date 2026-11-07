@@ -1,0 +1,985 @@
+{
+  "slug": "python",
+  "order": 8,
+  "icon": "code",
+  "accent": "#34d399",
+  "title": {
+    "ru": "Python: 22 вопроса",
+    "kg": "Python: 22 суроо"
+  },
+  "description": {
+    "ru": "Типы, срезы, словари, comprehension, аргументы, исключения, файлы, классы, генераторы и аннотации.",
+    "kg": "Типтер, кесиндилер, сөздүктөр, comprehension, аргументтер, исклүчөнүүлөр, файлдар, класстар, генераторлор жана аннотациялар."
+  },
+  "minutes": 25,
+  "questions": [
+    {
+      "id": "python-01",
+      "prompt": {
+        "ru": "Какой тип у результата `3 / 2` в Python 3?",
+        "kg": "Python 3'тө `3 / 2` натыйжасынын тиби кандай?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "float, 1.5",
+            "kg": "float, 1.5"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "int, 1",
+            "kg": "int, 1"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "int, 2",
+            "kg": "int, 2"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "str, \"1.5\"",
+            "kg": "str, \"1.5\""
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`/` всегда возвращает float. Целочисленное деление — `//`: `3 // 2 == 1`. Остаток — `%`: `3 % 2 == 1`.",
+        "kg": "`/` дайыма float кайтарат. Бүтүн сандык бөлүү — `//`: `3 // 2 == 1`. Калдык — `%`: `3 % 2 == 1`."
+      },
+      "code": "3 / 2",
+      "example": "```python\nprint(3 / 2)    # 1.5\nprint(3 // 2)   # 1\nprint(3 % 2)    # 1\nprint(3 ** 2)   # 9\n```"
+    },
+    {
+      "id": "python-02",
+      "prompt": {
+        "ru": "Что вернёт `len(\"привет\")`?",
+        "kg": "`len(\"привет\")` эмнени кайтарат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "6",
+            "kg": "6"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "7",
+            "kg": "7"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "5",
+            "kg": "5"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Ошибку",
+            "kg": "Ката"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`len` считает символы Unicode. В строке «привет» шесть букв. Кириллица в Python 3 — это обычные символы, не байты.",
+        "kg": "`len` Unicode белгилерин эсептейт. «привет» сабында алты тамга бар. Python 3'тө кириллица — кадимки белгилер, байттар эмес."
+      },
+      "code": "len(\"привет\")",
+      "example": "```python\nprint(len(\"привет\"))          # 6\nprint(len(\"привет\".encode())) # 12 — байты UTF-8\n```"
+    },
+    {
+      "id": "python-03",
+      "prompt": {
+        "ru": "Что вернёт срез `numbers[1:4]`?",
+        "kg": "`numbers[1:4]` кесиндиси эмнени кайтарат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Элементы с индексами 1, 2, 3",
+            "kg": "1, 2, 3 индекстери бар элементтерди"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Элементы с индексами 1, 2, 3, 4",
+            "kg": "1, 2, 3, 4 индекстери бар элементтерди"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Элементы с индексами 0, 1, 2, 3",
+            "kg": "0, 1, 2, 3 индекстери бар элементтерди"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Элементы с индексами 1 и 4",
+            "kg": "1 жана 4 индекстери бар элементтерди"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Правая граница среза не включается. `[1:4]` — это индексы 1, 2, 3. Если граница опущена, берётся от начала или до конца.",
+        "kg": "Кесиндинин оң чеги кирбейт. `[1:4]` — 1, 2, 3 индекстери. Чек түшүп калса, башынан же аягына чейин алынат."
+      },
+      "code": "numbers[1:4]",
+      "example": "```python\nnumbers = [10, 20, 30, 40, 50]\nprint(numbers[1:4])   # [20, 30, 40]\nprint(numbers[:2])    # [10, 20]\nprint(numbers[2:])    # [30, 40, 50]\nprint(numbers[::-1])  # [50, 40, 30, 20, 10]\n```"
+    },
+    {
+      "id": "python-04",
+      "prompt": {
+        "ru": "Как безопасно получить значение из словаря по ключу `name`?",
+        "kg": "Сөздүктөн `name` ачкычы боюнча маанини коопсуз кантип алуу керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "data.get(\"name\", \"\")",
+            "kg": "data.get(\"name\", \"\")"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "data[\"name\"]",
+            "kg": "data[\"name\"]"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "data.name",
+            "kg": "data.name"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "data.fetch(\"name\")",
+            "kg": "data.fetch(\"name\")"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`get` возвращает `None` или указанное значение по умолчанию, если ключа нет. `data[\"name\"]` выбросит `KeyError`.",
+        "kg": "`get` ачкыч жок болсо `None` же көрсөтүлгөн демейки маанини кайтарат. `data[\"name\"]` `KeyError` чыгарат."
+      },
+      "code": "data.get(\"name\", \"\")",
+      "example": "```python\ndata = {\"age\": 20}\nprint(data.get(\"name\"))        # None\nprint(data.get(\"name\", \"\"))   # \"\"\nprint(data[\"name\"])            # KeyError\n```"
+    },
+    {
+      "id": "python-05",
+      "prompt": {
+        "ru": "Что делает `list.append(x)`?",
+        "kg": "`list.append(x)` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Добавляет один элемент в конец списка",
+            "kg": "Тизменин аягына бир элемент кошот"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Добавляет несколько элементов",
+            "kg": "Бир нече элемент кошот"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Удаляет элемент",
+            "kg": "Элементти өчүрөт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Сортирует список",
+            "kg": "Тизмени иреттейт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`append` добавляет один объект, даже если это список — получится вложенный список. Для нескольких элементов — `extend` или `+=`.",
+        "kg": "`append` бир объект кошот, ал түрмөк болсо да — ичине салынган түрмөк пайда болот. Бир нече элемент үчүн `extend` же `+=`."
+      },
+      "code": "items.append(x)",
+      "example": "```python\nitems = [1, 2]\nitems.append(3)      # [1, 2, 3]\nitems.append([4, 5]) # [1, 2, 3, [4, 5]]\nitems.extend([6, 7]) # [1, 2, 3, [4, 5], 6, 7]\n```"
+    },
+    {
+      "id": "python-06",
+      "prompt": {
+        "ru": "Как создать список квадратов чисел от 0 до 4?",
+        "kg": "0дөн 4кө чейинки сандардын квадраттарынын тизмесин кантип түзүү керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "[x ** 2 for x in range(5)]",
+            "kg": "[x ** 2 for x in range(5)]"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "[x ** 2 in range(5)]",
+            "kg": "[x ** 2 in range(5)]"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "list(x ** 2 for x in range(5))",
+            "kg": "list(x ** 2 for x in range(5))"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "map(x ** 2, range(5))",
+            "kg": "map(x ** 2, range(5))"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "List comprehension: выражение, затем `for`, затем условие. `range(5)` даёт 0–4. `map` вернёт итератор, а не список, и требует `lambda`.",
+        "kg": "List comprehension: туюнтма, анан `for`, анан шарт. `range(5)` 0–4 берет. `map` тизме эмес, итератор кайтарат жана `lambda` талап кылат."
+      },
+      "code": "[x ** 2 for x in range(5)]",
+      "example": "```python\nsquares = [x ** 2 for x in range(5)]        # [0, 1, 4, 9, 16]\nevens = [x for x in range(10) if x % 2 == 0] # [0, 2, 4, 6, 8]\n```"
+    },
+    {
+      "id": "python-07",
+      "prompt": {
+        "ru": "Что делает `dict.get(key, default)`?",
+        "kg": "`dict.get(key, default)` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Возвращает значение или default, если ключа нет",
+            "kg": "Маанини же ачкыч жок болсо default'ту кайтарат"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Удаляет ключ",
+            "kg": "Ачкычты өчүрөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Добавляет ключ",
+            "kg": "Ачкыч кошот"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Сортирует словарь",
+            "kg": "Сөздүктү иреттейт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`get` не создаёт ключ и не падает. Если нужно создать запись при отсутствии, используй `setdefault` или `defaultdict`.",
+        "kg": "`get` ачкыч түзбөйт жана ката бербейт. Жок болсо жазуу түзүү керек болсо, `setdefault` же `defaultdict` колдон."
+      },
+      "code": "data.get(key, default)",
+      "example": "```python\ncounts = {}\ncounts[\"a\"] = counts.get(\"a\", 0) + 1\nprint(counts)  # {'a': 1}\n```"
+    },
+    {
+      "id": "python-08",
+      "prompt": {
+        "ru": "Что делает `enumerate(items)`?",
+        "kg": "`enumerate(items)` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Возвращает пары (индекс, элемент)",
+            "kg": "Жуптарды (индекс, элемент) кайтарат"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Сортирует элементы",
+            "kg": "Элементтерди иреттейт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Считает элементы",
+            "kg": "Элементтерди эсептейт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Удаляет дубликаты",
+            "kg": "Дубликаттарды өчүрөт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Удобно, когда нужен и индекс, и значение. `enumerate(items, start=1)` начнёт нумерацию с 1.",
+        "kg": "Индекс жана маани тең керек болгондо ыңгайлуу. `enumerate(items, start=1)` номерлөөнү 1ден баштайт."
+      },
+      "code": "for index, item in enumerate(items): ...",
+      "example": "```python\nfor i, name in enumerate([\"a\", \"b\"], start=1):\n    print(i, name)\n# 1 a\n# 2 b\n```"
+    },
+    {
+      "id": "python-09",
+      "prompt": {
+        "ru": "Что такое `*args` и `**kwargs`?",
+        "kg": "`*args` жана `**kwargs` деген эмне?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "*args — позиционные аргументы кортежем, **kwargs — именованные словарём",
+            "kg": "*args — позициялык аргументтер кортеж менен, **kwargs — аталышкан аргументтер сөздүк менен"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "*args — список, **kwargs — кортеж",
+            "kg": "*args — тизме, **kwargs — кортеж"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Это обязательные аргументы",
+            "kg": "Бул милдеттүү аргументтер"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Это аннотации типов",
+            "kg": "Бул тип аннотациялары"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`*args` собирает лишние позиционные аргументы в tuple, `**kwargs` — именованные в dict. Имена не обязательны, важна звёздочка.",
+        "kg": "`*args` ашыкча позициялык аргументтерди tuple'га, `**kwargs` аталышкандарды dict'ке чогултат. Аттар милдеттүү эмес, жылдызча маанилүү."
+      },
+      "code": "def func(*args, **kwargs): ...",
+      "example": "```python\ndef func(*args, **kwargs):\n    print(args)    # (1, 2)\n    print(kwargs)  # {'x': 3}\n\nfunc(1, 2, x=3)\n```"
+    },
+    {
+      "id": "python-10",
+      "prompt": {
+        "ru": "Что вернёт функция без `return`?",
+        "kg": "`return` жок функция эмнени кайтарат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "None",
+            "kg": "None"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "0",
+            "kg": "0"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Пустую строку",
+            "kg": "Бош сап"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Ошибку",
+            "kg": "Ката"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Любая функция без явного `return` возвращает `None`. `return` без значения — тоже `None`.",
+        "kg": "Ачык `return` жок ар кандай функция `None` кайтарат. Маанисиз `return` да — `None`."
+      },
+      "code": "def f(): pass",
+      "example": "```python\ndef f():\n    pass\n\nprint(f())          # None\nprint(f() is None)  # True\n```"
+    },
+    {
+      "id": "python-11",
+      "prompt": {
+        "ru": "Что произойдёт при изменении списка по умолчанию в аргументе?",
+        "kg": "Аргументтеги демейки тизме өзгөртүлсө эмне болот?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Изменения сохранятся между вызовами — это общий объект",
+            "kg": "Өзгөртүүлөр чакыруулар арасында сакталат — бул жалпы объект"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Каждый вызов получит новый список",
+            "kg": "Ар бир чакыруу жаңы тизме алат"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Python выбросит ошибку",
+            "kg": "Python ката чыгарат"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Список станет кортежем",
+            "kg": "Тизме кортеж болуп калат"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Значение по умолчанию вычисляется один раз при определении функции. Для изменяемых объектов используй `None` и создавай объект внутри.",
+        "kg": "Демейки маани функция аныкталганда бир жолу эсептелет. Өзгөрмө объекттер үчүн `None` колдонуп, объектти ичинде түз."
+      },
+      "code": "def add(item, items=None): ...",
+      "example": "```python\n# Плохо\ndef add_bad(item, items=[]):\n    items.append(item)\n    return items\n\n# Хорошо\ndef add_good(item, items=None):\n    if items is None:\n        items = []\n    items.append(item)\n    return items\n```"
+    },
+    {
+      "id": "python-12",
+      "prompt": {
+        "ru": "Что делает `try/except/finally`?",
+        "kg": "`try/except/finally` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Ловит исключение и гарантированно выполняет finally",
+            "kg": "Исключениени кармап, finally'ни сөзсүз аткарат"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Игнорирует все ошибки",
+            "kg": "Бардык каталарды этибарга албайт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Запускает код дважды",
+            "kg": "Кодду эки жолу иштетет"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Создаёт поток",
+            "kg": "Агым түзөт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`finally` выполняется всегда: и при ошибке, и без неё. Это место для закрытия файла или соединения.",
+        "kg": "`finally` дайыма аткарылат: ката болгондо да, болбогондо да. Бул файлды же байланышты жабуу үчүн орун."
+      },
+      "code": "try: ...\nexcept ValueError as exc: ...\nfinally: ...",
+      "example": "```python\ntry:\n    value = int(\"abc\")\nexcept ValueError as exc:\n    print(\"Ошибка:\", exc)\nfinally:\n    print(\"Это выполнится всегда\")\n```"
+    },
+    {
+      "id": "python-13",
+      "prompt": {
+        "ru": "Как правильно открыть файл для чтения с гарантией закрытия?",
+        "kg": "Файлды окуу үчүн жабылышына кепилдик менен туура кантип ачуу керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "with open(\"data.txt\", encoding=\"utf-8\") as f:",
+            "kg": "with open(\"data.txt\", encoding=\"utf-8\") as f:"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "f = open(\"data.txt\")",
+            "kg": "f = open(\"data.txt\")"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "open(\"data.txt\").read()",
+            "kg": "open(\"data.txt\").read()"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "file(\"data.txt\")",
+            "kg": "file(\"data.txt\")"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`with` закрывает файл даже при исключении. Явно указывай `encoding`, иначе на Windows кодировка может отличаться.",
+        "kg": "`with` файлды ката болгондо да жабат. `encoding`'ди ачык көрсөт, антпесе Windows'то коддоо башка болушу мүмкүн."
+      },
+      "code": "with open(\"data.txt\", encoding=\"utf-8\") as f: ...",
+      "example": "```python\nwith open(\"data.txt\", encoding=\"utf-8\") as f:\n    text = f.read()\n\nwith open(\"out.txt\", \"w\", encoding=\"utf-8\") as f:\n    f.write(\"привет\")\n```"
+    },
+    {
+      "id": "python-14",
+      "prompt": {
+        "ru": "Что делает `pathlib.Path(\"data\") / \"file.csv\"`?",
+        "kg": "`pathlib.Path(\"data\") / \"file.csv\"` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Создаёт путь data/file.csv",
+            "kg": "data/file.csv жолун түзөт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Делит строку",
+            "kg": "Сапты бөлөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Читает файл",
+            "kg": "Файлды окуйт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Создаёт файл на диске",
+            "kg": "Дискте файл түзөт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Оператор `/` у `Path` склеивает пути кроссплатформенно. Сам файл не создаётся — только объект пути.",
+        "kg": "`Path` үчүн `/` оператору жолдорду платформалар аралык бириктирет. Файл өзү түзүлбөйт — жол объектиси гана."
+      },
+      "code": "Path(\"data\") / \"file.csv\"",
+      "example": "```python\nfrom pathlib import Path\n\npath = Path(\"data\") / \"file.csv\"\nprint(path)          # data\\file.csv на Windows\nprint(path.exists())\npath.parent.mkdir(parents=True, exist_ok=True)\n```"
+    },
+    {
+      "id": "python-15",
+      "prompt": {
+        "ru": "Что делает `json.dumps(data)`?",
+        "kg": "`json.dumps(data)` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Превращает объект Python в JSON-строку",
+            "kg": "Python объектин JSON сабына айландырат"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Читает JSON-файл",
+            "kg": "JSON файлын окуйт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Создаёт словарь",
+            "kg": "Сөздүк түзөт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Отправляет запрос",
+            "kg": "Суроо жөнөтөт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`dumps` — dump to string. `json.dump` пишет в файл, `json.loads` парсит строку, `json.load` читает файл.",
+        "kg": "`dumps` — dump to string. `json.dump` файлга жазат, `json.loads` сапты парсит, `json.load` файлды окуйт."
+      },
+      "code": "json.dumps(data)",
+      "example": "```python\nimport json\n\ntext = json.dumps({\"name\": \"Айбек\"}, ensure_ascii=False)\nprint(text)  # {\"name\": \"Айбек\"}\n\nparsed = json.loads(text)\nprint(parsed[\"name\"])\n```"
+    },
+    {
+      "id": "python-16",
+      "prompt": {
+        "ru": "Что делает `@dataclass`?",
+        "kg": "`@dataclass` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Автоматически создаёт __init__, __repr__ и сравнение",
+            "kg": "Автоматтык түрдө __init__, __repr__ жана салыштыруу түзөт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Создаёт базу данных",
+            "kg": "Маалымат базасын түзөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Запускает сервер",
+            "kg": "Серверди иштетет"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Компилирует код в C",
+            "kg": "Кодду C'ге компиляциялайт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Декоратор из `dataclasses` генерирует служебные методы по аннотациям полей. Это удобно для моделей данных без boilerplate.",
+        "kg": "`dataclasses` декортору талаа аннотациялары боюнча кызматтык методдорду жаратат. Бул boilerplate'сиз маалымат моделдери үчүн ыңгайлуу."
+      },
+      "code": "@dataclass\nclass User: ...",
+      "example": "```python\nfrom dataclasses import dataclass\n\n@dataclass\nclass User:\n    name: str\n    age: int = 0\n\nuser = User(\"Айбек\", 20)\nprint(user)  # User(name='Айбек', age=20)\n```"
+    },
+    {
+      "id": "python-17",
+      "prompt": {
+        "ru": "Что делает `@property`?",
+        "kg": "`@property` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Позволяет обращаться к методу как к атрибуту",
+            "kg": "Методго атрибут катары кайрылууга мүмкүндүк берет"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Делает атрибут приватным",
+            "kg": "Атрибутту приваттык кылат"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Создаёт статический метод",
+            "kg": "Статикалык метод түзөт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Удаляет атрибут",
+            "kg": "Атрибутту өчүрөт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`@property` создаёт getter, `@x.setter` — setter. Так можно валидировать значение при присваивании.",
+        "kg": "`@property` getter түзөт, `@x.setter` — setter. Ошентип дайындоодо маанини валидациялоого болот."
+      },
+      "code": "@property\ndef full_name(self): ...",
+      "example": "```python\nclass User:\n    def __init__(self, name):\n        self._name = name\n\n    @property\n    def name(self):\n        return self._name\n\n    @name.setter\n    def name(self, value):\n        if not value:\n            raise ValueError(\"пустое имя\")\n        self._name = value\n```"
+    },
+    {
+      "id": "python-18",
+      "prompt": {
+        "ru": "Чем `is` отличается от `==`?",
+        "kg": "`is` `==` тен эмнеси менен айырмаланат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "is сравнивает идентичность объектов, == — значения",
+            "kg": "is объектилердин идентификациясын, == маанилерди салыштырат"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "is сравнивает строки, == числа",
+            "kg": "is саптарды, == сандарды салыштырат"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Это одно и то же",
+            "kg": "Бул бирдей нерсе"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "== работает только с числами",
+            "kg": "== сандар менен гана иштейт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`is` проверяет, что это один и тот же объект в памяти. Для `None` правильно `x is None`, для значений — `==`.",
+        "kg": "`is` эстутумдагы бир эле объект экенин текшерет. `None` үчүн туура `x is None`, маанилер үчүн — `==`."
+      },
+      "code": "x is None\nx == 0",
+      "example": "```python\na = [1, 2]\nb = [1, 2]\nprint(a == b)  # True\nprint(a is b)  # False\nprint(a is None)  # False\n```"
+    },
+    {
+      "id": "python-19",
+      "prompt": {
+        "ru": "Что делает `sorted(items, key=lambda x: x[\"age\"], reverse=True)`?",
+        "kg": "`sorted(items, key=lambda x: x[\"age\"], reverse=True)` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Сортирует по age по убыванию",
+            "kg": "age боюнча кемүү тартипте иреттейт"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Фильтрует по age",
+            "kg": "age боюнча фильтрлейт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Считает средний age",
+            "kg": "Орточо age эсептейт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Удаляет age",
+            "kg": "age'ды өчүрөт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`sorted` возвращает новый список, `key` задаёт ключ сортировки, `reverse=True` меняет направление. Исходный список не меняется.",
+        "kg": "`sorted` жаңы тизме кайтарат, `key` иреттөө ачкычын берет, `reverse=True` багытын өзгөртөт. Баштапкы тизме өзгөрбөйт."
+      },
+      "code": "sorted(items, key=lambda x: x[\"age\"], reverse=True)",
+      "example": "```python\nitems = [{\"name\": \"A\", \"age\": 30}, {\"name\": \"B\", \"age\": 20}]\nprint(sorted(items, key=lambda x: x[\"age\"]))\n# [{'name': 'B', 'age': 20}, {'name': 'A', 'age': 30}]\n```"
+    },
+    {
+      "id": "python-20",
+      "prompt": {
+        "ru": "В чём разница между `list.sort()` и `sorted(list)`?",
+        "kg": "`list.sort()` жана `sorted(list)` ортосунда кандай айырма бар?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "sort меняет список на месте и возвращает None, sorted возвращает новый список",
+            "kg": "sort тизмени ордунда өзгөртүп None кайтарат, sorted жаңы тизме кайтарат"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "sort возвращает новый список",
+            "kg": "sort жаңы тизме кайтарат"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "sorted меняет исходный список",
+            "kg": "sorted баштапкы тизмени өзгөртөт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Разницы нет",
+            "kg": "Айырма жок"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "`list.sort()` — метод списка, мутирует и возвращает `None`. `sorted()` — встроенная функция, работает с любым итерируемым.",
+        "kg": "`list.sort()` — тизменин методу, мутациялайт жана `None` кайтарат. `sorted()` — курулган функция, каалаган итерируемый менен иштейт."
+      },
+      "code": "items.sort()\nordered = sorted(items)",
+      "example": "```python\nitems = [3, 1, 2]\nresult = items.sort()\nprint(items)   # [1, 2, 3]\nprint(result)  # None\n\nordered = sorted([3, 1, 2])\nprint(ordered) # [1, 2, 3]\n```"
+    },
+    {
+      "id": "python-21",
+      "prompt": {
+        "ru": "Что делает `yield` в функции?",
+        "kg": "Функциядагы `yield` эмне кылат?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "Превращает функцию в генератор, выдающий значения по одному",
+            "kg": "Функцияны бирден маани берүүчү генераторго айландырат"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "Возвращает значение и завершает функцию",
+            "kg": "Маани кайтарып, функцияны бүтүрөт"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "Создаёт поток",
+            "kg": "Агым түзөт"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "Удаляет переменную",
+            "kg": "Өзгөрмөнү өчүрөт"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "Генератор ленивый: код выполняется при `next()`. Память не заполняется всем списком сразу — удобно для больших файлов.",
+        "kg": "Генератор ленивдүү: код `next()` учурунда аткарылат. Эстутум бүт тизме менен толтурулбайт — чоң файлдар үчүн ыңгайлуу."
+      },
+      "code": "def gen():\n    yield 1",
+      "example": "```python\ndef read_lines(path):\n    with open(path, encoding=\"utf-8\") as f:\n        for line in f:\n            yield line.strip()\n\nfor line in read_lines(\"data.txt\"):\n    print(line)\n```"
+    },
+    {
+      "id": "python-22",
+      "prompt": {
+        "ru": "Как правильно объявить тип `list[int]` в аннотации?",
+        "kg": "Аннотацияда `list[int]` тибин кантип туура жарыялоо керек?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": {
+            "ru": "def total(numbers: list[int]) -> int:",
+            "kg": "def total(numbers: list[int]) -> int:"
+          }
+        },
+        {
+          "id": "b",
+          "text": {
+            "ru": "def total(numbers: [int]) -> int:",
+            "kg": "def total(numbers: [int]) -> int:"
+          }
+        },
+        {
+          "id": "c",
+          "text": {
+            "ru": "def total(numbers: list) -> int:",
+            "kg": "def total(numbers: list) -> int:"
+          }
+        },
+        {
+          "id": "d",
+          "text": {
+            "ru": "def total(numbers: int[]) -> int:",
+            "kg": "def total(numbers: int[]) -> int:"
+          }
+        }
+      ],
+      "correct": "a",
+      "explanation": {
+        "ru": "С Python 3.9 встроенные generic-типы работают напрямую: `list[int]`, `dict[str, int]`. Аннотации не проверяются в рантайме, но помогают IDE и mypy.",
+        "kg": "Python 3.9'дон баштап курулган generic типтер түз иштейт: `list[int]`, `dict[str, int]`. Аннотациялар рантаймда текшерилбейт, бирок IDE жана mypy'ге жардам берет."
+      },
+      "code": "def total(numbers: list[int]) -> int: ...",
+      "example": "```python\ndef total(numbers: list[int]) -> int:\n    return sum(numbers)\n\nprint(total([1, 2, 3]))  # 6\n```"
+    }
+  ]
+}
