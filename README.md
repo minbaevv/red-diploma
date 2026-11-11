@@ -5,8 +5,8 @@ Bilingual (RU/KG) exam cockpit for the Motion Web backend + AI final exam. It co
 ## What is inside
 
 - **13 modules**: Python core, functions, SQL, Linux/Git, backend/API, ML/data, computer vision, LLM/RAG/Streamlit, FastAPI/Pydantic, databases/ORM, automation/LLM, DevOps/security, exam tactics.
-- **140 tasks**: 42 code tasks checked by tests and 98 theory tasks with model answers, follow-up questions, walkthroughs, pitfalls, and exam tips. Every code task starts with a **practice walkthrough**: worked examples, the core idea, a step-by-step plan, a common mistake, and an exam tip before the editor. The capstone path covers `def` functions, ML training, model compression, FastAPI serving, Streamlit UI, MediaPipe gestures, and GitHub artifacts.
-- **Guided start**: `/start` shows a 20-step `ml-capstone` route from Python to a deployed ML service. Every completed lesson or task shows a **Continue** button that opens the next step with `?path=ml-capstone&step=N`.
+- **152 tasks**: 54 code tasks checked by tests and 98 theory tasks with model answers, follow-up questions, walkthroughs, pitfalls, and exam tips. Every code task starts with a **practice walkthrough**: worked examples, the core idea, a step-by-step plan, a common mistake, and an exam tip before the editor. The capstone path covers `def` functions, ML training, model compression, FastAPI serving, Streamlit UI, MediaPipe gestures, and GitHub artifacts; the project path rebuilds the Flowers CNN, both FastAPI services, Streamlit, and OpenCV in small code chunks.
+- **Guided start**: `/start` switches between a 20-step `ml-capstone` route from Python to a deployed ML service and a 12-step `exam-project` route that rebuilds the exam project in small code chunks. Every completed lesson or task shows a **Continue** button that opens the next step with `?path=<slug>&step=N`.
 - **3 exams**: stage 1 (20 points), stage 2 (30 points), stage 3 (50 points). A total of 80+ is the red-diploma target.
 - **Bilingual UI and content** with RU/KG switching.
 - **Local progress** in SQLite: completed lessons/tasks, attempts, best exam scores, notes, settings.
@@ -57,7 +57,9 @@ Open `/start` (or **Старт** in the sidebar) to follow the `ml-capstone` rou
 4. Streamlit uploader that calls the API.
 5. GitHub artifacts, README, and a final runbook.
 
-The route is stored in `backend/content/paths.json` and returned by `/api/bootstrap`. The current step is highlighted, and lesson/task pages show a **Continue** card after completion. The URL keeps the route context in `?path=ml-capstone&step=N`, so the next button works without going back to the task list.
+The second route, `exam-project`, is pure practice: unzip → transforms/loaders → honest split → `FlowerCNN` → training → evaluation/save → FastAPI Flowers → FastAPI MNIST → Streamlit → OpenCV preprocess → webcam. Its tasks are marked `practice_only`, so the tutorial block is hidden while hints and examples stay available.
+
+The route is stored in `backend/content/paths.json` and returned by `/api/bootstrap`. The current step is highlighted, and lesson/task pages show a **Continue** card after completion. The URL keeps the route context in `?path=<slug>&step=N`, so the next button works without going back to the task list.
 
 ## Capstone path: model → API → UI
 

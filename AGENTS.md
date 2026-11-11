@@ -4,7 +4,7 @@
 
 Bilingual (RU/KG) exam-prep app for the Motion Web backend + AI final exam.
 FastAPI backend serves content and checks code; React/Vite frontend renders
-lessons, practice, exams, and the guided `ml-capstone` route.
+lessons, practice, exams, and the guided `ml-capstone` and `exam-project` routes.
 
 ## Commands
 
@@ -31,21 +31,33 @@ The API runs at `http://127.0.0.1:8000`; Vite proxies `/api` on `:5173`.
 - `backend/content/*.json` — all lessons, tasks, exams, and routes.
 - `backend/content/drills-*.json` — drill question banks (8 categories, 206 questions).
 - `backend/tests/test_api.py` — API/content invariants.
+- `backend/tests/conftest.py` — throw-away SQLite DB for tests; never touches the real progress DB.
 - `frontend/src/pages/TaskPage.jsx` — theory/code practice UI and tutorial.
 - `frontend/src/pages/LessonPage.jsx` — lesson reader.
 - `frontend/src/pages/Drills.jsx` / `DrillPage.jsx` — drill catalog and study/exam modes.
-- `frontend/src/pages/PathPage.jsx` / `StartPage.jsx` — guided route.
+- `frontend/src/pages/StartPage.jsx` — guided route switcher and route page.
+- `frontend/src/components/PathNext.jsx` — next-step card on task pages.
 - `frontend/src/theme.css` — dark multi-accent design system.
 
 ## Content rules
 
 - Keep both RU and KG fields in sync. Never add a Russian-only string.
-- Code tasks live in `backend/content/tasks-code*.json`; every code task needs
-  `walkthrough`, `pitfalls`, and `exam_tip`. A test enforces this.
+- Code tasks live in `backend/content/tasks-code*.json`; currently 54 code
+  tasks (152 tasks total). Every code task needs `walkthrough`, `pitfalls`,
+  and `exam_tip`. A test enforces this.
+- Algorithm practice must not call built-in `min`/`max`/`sorted`/`sum` where
+  the task says to write the algorithm manually. Declare `forbidden_patterns`
+  (regex, e.g. `\\bmin\\s*\\(`); the runner rejects matches before execution.
 - The public task payload exposes only the first two tests as `examples`.
   Keep full `tests` and `solution` hidden from the client.
-- Guided route `ml-capstone` has 20 steps in `paths.json`; step links use
-  `?path=ml-capstone&step=N`.
+- Guided routes in `paths.json`: `ml-capstone` (5 sections, 20 steps) and
+  `exam-project` (6 sections, 12 practice-only project steps). Step links use
+  `?path=<slug>&step=N`.
+- Project tasks are marked `practice_only: true`: the frontend hides the
+  tutorial block but still shows hints and examples.
+- `check_mode: "static"` uses regex/substring checks for tasks whose packages
+  are not installed (torch, streamlit); FastAPI, OpenCV, and pure-Python tasks
+  use executable tests.
 - Drills live in `drills-*.json`; every question needs RU/KG prompt, four
   options a-d, `correct`, `explanation`, and `example`. The public payload
   strips `correct`, `explanation`, and `example`.
@@ -56,7 +68,7 @@ The API runs at `http://127.0.0.1:8000`; Vite proxies `/api` on `:5173`.
 
 ## Verification
 
-- Backend: `py -3.13 -m pytest -q` (currently 17 tests).
+- Backend: `py -3.13 -m pytest -q` (currently 21 tests).
 - Frontend: `npm run build` must pass.
 - UI: check desktop and mobile for horizontal overflow and console errors.
 - Do not claim a content/API change works from reading code alone; hit the API
@@ -66,6 +78,8 @@ The API runs at `http://127.0.0.1:8000`; Vite proxies `/api` on `:5173`.
 
 - The code runner executes local Python and is not a sandbox. Never expose the
   app publicly without an isolated runner.
+- Tests must stay isolated: `backend/tests/conftest.py` points `RED_DIPLOMA_DB`
+  at a temporary SQLite file, so `pytest` never touches the real progress DB.
 - `RUN_TIMEOUT_SECONDS` defaults to 5 seconds.
 - On Windows, the console may mangle Cyrillic. Use `py -3 -X utf8` for scripts
   or write/read UTF-8 files directly.
