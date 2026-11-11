@@ -276,7 +276,7 @@ export default function TaskPage() {
 
       {done && pathInfo && <PathNext pathInfo={pathInfo} />}
 
-      <TaskTutorial task={task} />
+      {!task.practice_only && <TaskTutorial task={task} />}
 
       <div className="task-layout">
         <div className="task-main">

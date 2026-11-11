@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 import sys
 import tempfile
@@ -13,7 +14,13 @@ RESULT_MARKER = "__RED_DIPLOMA_RESULT__"
 MAX_CODE_BYTES = 40_000
 
 
-def run_code(code: str, tests: list[dict[str, Any]]) -> dict[str, Any]:
+def run_code(
+    code: str,
+    tests: list[dict[str, Any]],
+    *,
+    static: bool = False,
+    forbidden_patterns: list[str] | None = None,
+) -> dict[str, Any]:
     if len(code.encode("utf-8")) > MAX_CODE_BYTES:
         return {
             "passed": False,
@@ -22,6 +29,26 @@ def run_code(code: str, tests: list[dict[str, Any]]) -> dict[str, Any]:
             "stderr": "Код слишком длинный. Максимум 40 КБ.",
             "error": "code_too_long",
         }
+
+    hits = _forbidden_hits(code, forbidden_patterns or [])
+    if hits:
+        return {
+            "passed": False,
+            "results": [
+                {
+                    "ok": False,
+                    "input": "запрещённая конструкция",
+                    "expected": "без " + ", ".join(forbidden_patterns or []),
+                    "actual": ", ".join(hits),
+                }
+            ],
+            "stdout": "",
+            "stderr": "В этом задании нельзя использовать: " + ", ".join(hits),
+            "error": "forbidden",
+        }
+
+    if static:
+        return _run_static(code, tests)
 
     harness = _build_harness(code, tests)
     with tempfile.TemporaryDirectory(prefix="red-diploma-") as directory:
@@ -75,6 +102,61 @@ def run_code(code: str, tests: list[dict[str, Any]]) -> dict[str, Any]:
         "results": results,
         "stdout": _truncate(visible_stdout),
         "stderr": _truncate(stderr),
+        "error": None,
+    }
+
+
+def _forbidden_hits(code: str, patterns: list[str]) -> list[str]:
+    hits: list[str] = []
+    for pattern in patterns:
+        match = re.search(pattern, code, re.MULTILINE)
+        if match:
+            hits.append(match.group(0).strip())
+    return hits
+
+
+def _run_static(code: str, tests: list[dict[str, Any]]) -> dict[str, Any]:
+    def has(pattern: str) -> bool:
+        return re.search(pattern, code, re.MULTILINE) is not None
+
+    def count(pattern: str) -> int:
+        return len(re.findall(pattern, code, re.MULTILINE))
+
+    environment = {
+        "_source": code,
+        "re": re,
+        "has": has,
+        "count": count,
+    }
+    results: list[dict[str, Any]] = []
+    for case in tests:
+        expression = case.get("expr", "")
+        label = case.get("label") or expression
+        try:
+            value = eval(expression, environment)  # noqa: S307 - trusted content
+            results.append(
+                {
+                    "ok": value == case.get("expected"),
+                    "input": label,
+                    "expected": case.get("expected"),
+                    "actual": value,
+                }
+            )
+        except Exception as exc:  # noqa: BLE001 - report to the learner
+            results.append(
+                {
+                    "ok": False,
+                    "input": label,
+                    "expected": case.get("expected"),
+                    "error": f"{type(exc).__name__}: {exc}",
+                }
+            )
+
+    return {
+        "passed": all(item.get("ok") for item in results),
+        "results": results,
+        "stdout": "",
+        "stderr": "",
         "error": None,
     }
 

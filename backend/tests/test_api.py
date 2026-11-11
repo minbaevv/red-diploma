@@ -33,9 +33,16 @@ def client():
         yield test_client
 
 
+def test_tests_use_isolated_database():
+    from app.config import settings
+
+    assert "red-diploma-test-" in str(settings.db_path)
+    assert settings.db_path.name == "red_diploma.db"
+
+
 def test_curriculum_totals():
     assert len(content.modules()) == 13
-    assert len(content.tasks()) == 140
+    assert len(content.tasks()) == 152
     assert len(content.module_by_slug("data-ml")["task_slugs"]) == 22
     assert [(exam["stage"], exam["points"]) for exam in content.exams()] == [
         (1, 20),
@@ -46,10 +53,45 @@ def test_curriculum_totals():
 
 def test_every_code_solution_passes():
     code_tasks = [task for task in content.tasks() if task["type"] == "code"]
-    assert len(code_tasks) == 42
     for task in code_tasks:
-        result = run_code(task["solution"], task["tests"])
+        result = run_code(
+            task["solution"],
+            task["tests"],
+            static=task.get("check_mode") == "static",
+            forbidden_patterns=task.get("forbidden_patterns", []),
+        )
         assert result["passed"], task["slug"]
+
+
+def test_static_checker_does_not_execute_user_code():
+    checks = [
+        {
+            "label": "transforms.Compose",
+            "expr": "has('transforms\\\\.Compose')",
+            "expected": True,
+        }
+    ]
+    result = run_code(
+        "import torchvision\npipeline = transforms.Compose([])",
+        checks,
+        static=True,
+    )
+    assert result["passed"] is True
+    assert result["results"][0]["input"] == "transforms.Compose"
+
+    missing = run_code("value = 1", checks, static=True)
+    assert missing["passed"] is False
+
+
+def test_forbidden_patterns_block_instead_of_silently_passing():
+    result = run_code(
+        "def minmax(values):\n    return min(values), max(values)\n",
+        [],
+        forbidden_patterns=[r"\bmin\s*\(", r"\bmax\s*\("],
+    )
+    assert result["passed"] is False
+    assert result["error"] == "forbidden"
+    assert "min(" in result["stderr"]
 
 
 def test_every_code_task_has_guided_explanation():
@@ -70,7 +112,7 @@ def test_bootstrap_hides_tests_and_solutions(client: TestClient):
         assert "tests" not in task
         assert "solution" not in task
     code_tasks = [task for task in payload["tasks"] if task["type"] == "code"]
-    assert len(code_tasks) == 42
+    assert len(code_tasks) == 54
     for task in code_tasks:
         assert 1 <= len(task.get("examples", [])) <= 2, task["slug"]
 
@@ -97,6 +139,19 @@ def test_bootstrap_includes_valid_guided_path(client: TestClient):
     for step in steps:
         target = known_lessons if step["type"] == "lesson" else known_tasks
         assert step["slug"] in target
+
+
+def test_project_path_is_practice_only(client: TestClient):
+    payload = client.get("/api/bootstrap").json()
+    path = next(item for item in payload["paths"] if item["slug"] == "exam-project")
+    steps = [step for section in path["sections"] for step in section["steps"]]
+    assert len(steps) == 12
+    assert all(step["type"] == "task" for step in steps)
+
+    known_tasks = {task["slug"]: task for task in payload["tasks"]}
+    for step in steps:
+        assert step["slug"] in known_tasks
+        assert known_tasks[step["slug"]]["practice_only"] is True
 
 
 def test_task_run_marks_progress(client: TestClient):

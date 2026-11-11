@@ -31,6 +31,7 @@ def load_content() -> dict[str, Any]:
         *_read("tasks-code-extra-api-ui.json"),
         *_read("tasks-code-extra-ml-cv.json"),
         *_read("tasks-code-extra-ml-data.json"),
+        *_read("tasks-code-project.json"),
     ]
     extra_theory = [
         *_read("tasks-theory-extra-python.json"),

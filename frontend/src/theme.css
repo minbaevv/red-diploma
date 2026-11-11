@@ -2009,6 +2009,50 @@ kbd {
   flex: 0 0 auto;
 }
 
+.path-switcher {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+  margin: 18px 0 22px;
+}
+
+.path-switch {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  color: var(--ink-soft);
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  text-decoration: none;
+  transition: border-color 0.18s ease, background 0.18s ease;
+}
+
+.path-switch:hover {
+  background: rgba(255, 255, 255, 0.045);
+  border-color: rgba(34, 211, 238, 0.32);
+}
+
+.path-switch.active {
+  background: rgba(34, 211, 238, 0.08);
+  border-color: rgba(34, 211, 238, 0.55);
+}
+
+.path-switch span {
+  color: #fff;
+  font-family: var(--display);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.15;
+}
+
+.path-switch small {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
 .path-hero {
   position: relative;
   display: grid;

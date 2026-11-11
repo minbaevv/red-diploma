@@ -61,6 +61,22 @@ export default function StartPage() {
         }
       />
 
+      {paths.length > 1 && (
+        <nav className="path-switcher" aria-label={bi('Выбор маршрута', 'Маршрут тандоо')}>
+          {paths.map((item) => (
+            <Link
+              key={item.slug}
+              to={`/start?path=${item.slug}`}
+              className={`path-switch ${item.slug === path.slug ? 'active' : ''}`}
+              aria-current={item.slug === path.slug ? 'page' : undefined}
+            >
+              <span>{pick(item.title, lang)}</span>
+              <small>{pick(item.subtitle, lang)}</small>
+            </Link>
+          ))}
+        </nav>
+      )}
+
       <section className="path-hero">
         <div className="path-hero-copy">
           <div className="hero-kicker">

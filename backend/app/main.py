@@ -90,7 +90,13 @@ def _task_public(task: dict[str, Any]) -> dict[str, Any]:
         if key not in {"tests", "solution"}
     }
     if task.get("tests"):
-        public["examples"] = task["tests"][:2]
+        public["examples"] = [
+            {
+                "input": item.get("label") or item.get("input", ""),
+                "expected": item.get("expected"),
+            }
+            for item in task["tests"][:2]
+        ]
     return public
 
 
@@ -289,7 +295,12 @@ def task_run(slug: str, payload: RunRequest) -> dict[str, Any]:
     if task.get("type") != "code":
         raise HTTPException(status_code=400, detail="This task is not a code task")
 
-    result = run_code(payload.code, task.get("tests", []))
+    result = run_code(
+        payload.code,
+        task.get("tests", []),
+        static=task.get("check_mode") == "static",
+        forbidden_patterns=task.get("forbidden_patterns", []),
+    )
     score = float(task.get("points", 0)) if result["passed"] else 0
     record_attempt(
         kind="task",
@@ -418,7 +429,12 @@ def exam_submit(slug: str, payload: ExamSubmitRequest) -> dict[str, Any]:
                 )
                 continue
             code = str(answer or question.get("starter_code", ""))
-            run = run_code(code, task.get("tests", []))
+            run = run_code(
+                code,
+                task.get("tests", []),
+                static=task.get("check_mode") == "static",
+                forbidden_patterns=task.get("forbidden_patterns", []),
+            )
             earned = points if run["passed"] else 0
             total += earned
             results.append(

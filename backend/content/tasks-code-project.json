@@ -1,0 +1,1453 @@
+[
+  {
+    "slug": "proj-unzip-flowers",
+    "type": "code",
+    "module": "data-ml",
+    "practice_only": true,
+    "check_mode": "static",
+    "title": {
+      "ru": "Проект 1. Распаковка Flowers.zip",
+      "kg": "Долбоор 1. Flowers.zip ачуу"
+    },
+    "prompt": {
+      "ru": "Первый шаг проекта. Напиши код, который открывает `/content/Flowers.zip` через `zipfile.ZipFile` в режиме `'r'` и распаковывает всё в текущую папку (`extractall('.')`). Используй `with`, чтобы архив закрылся сам.",
+      "kg": "Долбоордун биринчи кадамы. `/content/Flowers.zip` архивин `zipfile.ZipFile` аркылуу `'r'` режиминде ачып, баарын учурдагы папкага (`extractall('.')`) чыгарган код жаз. Архив өзү жабылышы үчүн `with` колдон."
+    },
+    "difficulty": 1,
+    "points": 4,
+    "starter_code": "import zipfile\n\n# распакуй /content/Flowers.zip в текущую папку\n",
+    "tests": [
+      {
+        "label": "import zipfile",
+        "expr": "has('import zipfile')",
+        "expected": true
+      },
+      {
+        "label": "zipfile.ZipFile",
+        "expr": "has('zipfile.ZipFile')",
+        "expected": true
+      },
+      {
+        "label": "/content/Flowers.zip",
+        "expr": "has('/content/Flowers.zip')",
+        "expected": true
+      },
+      {
+        "label": "with ... as zf",
+        "expr": "has('with zipfile.ZipFile')",
+        "expected": true
+      },
+      {
+        "label": "extractall",
+        "expr": "has('extractall')",
+        "expected": true
+      }
+    ],
+    "hints": [
+      {
+        "ru": "Импортируй `zipfile`.",
+        "kg": "`zipfile` импортто."
+      },
+      {
+        "ru": "`with zipfile.ZipFile(path, 'r') as zf:` — дальше работай через `zf`.",
+        "kg": "`with zipfile.ZipFile(path, 'r') as zf:` — андан кийин `zf` аркылуу иште."
+      },
+      {
+        "ru": "`zf.extractall('.')` — точка означает текущую директорию.",
+        "kg": "`zf.extractall('.')` — чекит учурдагы директорияны билдирет."
+      }
+    ],
+    "explanation": {
+      "ru": "`ZipFile` — контекстный менеджер: на выходе из `with` файл закрывается. `extractall` создаёт папки из архива.",
+      "kg": "`ZipFile` — контексттик менеджер: `with` блогунан чыкканда файл жабылат. `extractall` архивден папкаларды түзөт."
+    },
+    "walkthrough": [
+      {
+        "ru": "1. Импортируем `zipfile`.",
+        "kg": "1. `zipfile` импорттойбуз."
+      },
+      {
+        "ru": "2. Открываем архив через `with`.",
+        "kg": "2. Архивди `with` аркылуу ачабыз."
+      },
+      {
+        "ru": "3. Вызываем `extractall('.')`.",
+        "kg": "3. `extractall('.')` чакырабыз."
+      }
+    ],
+    "pitfalls": {
+      "ru": "Не открывай архив без `with` — файл останется открытым. И не передавай в `extractall` путь к самому архиву: нужна папка назначения.",
+      "kg": "Архивди `with` жок ачпа — файл ачык бойдон калат. `extractall` ге архивдин өзүнүн жолун бербе: багытталган папка керек."
+    },
+    "exam_tip": {
+      "ru": "На защите объясни, зачем `with`: он гарантирует закрытие файла даже при ошибке.",
+      "kg": "Коргоодо `with` эмне үчүн керек экенин түшүндүр: ката болгондо да файлдын жабылышын кепилдейт."
+    },
+    "solution": "import zipfile\n\nwith zipfile.ZipFile('/content/Flowers.zip', 'r') as zf:\n    zf.extractall('.')\n"
+  },
+  {
+    "slug": "proj-flowers-transforms",
+    "type": "code",
+    "module": "data-ml",
+    "practice_only": true,
+    "check_mode": "static",
+    "title": {
+      "ru": "Проект 2. Transforms для Flowers",
+      "kg": "Долбоор 2. Flowers үчүн transforms"
+    },
+    "prompt": {
+      "ru": "Собери `transform` для Flowers: `Resize((128, 128))`, `ToTensor()`, `Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])`. Порядок важен: сначала размер, потом тензор, потом нормализация.",
+      "kg": "Flowers үчүн `transform` кура: `Resize((128, 128))`, `ToTensor()`, `Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])`. Ирет маанилүү: адегенде өлчөм, анан тензор, анан нормалдаштыруу."
+    },
+    "difficulty": 2,
+    "points": 6,
+    "starter_code": "from torchvision import transforms\n\ntransform = transforms.Compose([\n    # Resize, ToTensor, Normalize\n])\n",
+    "tests": [
+      {
+        "label": "transforms.Compose",
+        "expr": "has('transforms.Compose')",
+        "expected": true
+      },
+      {
+        "label": "transforms.Resize",
+        "expr": "has('transforms.Resize')",
+        "expected": true
+      },
+      {
+        "label": "transforms.ToTensor",
+        "expr": "has('transforms.ToTensor')",
+        "expected": true
+      },
+      {
+        "label": "transforms.Normalize",
+        "expr": "has('transforms.Normalize')",
+        "expected": true
+      },
+      {
+        "label": "128, 128",
+        "expr": "has('128, 128')",
+        "expected": true
+      },
+      {
+        "label": "порядок Resize → ToTensor → Normalize",
+        "expr": "0 < _source.index('transforms.Resize') < _source.index('transforms.ToTensor') < _source.index('transforms.Normalize')",
+        "expected": true
+      },
+      {
+        "label": "[0.5, 0.5, 0.5]",
+        "expr": "has('[0.5, 0.5, 0.5]')",
+        "expected": true
+      }
+    ],
+    "hints": [
+      {
+        "ru": "`transforms.Compose([...])` принимает список шагов.",
+        "kg": "`transforms.Compose([...])` кадамдардын тизмесин кабыл алат."
+      },
+      {
+        "ru": "Сначала `Resize`, затем `ToTensor`, в конце `Normalize`.",
+        "kg": "Алгач `Resize`, анан `ToTensor`, акырында `Normalize`."
+      },
+      {
+        "ru": "`Normalize(mean, std)` принимает два списка по три числа.",
+        "kg": "`Normalize(mean, std)` үч сандан турган эки тизмени кабыл алат."
+      }
+    ],
+    "explanation": {
+      "ru": "`ToTensor` переводит PIL (HWC, 0..255) в CHW float 0..1; `Normalize` вычитает mean и делит на std. Поэтому `Normalize` идёт после `ToTensor`.",
+      "kg": "`ToTensor` PILди (HWC, 0..255) CHW float 0..1ге өткөрөт; `Normalize` meanды кемитип, stdга бөлөт. Ошондуктан `Normalize` `ToTensor`дан кийин турат."
+    },
+    "walkthrough": [
+      {
+        "ru": "1. Импортируем `transforms`.",
+        "kg": "1. `transforms` импорттойбуз."
+      },
+      {
+        "ru": "2. Создаём `Compose` со списком шагов.",
+        "kg": "2. Кадамдар тизмеси менен `Compose` түзөбүз."
+      },
+      {
+        "ru": "3. Ставим `Resize`, `ToTensor`, `Normalize` по порядку.",
+        "kg": "3. `Resize`, `ToTensor`, `Normalize` ирети менен коёбуз."
+      }
+    ],
+    "pitfalls": {
+      "ru": "`Normalize` до `ToTensor` не сработает: он ждёт тензор. И не перепутай порядок аргументов: сначала mean, потом std.",
+      "kg": "`Normalize` `ToTensor`дан мурун иштебейт: ал тензор күтөт. Аргументтердин иретин да алмаштырба: адегенде mean, анан std."
+    },
+    "exam_tip": {
+      "ru": "Если спросят, почему 0.5: это перевод диапазона [0, 1] в [-1, 1].",
+      "kg": "Эмне үчүн 0.5 деп сурашса: бул [0, 1] диапазонун [-1, 1]ге которуу."
+    },
+    "solution": "from torchvision import transforms\n\ntransform = transforms.Compose([\n    transforms.Resize((128, 128)),\n    transforms.ToTensor(),\n    transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])\n])\n"
+  },
+  {
+    "slug": "proj-flowers-loaders",
+    "type": "code",
+    "module": "data-ml",
+    "practice_only": true,
+    "check_mode": "static",
+    "title": {
+      "ru": "Проект 3. ImageFolder и DataLoader",
+      "kg": "Долбоор 3. ImageFolder жана DataLoader"
+    },
+    "prompt": {
+      "ru": "Создай `train_data` и `test_data` через `datasets.ImageFolder` с одним и тем же `transform`. Затем `train_loader` с `batch_size=32, shuffle=True` и `test_loader` с `batch_size=32` без shuffle. Выведи `train_data.classes`.",
+      "kg": "`train_data` жана `test_data` ны бирдей `transform` менен `datasets.ImageFolder` аркылуу түз. Андан кийин `train_loader` ды `batch_size=32, shuffle=True` менен, `test_loader` ды `batch_size=32` менен shuffle жок түз. `train_data.classes` чыгар."
+    },
+    "difficulty": 2,
+    "points": 8,
+    "starter_code": "from torchvision import datasets, transforms\nfrom torch.utils.data import DataLoader\n\ntransform = transforms.Compose([\n    transforms.Resize((128, 128)),\n    transforms.ToTensor(),\n    transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])\n])\n\n# train_data, test_data\n# train_loader, test_loader\n",
+    "tests": [
+      {
+        "label": "datasets.ImageFolder",
+        "expr": "has('datasets.ImageFolder')",
+        "expected": true
+      },
+      {
+        "label": "/content/Flowers/train",
+        "expr": "has('/content/Flowers/train')",
+        "expected": true
+      },
+      {
+        "label": "/content/Flowers/test",
+        "expr": "has('/content/Flowers/test')",
+        "expected": true
+      },
+      {
+        "label": "DataLoader",
+        "expr": "has('DataLoader')",
+        "expected": true
+      },
+      {
+        "label": "batch_size=32",
+        "expr": "has(r'batch_size\\s*=\\s*32')",
+        "expected": true
+      },
+      {
+        "label": "один shuffle=True",
+        "expr": "count(r'shuffle\\s*=\\s*True') == 1",
+        "expected": true
+      },
+      {
+        "label": "train_data.classes",
+        "expr": "has('train_data.classes')",
+        "expected": true
+      }
+    ],
+    "hints": [
+      {
+        "ru": "`datasets.ImageFolder(root, transform=transform)` — по одному на train и test.",
+        "kg": "`datasets.ImageFolder(root, transform=transform)` — train жана test үчүн бирден."
+      },
+      {
+        "ru": "`DataLoader(dataset, batch_size=32, shuffle=True)` для train.",
+        "kg": "Train үчүн `DataLoader(dataset, batch_size=32, shuffle=True)`."
+      },
+      {
+        "ru": "Для test оставь `shuffle=False` (или не передавай его).",
+        "kg": "Test үчүн `shuffle=False` калтыр (же такыр бербе)."
+      }
+    ],
+    "explanation": {
+      "ru": "`ImageFolder` читает классы из имён подпапок. `DataLoader` собирает батчи; shuffle нужен только для train.",
+      "kg": "`ImageFolder` класстарды ички папкалардын атынан окуйт. `DataLoader` батчтарды чогултат; shuffle train үчүн гана керек."
+    },
+    "walkthrough": [
+      {
+        "ru": "1. Создаём два `ImageFolder` с одним transform.",
+        "kg": "1. Бир transform менен эки `ImageFolder` түзөбүз."
+      },
+      {
+        "ru": "2. Оборачиваем train в `DataLoader` с shuffle.",
+        "kg": "2. Trainди shuffle менен `DataLoader`га ороп коёбуз."
+      },
+      {
+        "ru": "3. Оборачиваем test в `DataLoader` без shuffle.",
+        "kg": "3. Testти shuffle жок `DataLoader`га ороп коёбуз."
+      },
+      {
+        "ru": "4. Печатаем `classes`.",
+        "kg": "4. `classes` басып чыгарабыз."
+      }
+    ],
+    "pitfalls": {
+      "ru": "Не перемешивай test: иначе метрика не воспроизводится. И не забудь `transform=transform`, иначе картинки будут разного размера.",
+      "kg": "Testти аралаштырба: болбосо метрика кайталанбайт. `transform=transform` ды унутпа, болбосо сүрөттөр ар кандай өлчөмдө болот."
+    },
+    "exam_tip": {
+      "ru": "`train_data.classes` — список классов в алфавитном порядке; его использует модель и API.",
+      "kg": "`train_data.classes` — класстардын алфавиттик тизмеси; аны модель жана API колдонот."
+    },
+    "solution": "from torchvision import datasets, transforms\nfrom torch.utils.data import DataLoader\n\ntransform = transforms.Compose([\n    transforms.Resize((128, 128)),\n    transforms.ToTensor(),\n    transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])\n])\n\ntrain_data = datasets.ImageFolder('/content/Flowers/train', transform=transform)\ntest_data = datasets.ImageFolder('/content/Flowers/test', transform=transform)\n\ntrain_loader = DataLoader(train_data, batch_size=32, shuffle=True)\ntest_loader = DataLoader(test_data, batch_size=32)\n\nprint(train_data.classes)\n"
+  },
+  {
+    "slug": "proj-split-unsplit",
+    "type": "code",
+    "module": "data-ml",
+    "practice_only": true,
+    "title": {
+      "ru": "Проект 4. Честный split одной папки",
+      "kg": "Долбоор 4. Бир папканын таза split'и"
+    },
+    "prompt": {
+      "ru": "Датасет пришёл одной папкой без `train`/`test`. Напиши `split_indices(count, val_ratio=0.2, seed=42)`: создай список индексов `0..count-1`, перемешай его через `random.Random(seed).shuffle(...)` и верни два списка — `train_indices`, `val_indices`. Валидация — первые `int(count * val_ratio)` индексов. Функция должна быть воспроизводимой и не терять индексы.",
+      "kg": "Датасет `train`/`test` болуп бөлүнбөй, бир папка менен келди. `split_indices(count, val_ratio=0.2, seed=42)` жаз: `0..count-1` индекстерин тизме кыл, `random.Random(seed).shuffle(...)` менен аралаштыр жана эки тизме кайтар — `train_indices`, `val_indices`. Валидация — алгачкы `int(count * val_ratio)` индекс. Функция кайталануучу болушу керек жана индекстерди жоготпошу керек."
+    },
+    "difficulty": 3,
+    "points": 10,
+    "starter_code": "import random\n\n\ndef split_indices(count, val_ratio=0.2, seed=42):\n    # верни train_indices, val_indices\n    pass\n",
+    "tests": [
+      {
+        "input": "len(split_indices(100)[0])",
+        "expected": 80
+      },
+      {
+        "input": "len(split_indices(100)[1])",
+        "expected": 20
+      },
+      {
+        "input": "sorted(split_indices(100)[0] + split_indices(100)[1]) == list(range(100))",
+        "expected": true
+      },
+      {
+        "input": "len(set(split_indices(100)[0]) & set(split_indices(100)[1]))",
+        "expected": 0
+      },
+      {
+        "input": "split_indices(50, seed=7) == split_indices(50, seed=7)",
+        "expected": true
+      },
+      {
+        "input": "split_indices(0)",
+        "expected": [
+          [],
+          []
+        ]
+      },
+      {
+        "input": "len(split_indices(10, 0.3)[1])",
+        "expected": 3
+      }
+    ],
+    "hints": [
+      {
+        "ru": "`list(range(count))` даёт все индексы.",
+        "kg": "`list(range(count))` бардык индекстерди берет."
+      },
+      {
+        "ru": "Создай `rng = random.Random(seed)` и вызови `rng.shuffle(indices)` — глобальный `random.shuffle` зависит от общего состояния.",
+        "kg": "`rng = random.Random(seed)` түзүп, `rng.shuffle(indices)` чакыр — глобалдык `random.shuffle` жалпы абалга көз каранды."
+      },
+      {
+        "ru": "`val_size = int(count * val_ratio)`; верни `indices[val_size:]` и `indices[:val_size]`.",
+        "kg": "`val_size = int(count * val_ratio)`; `indices[val_size:]` жана `indices[:val_size]` кайтар."
+      },
+      {
+        "ru": "В реальном проекте оберни два вида датасета в `Subset(train_view, train_indices)` и `Subset(val_view, val_indices)`, чтобы аугментация была только в train.",
+        "kg": "Чыныгы долбоордо эки датасет көрүнүшүн `Subset(train_view, train_indices)` жана `Subset(val_view, val_indices)`га ороп кой, аугментация trainде гана болушу үчүн."
+      }
+    ],
+    "explanation": {
+      "ru": "Сначала делим индексы, потом применяем transforms при чтении. Если сделать один датасет с аугментацией и `random_split`, валидация получит те же случайные преобразования — утечка.",
+      "kg": "Адегенде индекстерди бөлөбүз, анан окуу учурунда transforms колдонобуз. Эгер аугментациялуу бир датасетти алып `random_split` кылсак, валидация ошол эле кокустук өзгөртүүлөрдү алат — утечка."
+    },
+    "walkthrough": [
+      {
+        "ru": "1. Создаём индексы `0..count-1`.",
+        "kg": "1. `0..count-1` индекстерин түзөбүз."
+      },
+      {
+        "ru": "2. Перемешиваем их локальным `Random(seed)`.",
+        "kg": "2. Аларды локалдык `Random(seed)` менен аралаштырабыз."
+      },
+      {
+        "ru": "3. Считаем `val_size`.",
+        "kg": "3. `val_size` эсептейбиз."
+      },
+      {
+        "ru": "4. Делим на два среза и возвращаем.",
+        "kg": "4. Эки срезге бөлүп кайтарабыз."
+      }
+    ],
+    "pitfalls": {
+      "ru": "Глобальный `random.shuffle` меняет состояние всего модуля — результат зависит от предыдущих вызовов. `random.Random(seed)` изолирует генератор. И не применяй аугментацию к общему датасету до split.",
+      "kg": "Глобалдык `random.shuffle` бүт модулдун абалын өзгөртөт — натыйжа мурунку чакырууларга көз каранды. `random.Random(seed)` генераторду бөлөт. Аугментацияны splitке чейин жалпы датасетке колдонбо."
+    },
+    "exam_tip": {
+      "ru": "На защите скажи: split по индексам + два transform-views = честная валидация без утечки аугментации.",
+      "kg": "Коргоодо айт: индекстер боюнча split + эки transform-view = аугментация утечкасыз таза валидация."
+    },
+    "solution": "import random\n\n\ndef split_indices(count, val_ratio=0.2, seed=42):\n    indices = list(range(count))\n    random.Random(seed).shuffle(indices)\n    val_size = int(count * val_ratio)\n    return indices[val_size:], indices[:val_size]\n"
+  },
+  {
+    "slug": "proj-flower-cnn",
+    "type": "code",
+    "module": "data-ml",
+    "practice_only": true,
+    "check_mode": "static",
+    "title": {
+      "ru": "Проект 5. FlowerCNN",
+      "kg": "Долбоор 5. FlowerCNN"
+    },
+    "prompt": {
+      "ru": "Напиши `FlowerCNN(nn.Module)`: три блока `Conv2d → ReLU → MaxPool2d(2)` с каналами `3→32→64→128`, `padding=1`, затем `Flatten`, `Linear(128 * 16 * 16, 256)`, `ReLU`, `Dropout(0.5)` и последний `Linear(256, len(train_data.classes))`. В `forward` сначала `self.conv`, потом `self.fc`.",
+      "kg": "`FlowerCNN(nn.Module)` жаз: `3→32→64→128` каналдары менен үч `Conv2d → ReLU → MaxPool2d(2)` блогу, `padding=1`, анан `Flatten`, `Linear(128 * 16 * 16, 256)`, `ReLU`, `Dropout(0.5)` жана акыркы `Linear(256, len(train_data.classes))`. `forward`до адегенде `self.conv`, анан `self.fc`."
+    },
+    "difficulty": 3,
+    "points": 10,
+    "starter_code": "import torch.nn as nn\n\n\nclass FlowerCNN(nn.Module):\n    def __init__(self):\n        super().__init__()\n        # conv + fc\n\n    def forward(self, x):\n        # conv -> fc\n        return x\n",
+    "tests": [
+      {
+        "label": "class FlowerCNN",
+        "expr": "has('class FlowerCNN')",
+        "expected": true
+      },
+      {
+        "label": "nn.Module",
+        "expr": "has('nn.Module')",
+        "expected": true
+      },
+      {
+        "label": "3 × Conv2d",
+        "expr": "count('nn.Conv2d') == 3",
+        "expected": true
+      },
+      {
+        "label": "padding=1",
+        "expr": "count(r'padding\\s*=\\s*1') == 3",
+        "expected": true
+      },
+      {
+        "label": "3 × MaxPool2d",
+        "expr": "count('nn.MaxPool2d') == 3",
+        "expected": true
+      },
+      {
+        "label": "nn.Flatten",
+        "expr": "has('nn.Flatten')",
+        "expected": true
+      },
+      {
+        "label": "Linear(128 * 16 * 16, 256)",
+        "expr": "has(r'Linear\\(128\\s*\\*\\s*16\\s*\\*\\s*16\\s*,\\s*256\\)')",
+        "expected": true
+      },
+      {
+        "label": "Dropout(0.5)",
+        "expr": "has(r'Dropout\\(0\\.5\\)')",
+        "expected": true
+      },
+      {
+        "label": "Linear(256, len(train_data.classes))",
+        "expr": "has(r'Linear\\(256\\s*,\\s*len\\(train_data\\.classes\\)\\)')",
+        "expected": true
+      },
+      {
+        "label": "self.conv в forward",
+        "expr": "has('x = self.conv')",
+        "expected": true
+      },
+      {
+        "label": "self.fc в forward",
+        "expr": "has('x = self.fc')",
+        "expected": true
+      }
+    ],
+    "hints": [
+      {
+        "ru": "После трёх `MaxPool2d(2)` от 128 остаётся 16.",
+        "kg": "Үч `MaxPool2d(2)` дан кийин 128ден 16 калат."
+      },
+      {
+        "ru": "Первый `Conv2d` принимает 3 канала RGB.",
+        "kg": "Биринчи `Conv2d` 3 RGB каналын кабыл алат."
+      },
+      {
+        "ru": "Последний слой должен вернуть число классов, а не 5.",
+        "kg": "Акыркы катмар 5 эмес, класстардын санын кайтарышы керек."
+      }
+    ],
+    "explanation": {
+      "ru": "CNN уменьшает пространство и увеличивает каналы; классификатор получает вектор `128*16*16`.",
+      "kg": "CNN мейкиндикти кичирейтип, каналдарды көбөйтөт; классификатор `128*16*16` векторун алат."
+    },
+    "walkthrough": [
+      {
+        "ru": "1. Три conv-блока с pooling.",
+        "kg": "1. Pooling менен үч conv-блок."
+      },
+      {
+        "ru": "2. `Flatten` превращает карту в вектор.",
+        "kg": "2. `Flatten` картаны векторго айландырат."
+      },
+      {
+        "ru": "3. Два Linear + Dropout.",
+        "kg": "3. Эки Linear + Dropout."
+      },
+      {
+        "ru": "4. `forward`: conv, затем fc.",
+        "kg": "4. `forward`: conv, анан fc."
+      }
+    ],
+    "pitfalls": {
+      "ru": "Забыть `super().__init__()`; hardcode 5 классов; перепутать `128*16*16` с `128*32*32`.",
+      "kg": "`super().__init__()` унутпоо; 5 классты hardcode кылуу; `128*16*16` ды `128*32*32` менен алмаштыруу."
+    },
+    "exam_tip": {
+      "ru": "На защите посчитай 128 → 64 → 32 → 16 после трёх pooling.",
+      "kg": "Коргоодо үч poolingден кийин 128 → 64 → 32 → 16 деп эсепте."
+    },
+    "solution": "import torch.nn as nn\n\n\nclass FlowerCNN(nn.Module):\n    def __init__(self):\n        super().__init__()\n\n        self.conv = nn.Sequential(\n            nn.Conv2d(3, 32, 3, padding=1),\n            nn.ReLU(),\n            nn.MaxPool2d(2),\n\n            nn.Conv2d(32, 64, 3, padding=1),\n            nn.ReLU(),\n            nn.MaxPool2d(2),\n\n            nn.Conv2d(64, 128, 3, padding=1),\n            nn.ReLU(),\n            nn.MaxPool2d(2)\n        )\n\n        self.fc = nn.Sequential(\n            nn.Flatten(),\n            nn.Linear(128 * 16 * 16, 256),\n            nn.ReLU(),\n            nn.Dropout(0.5),\n            nn.Linear(256, len(train_data.classes))\n        )\n\n    def forward(self, x):\n        x = self.conv(x)\n        x = self.fc(x)\n        return x\n"
+  },
+  {
+    "slug": "proj-train-loop",
+    "type": "code",
+    "module": "data-ml",
+    "practice_only": true,
+    "check_mode": "static",
+    "title": {
+      "ru": "Проект 6. Цикл обучения",
+      "kg": "Долбоор 6. Окутуу цикли"
+    },
+    "prompt": {
+      "ru": "Собери цикл обучения: `device`, `CrossEntropyLoss`, `Adam` с `lr=0.0001`, `StepLR(step_size=5, gamma=0.5)`, `epochs=25`. В каждой эпохе `model.train()`, обнуляй градиенты, делай forward/loss/backward/step, копи `loss.item()` и вызывай `scheduler.step()`.",
+      "kg": "Окутуу циклиңди кура: `device`, `CrossEntropyLoss`, `Adam` `lr=0.0001` менен, `StepLR(step_size=5, gamma=0.5)`, `epochs=25`. Ар бир эпохада `model.train()`, градиенттерди нөлдө, forward/loss/backward/step жаса, `loss.item()` топтоп, `scheduler.step()` чакыр."
+    },
+    "difficulty": 3,
+    "points": 10,
+    "starter_code": "import torch\nimport torch.nn as nn\nimport torch.optim as optim\n\n# device, model, criterion, optimizer, scheduler, epochs\n\nfor epoch in range(epochs):\n    model.train()\n    total_loss = 0\n    # цикл по train_loader\n",
+    "tests": [
+      {
+        "label": "CrossEntropyLoss",
+        "expr": "has('CrossEntropyLoss')",
+        "expected": true
+      },
+      {
+        "label": "optim.Adam",
+        "expr": "has('optim.Adam')",
+        "expected": true
+      },
+      {
+        "label": "lr=0.0001",
+        "expr": "has(r'lr\\s*=\\s*0\\.0001')",
+        "expected": true
+      },
+      {
+        "label": "StepLR",
+        "expr": "has('StepLR')",
+        "expected": true
+      },
+      {
+        "label": "step_size=5",
+        "expr": "has(r'step_size\\s*=\\s*5')",
+        "expected": true
+      },
+      {
+        "label": "gamma=0.5",
+        "expr": "has(r'gamma\\s*=\\s*0\\.5')",
+        "expected": true
+      },
+      {
+        "label": "epochs = 25",
+        "expr": "has(r'epochs\\s*=\\s*25')",
+        "expected": true
+      },
+      {
+        "label": "model.train()",
+        "expr": "has('model.train()')",
+        "expected": true
+      },
+      {
+        "label": "optimizer.zero_grad()",
+        "expr": "has('optimizer.zero_grad()')",
+        "expected": true
+      },
+      {
+        "label": "loss.backward()",
+        "expr": "has('loss.backward()')",
+        "expected": true
+      },
+      {
+        "label": "optimizer.step()",
+        "expr": "has('optimizer.step()')",
+        "expected": true
+      },
+      {
+        "label": "scheduler.step()",
+        "expr": "has('scheduler.step()')",
+        "expected": true
+      },
+      {
+        "label": "цикл по train_loader",
+        "expr": "has(r'for\\s+images\\s*,\\s*labels\\s+in\\s+train_loader')",
+        "expected": true
+      },
+      {
+        "label": "model.to(device)",
+        "expr": "has('model.to')",
+        "expected": true
+      }
+    ],
+    "hints": [
+      {
+        "ru": "Сначала `device`, `model.to(device)`, `criterion`, `optimizer`, `scheduler`.",
+        "kg": "Алгач `device`, `model.to(device)`, `criterion`, `optimizer`, `scheduler`."
+      },
+      {
+        "ru": "Внутри эпохи: `model.train()`, `total_loss = 0`, цикл по батчам.",
+        "kg": "Эпоханын ичинде: `model.train()`, `total_loss = 0`, батчтар боюнча цикл."
+      },
+      {
+        "ru": "Порядок батча: `zero_grad` → `outputs` → `loss` → `backward` → `step`.",
+        "kg": "Батчтын ирети: `zero_grad` → `outputs` → `loss` → `backward` → `step`."
+      },
+      {
+        "ru": "Добавь `total_loss += loss.item()` и `scheduler.step()`.",
+        "kg": "`total_loss += loss.item()` жана `scheduler.step()` кош."
+      }
+    ],
+    "explanation": {
+      "ru": "Порядок обязателен: обнулить градиенты → forward → loss → backward → step. Иначе градиенты накопятся или обновление будет неверным.",
+      "kg": "Ирет милдеттүү: градиенттерди нөлдөө → forward → loss → backward → step. Болбосо градиенттер топтолот же жаңыртуу туура эмес болот."
+    },
+    "walkthrough": [
+      {
+        "ru": "1. Выбираем устройство и переносим модель.",
+        "kg": "1. Түзмени тандап, моделди которобуз."
+      },
+      {
+        "ru": "2. Создаём loss, optimizer и scheduler.",
+        "kg": "2. Loss, optimizer жана scheduler түзөбүз."
+      },
+      {
+        "ru": "3. Проходим эпохи и батчи.",
+        "kg": "3. Эпохалар жана батчтар боюнча өтөбүз."
+      },
+      {
+        "ru": "4. Копим loss и печатаем эпоху.",
+        "kg": "4. Loss топтоп, эпоханы басып чыгарабыз."
+      }
+    ],
+    "pitfalls": {
+      "ru": "Если не обнулить градиенты, они накопятся. Если забыть `model.train()`, Dropout и BatchNorm останутся в режиме eval. В этом примере `scheduler.step()` стоит внутри батча — LR падает слишком часто; обычно его вызывают раз в эпоху, будь готов это объяснить.",
+      "kg": "Градиенттерди нөлдөбөсөң, алар топтолот. `model.train()` унутсаң, Dropout жана BatchNorm eval режиминде калат. Бул мисалда `scheduler.step()` батчтын ичинде турат — LR өтө тез төмөндөйт; адатта аны эпохада бир жолу чакырышат, муну түшүндүрүүгө даяр бол."
+    },
+    "exam_tip": {
+      "ru": "На защите проговори порядок шагов и зачем `loss.item()`.",
+      "kg": "Коргоодо кадамдардын иретин жана `loss.item()` эмне үчүн керек экенин айт."
+    },
+    "solution": "import torch\nimport torch.nn as nn\nimport torch.optim as optim\n\ndevice = torch.device('cuda' if torch.cuda.is_available() else 'cpu')\nmodel = FlowerCNN()\nmodel = model.to(device)\n\ncriterion = nn.CrossEntropyLoss()\noptimizer = optim.Adam(model.parameters(), lr=0.0001)\nscheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.5)\n\nepochs = 25\n\nfor epoch in range(epochs):\n    model.train()\n    total_loss = 0\n\n    for images, labels in train_loader:\n        images, labels = images.to(device), labels.to(device)\n\n        optimizer.zero_grad()\n        outputs = model(images)\n        loss = criterion(outputs, labels)\n\n        loss.backward()\n        optimizer.step()\n\n        total_loss += loss.item()\n        scheduler.step()\n\n    print(f\"Epoch {epoch+1}, Loss: {total_loss:.4f}\")\n"
+  },
+  {
+    "slug": "proj-eval-save",
+    "type": "code",
+    "module": "data-ml",
+    "practice_only": true,
+    "check_mode": "static",
+    "title": {
+      "ru": "Проект 7. Оценка и сохранение",
+      "kg": "Долбоор 7. Баалоо жана сактоо"
+    },
+    "prompt": {
+      "ru": "Оцени модель на `test_loader`: `model.eval()`, `torch.no_grad()`, `torch.max(outputs, 1)`, считай `correct` и `total`, выведи точность в процентах и сохрани `model.state_dict()` в `model.pth`.",
+      "kg": "Моделди `test_loader`до баала: `model.eval()`, `torch.no_grad()`, `torch.max(outputs, 1)`, `correct` жана `total` эсепте, пайыз менен тактыкты чыгар жана `model.state_dict()` ды `model.pth`га сакта."
+    },
+    "difficulty": 2,
+    "points": 8,
+    "starter_code": "import torch\n\nmodel.eval()\ncorrect = 0\ntotal = 0\n\n# цикл по test_loader\n\naccuracy = 100 * correct / total\nprint(f\"Accuracy: {accuracy:.2f}%\")\n\ntorch.save(model.state_dict(), 'model.pth')\n",
+    "tests": [
+      {
+        "label": "model.eval()",
+        "expr": "has('model.eval()')",
+        "expected": true
+      },
+      {
+        "label": "torch.no_grad()",
+        "expr": "has('torch.no_grad()')",
+        "expected": true
+      },
+      {
+        "label": "test_loader",
+        "expr": "has('test_loader')",
+        "expected": true
+      },
+      {
+        "label": "torch.max(outputs, 1)",
+        "expr": "has(r'torch\\.max\\(outputs')",
+        "expected": true
+      },
+      {
+        "label": "predicted == labels",
+        "expr": "has(r'predicted\\s*==\\s*labels')",
+        "expected": true
+      },
+      {
+        "label": "labels.size(0)",
+        "expr": "has(r'labels\\.size\\(0\\)')",
+        "expected": true
+      },
+      {
+        "label": ".sum().item()",
+        "expr": "has(r'\\.sum\\(\\)\\.item\\(\\)')",
+        "expected": true
+      },
+      {
+        "label": "100 * correct / total",
+        "expr": "has(r'100\\s*\\*\\s*correct\\s*/\\s*total')",
+        "expected": true
+      },
+      {
+        "label": "torch.save",
+        "expr": "has('torch.save')",
+        "expected": true
+      },
+      {
+        "label": "state_dict",
+        "expr": "has('state_dict')",
+        "expected": true
+      },
+      {
+        "label": "model.pth",
+        "expr": "has('model.pth')",
+        "expected": true
+      }
+    ],
+    "hints": [
+      {
+        "ru": "`model.eval()` выключает Dropout и переводит BatchNorm в eval.",
+        "kg": "`model.eval()` Dropoutту өчүрүп, BatchNormду eval режимине өткөрөт."
+      },
+      {
+        "ru": "`torch.no_grad()` экономит память и время.",
+        "kg": "`torch.no_grad()` эстутумду жана убакытты үнөмдөйт."
+      },
+      {
+        "ru": "`total += labels.size(0)`, `correct += (predicted == labels).sum().item()`.",
+        "kg": "`total += labels.size(0)`, `correct += (predicted == labels).sum().item()`."
+      },
+      {
+        "ru": "Сохраняй `state_dict`, а не весь объект модели.",
+        "kg": "Бүт модель объектисин эмес, `state_dict` сакта."
+      }
+    ],
+    "explanation": {
+      "ru": "eval mode + no_grad — обязательная пара для честной метрики и экономии памяти.",
+      "kg": "eval mode + no_grad — таза метрика жана эстутумду үнөмдөө үчүн милдеттүү жуп."
+    },
+    "walkthrough": [
+      {
+        "ru": "1. Переводим модель в eval.",
+        "kg": "1. Моделди eval режимине өткөрөбүз."
+      },
+      {
+        "ru": "2. Отключаем градиенты.",
+        "kg": "2. Градиенттерди өчүрөбүз."
+      },
+      {
+        "ru": "3. Считаем правильные ответы.",
+        "kg": "3. Туура жоопторду эсептейбиз."
+      },
+      {
+        "ru": "4. Считаем accuracy и сохраняем weights.",
+        "kg": "4. Accuracy эсептеп, weights сактайбыз."
+      }
+    ],
+    "pitfalls": {
+      "ru": "Забыть `model.eval()` → Dropout случайно гасит нейроны и метрика скачет. Сохранять `model` целиком хуже, чем `state_dict`: weights не зависят от структуры класса.",
+      "kg": "`model.eval()` унутсаң → Dropout нейрондорду кокустан өчүрүп, метрика секирет. Моделди бүтүндөй сактоо `state_dict` тан жаман: weights класс структурасына көз каранды болбойт."
+    },
+    "exam_tip": {
+      "ru": "На защите объясни разницу `torch.save(model)` и `torch.save(model.state_dict())`.",
+      "kg": "Коргоодо `torch.save(model)` жана `torch.save(model.state_dict())` айырмасын түшүндүр."
+    },
+    "solution": "import torch\n\nmodel.eval()\ncorrect = 0\ntotal = 0\n\nwith torch.no_grad():\n    for images, labels in test_loader:\n        images, labels = images.to(device), labels.to(device)\n\n        outputs = model(images)\n        _, predicted = torch.max(outputs, 1)\n\n        total += labels.size(0)\n        correct += (predicted == labels).sum().item()\n\naccuracy = 100 * correct / total\nprint(f\"Accuracy: {accuracy:.2f}%\")\n\ntorch.save(model.state_dict(), 'model.pth')\n"
+  },
+  {
+    "slug": "proj-fastapi-flowers",
+    "type": "code",
+    "module": "fastapi-pydantic",
+    "practice_only": true,
+    "check_mode": "static",
+    "title": {
+      "ru": "Проект 8. FastAPI для Flowers",
+      "kg": "Долбоор 8. Flowers үчүн FastAPI"
+    },
+    "prompt": {
+      "ru": "Собери FastAPI-сервис для Flowers. Загрузи `FlowerCNN` и `model.pth`, получи классы через `datasets.ImageFolder(...).classes`. Эндпоинт `POST /predict` принимает `UploadFile`, проверяет пустой файл (404), открывает картинку через `PIL`, применяет те же transforms 128×128, делает `unsqueeze(0)`, `torch.no_grad()`, `argmax` и возвращает `{'result': class_name}`. Ошибки обработки — 500.",
+      "kg": "Flowers үчүн FastAPI-сервис кура. `FlowerCNN` жана `model.pth` жүктө, класстарды `datasets.ImageFolder(...).classes` аркылуу ал. `POST /predict` эндпоинти `UploadFile` кабыл алат, бош файлды текшерет (404), сүрөттү `PIL` аркылуу ачат, ошол эле 128×128 transforms колдонот, `unsqueeze(0)`, `torch.no_grad()`, `argmax` жасап, `{'result': class_name}` кайтарат. Иштетүү каталары — 500."
+    },
+    "difficulty": 3,
+    "points": 12,
+    "starter_code": "from fastapi import FastAPI, HTTPException, UploadFile, File\nimport io\n\nimport torch\nfrom PIL import Image\nfrom torchvision import datasets, transforms\n\napp = FastAPI()\n\n# device, class_names, model, inference_tf\n\n@app.post('/predict')\nasync def predict(file: UploadFile = File(...)):\n    # прочитай файл, проверь, обработай, верни result\n    pass\n",
+    "tests": [
+      {
+        "label": "FastAPI",
+        "expr": "has('FastAPI')",
+        "expected": true
+      },
+      {
+        "label": "UploadFile",
+        "expr": "has('UploadFile')",
+        "expected": true
+      },
+      {
+        "label": "await file.read()",
+        "expr": "has('await file.read()')",
+        "expected": true
+      },
+      {
+        "label": "io.BytesIO",
+        "expr": "has('io.BytesIO')",
+        "expected": true
+      },
+      {
+        "label": "Image.open",
+        "expr": "has('Image.open')",
+        "expected": true
+      },
+      {
+        "label": "unsqueeze(0)",
+        "expr": "has('.unsqueeze')",
+        "expected": true
+      },
+      {
+        "label": "torch.no_grad()",
+        "expr": "has('torch.no_grad()')",
+        "expected": true
+      },
+      {
+        "label": "argmax",
+        "expr": "has('argmax')",
+        "expected": true
+      },
+      {
+        "label": "datasets.ImageFolder",
+        "expr": "has('datasets.ImageFolder')",
+        "expected": true
+      },
+      {
+        "label": ".classes",
+        "expr": "has('.classes')",
+        "expected": true
+      },
+      {
+        "label": "load_state_dict",
+        "expr": "has('load_state_dict')",
+        "expected": true
+      },
+      {
+        "label": "map_location",
+        "expr": "has('map_location')",
+        "expected": true
+      },
+      {
+        "label": "model.eval()",
+        "expr": "has('model.eval()')",
+        "expected": true
+      },
+      {
+        "label": "HTTPException",
+        "expr": "has('HTTPException')",
+        "expected": true
+      },
+      {
+        "label": "status 404",
+        "expr": "has(r'status_code\\s*=\\s*404')",
+        "expected": true
+      },
+      {
+        "label": "status 500",
+        "expr": "has(r'status_code\\s*=\\s*500')",
+        "expected": true
+      },
+      {
+        "label": "@app.post",
+        "expr": "has('@app.post')",
+        "expected": true
+      },
+      {
+        "label": "/predict",
+        "expr": "has('/predict')",
+        "expected": true
+      },
+      {
+        "label": "Resize",
+        "expr": "has('Resize')",
+        "expected": true
+      },
+      {
+        "label": "ToTensor",
+        "expr": "has('ToTensor')",
+        "expected": true
+      },
+      {
+        "label": "Normalize",
+        "expr": "has('Normalize')",
+        "expected": true
+      }
+    ],
+    "hints": [
+      {
+        "ru": "Модель и transform создаются один раз при старте, не внутри эндпоинта.",
+        "kg": "Модель жана transform стартта бир жолу түзүлөт, эндпоинттин ичинде эмес."
+      },
+      {
+        "ru": "`image_data = await file.read()`; пустой → `HTTPException(404)`.",
+        "kg": "`image_data = await file.read()`; бош → `HTTPException(404)`."
+      },
+      {
+        "ru": "`Image.open(io.BytesIO(image_data)).convert('RGB')`.",
+        "kg": "`Image.open(io.BytesIO(image_data)).convert('RGB')`."
+      },
+      {
+        "ru": "`inference_tf(img).unsqueeze(0).to(device)`.",
+        "kg": "`inference_tf(img).unsqueeze(0).to(device)`."
+      },
+      {
+        "ru": "Верни `{'result': class_names[pred]}`.",
+        "kg": "`{'result': class_names[pred]}` кайтар."
+      }
+    ],
+    "explanation": {
+      "ru": "Инференс должен повторять train transforms; `unsqueeze(0)` добавляет batch dimension.",
+      "kg": "Инференс train transforms кайталашы керек; `unsqueeze(0)` batch өлчөмүн кошот."
+    },
+    "walkthrough": [
+      {
+        "ru": "1. Загружаем классы и веса один раз.",
+        "kg": "1. Класстарды жана weights бир жолу жүктөйбүз."
+      },
+      {
+        "ru": "2. Читаем файл и проверяем пустоту.",
+        "kg": "2. Файлды окуп, боштугун текшеребиз."
+      },
+      {
+        "ru": "3. Открываем PIL и применяем transforms.",
+        "kg": "3. PIL ачып, transforms колдонобуз."
+      },
+      {
+        "ru": "4. Делаем forward и возвращаем класс.",
+        "kg": "4. Forward жасап, классты кайтарабыз."
+      }
+    ],
+    "pitfalls": {
+      "ru": "Если transforms в API отличаются от train, точность упадёт. Не вызывай `model.eval()` внутри эндпоинта каждый раз — сделай это при загрузке. Проверку пустого файла делай до `try`, иначе `HTTPException(404)` превратится в 500.",
+      "kg": "APIдеги transforms trainден айырмаланса, тактык төмөндөйт. `model.eval()` ды ар бир эндпоинтте чакырба — жүктөөдө жаса. Бош файлды текшерүүнү `try` дан мурун жаса, болбосо `HTTPException(404)` 500гө айланат."
+    },
+    "exam_tip": {
+      "ru": "На защите покажи, что API и обучение используют один и тот же размер и нормализацию.",
+      "kg": "Коргоодо API жана окутуу бирдей өлчөм жана нормалдаштыруу колдонорун көрсөт."
+    },
+    "solution": "from fastapi import FastAPI, HTTPException, UploadFile, File\nimport io\n\nimport torch\nfrom PIL import Image\nfrom torchvision import datasets, transforms\n\nfrom model import FlowerCNN\n\napp = FastAPI()\ndevice = torch.device('cuda' if torch.cuda.is_available() else 'cpu')\n\nclass_names = datasets.ImageFolder('/content/Flowers/train').classes\nmodel = FlowerCNN()\nmodel.load_state_dict(torch.load('model.pth', map_location=device))\nmodel.to(device)\nmodel.eval()\n\ninference_tf = transforms.Compose([\n    transforms.Resize((128, 128)),\n    transforms.ToTensor(),\n    transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])\n])\n\n\n@app.post('/predict')\nasync def predict(file: UploadFile = File(...)):\n    image_data = await file.read()\n    if not image_data:\n        raise HTTPException(status_code=404, detail='Файл не загружен')\n\n    try:\n        img = Image.open(io.BytesIO(image_data)).convert('RGB')\n        tensor = inference_tf(img).unsqueeze(0).to(device)\n\n        with torch.no_grad():\n            outputs = model(tensor)\n            pred = outputs.argmax(dim=1).item()\n\n        return {'result': class_names[pred]}\n    except Exception as exc:\n        raise HTTPException(status_code=500, detail=str(exc))\n"
+  },
+  {
+    "slug": "proj-fastapi-mnist",
+    "type": "code",
+    "module": "fastapi-pydantic",
+    "practice_only": true,
+    "check_mode": "static",
+    "title": {
+      "ru": "Проект 9. FastAPI для MNIST-одежды",
+      "kg": "Долбоор 9. MNIST кийими үчүн FastAPI"
+    },
+    "prompt": {
+      "ru": "Собери второй сервис — MNIST-одежда. Опиши `CheckImage`: два блока `Conv2d → BatchNorm2d → ReLU → MaxPool2d(2)` (1→16→32), затем `Flatten`, `Linear(32 * 7 * 7, 64)`, `ReLU`, `Dropout(0.3)`, `Linear(64, 10)`. Загрузи `model.pth` в `check_image_app`, сделай `POST /predict` с `UploadFile`, grayscale 28×28, `argmax` и словарём из 10 классов. Пустой файл — 404, ошибка — 500. В конце `uvicorn.run`.",
+      "kg": "Экинчи сервисти кура — MNIST кийими. `CheckImage` жаз: эки `Conv2d → BatchNorm2d → ReLU → MaxPool2d(2)` блогу (1→16→32), анан `Flatten`, `Linear(32 * 7 * 7, 64)`, `ReLU`, `Dropout(0.3)`, `Linear(64, 10)`. `model.pth` ды `check_image_app` га жүктө, `UploadFile` менен `POST /predict` жаса, grayscale 28×28, `argmax` жана 10 класстан турган сөздүк. Бош файл — 404, ката — 500. Аягында `uvicorn.run`."
+    },
+    "difficulty": 4,
+    "points": 12,
+    "starter_code": "from fastapi import FastAPI, HTTPException, UploadFile, File\nimport io\n\nimport torch\nimport torch.nn as nn\nfrom PIL import Image\nfrom torchvision import transforms\nimport uvicorn\n\n\nclass CheckImage(nn.Module):\n    def __init__(self):\n        super().__init__()\n        # first + second\n\n    def forward(self, i):\n        i = self.first(i)\n        i = self.second(i)\n        return i\n",
+    "tests": [
+      {
+        "label": "class CheckImage",
+        "expr": "has('class CheckImage')",
+        "expected": true
+      },
+      {
+        "label": "2 × Conv2d",
+        "expr": "count('nn.Conv2d') == 2",
+        "expected": true
+      },
+      {
+        "label": "2 × BatchNorm2d",
+        "expr": "count('nn.BatchNorm2d') == 2",
+        "expected": true
+      },
+      {
+        "label": "Linear(32 * 7 * 7, 64)",
+        "expr": "has(r'Linear\\(32\\s*\\*\\s*7\\s*\\*\\s*7\\s*,\\s*64\\)')",
+        "expected": true
+      },
+      {
+        "label": "Dropout(0.3)",
+        "expr": "has(r'Dropout\\(0\\.3\\)')",
+        "expected": true
+      },
+      {
+        "label": "Grayscale",
+        "expr": "has('Grayscale')",
+        "expected": true
+      },
+      {
+        "label": "Resize((28, 28))",
+        "expr": "has(r'Resize\\(\\(28\\s*,\\s*28\\)\\)')",
+        "expected": true
+      },
+      {
+        "label": "@check_image_app.post",
+        "expr": "has('@check_image_app.post')",
+        "expected": true
+      },
+      {
+        "label": "await file.read()",
+        "expr": "has('await file.read()')",
+        "expected": true
+      },
+      {
+        "label": "HTTPException",
+        "expr": "has('HTTPException')",
+        "expected": true
+      },
+      {
+        "label": "status 404",
+        "expr": "has(r'status_code\\s*=\\s*404')",
+        "expected": true
+      },
+      {
+        "label": "status 500",
+        "expr": "has(r'status_code\\s*=\\s*500')",
+        "expected": true
+      },
+      {
+        "label": "map_location=device",
+        "expr": "has('map_location=device')",
+        "expected": true
+      },
+      {
+        "label": "load_state_dict",
+        "expr": "has('load_state_dict')",
+        "expected": true
+      },
+      {
+        "label": "model.eval()",
+        "expr": "has('model.eval()')",
+        "expected": true
+      },
+      {
+        "label": "T-shirt/top",
+        "expr": "has('T-shirt/top')",
+        "expected": true
+      },
+      {
+        "label": "Ankle boot",
+        "expr": "has('Ankle boot')",
+        "expected": true
+      },
+      {
+        "label": "uvicorn.run",
+        "expr": "has('uvicorn.run')",
+        "expected": true
+      }
+    ],
+    "hints": [
+      {
+        "ru": "MNIST — один канал 28×28; после двух pooling 28→14→7.",
+        "kg": "MNIST — бир канал 28×28; эки poolingден кийин 28→14→7."
+      },
+      {
+        "ru": "`Linear(32 * 7 * 7, 64)` — размер после второго pooling.",
+        "kg": "`Linear(32 * 7 * 7, 64)` — экинчи poolingден кийинки өлчөм."
+      },
+      {
+        "ru": "`inference_tf = transforms.Compose([Grayscale(), Resize((28, 28)), ToTensor()])`.",
+        "kg": "`inference_tf = transforms.Compose([Grayscale(), Resize((28, 28)), ToTensor()])`."
+      },
+      {
+        "ru": "Словарь: 0..9 → названия классов одежды.",
+        "kg": "Сөздүк: 0..9 → кийим класстарынын аттары."
+      }
+    ],
+    "explanation": {
+      "ru": "MNIST — 1 канал 28×28; после двух pooling остаётся 7×7. Словарь переводит индекс в человекочитаемый класс.",
+      "kg": "MNIST — 1 канал 28×28; эки poolingден кийин 7×7 калат. Сөздүк индексти окулуучу класска которот."
+    },
+    "walkthrough": [
+      {
+        "ru": "1. Опиши `CheckImage` с BatchNorm.",
+        "kg": "1. BatchNorm менен `CheckImage` жаз."
+      },
+      {
+        "ru": "2. Загрузи weights и переведи в eval.",
+        "kg": "2. Weights жүктөп, evalга өткөр."
+      },
+      {
+        "ru": "3. Настрой grayscale 28×28.",
+        "kg": "3. Grayscale 28×28 жөндө."
+      },
+      {
+        "ru": "4. Обработай файл и верни класс.",
+        "kg": "4. Файлды иштеп, классты кайтар."
+      }
+    ],
+    "pitfalls": {
+      "ru": "Не перепутай `32 * 7 * 7` с `32 * 14 * 14`. Пустой файл проверяй до `try`, иначе 404 станет 500. `map_location=device` нужен, если веса сохранены на GPU.",
+      "kg": "`32 * 7 * 7` ды `32 * 14 * 14` менен алмаштырба. Бош файлды `try` дан мурун текшер, болбосо 404 500гө айланат. Веса GPUда сакталган болсо, `map_location=device` керек."
+    },
+    "exam_tip": {
+      "ru": "Назови 10 классов и объясни, почему 7×7.",
+      "kg": "10 классты атап, эмне үчүн 7×7 экенин түшүндүр."
+    },
+    "solution": "from fastapi import FastAPI, HTTPException, UploadFile, File\nimport io\n\nimport torch\nimport torch.nn as nn\nfrom PIL import Image\nfrom torchvision import transforms\nimport uvicorn\n\n\nclass CheckImage(nn.Module):\n    def __init__(self):\n        super().__init__()\n\n        self.first = nn.Sequential(\n            nn.Conv2d(1, 16, kernel_size=3, padding=1),\n            nn.BatchNorm2d(16),\n            nn.ReLU(),\n            nn.MaxPool2d(2),\n\n            nn.Conv2d(16, 32, kernel_size=3, padding=1),\n            nn.BatchNorm2d(32),\n            nn.ReLU(),\n            nn.MaxPool2d(2)\n        )\n\n        self.second = nn.Sequential(\n            nn.Flatten(),\n            nn.Linear(32 * 7 * 7, 64),\n            nn.ReLU(),\n            nn.Dropout(0.3),\n            nn.Linear(64, 10)\n        )\n\n    def forward(self, i):\n        i = self.first(i)\n        i = self.second(i)\n        return i\n\n\ninference_tf = transforms.Compose([\n    transforms.Grayscale(),\n    transforms.Resize((28, 28)),\n    transforms.ToTensor(),\n])\n\ncheck_image_app = FastAPI()\ndevice = torch.device('cuda' if torch.cuda.is_available() else 'cpu')\nmodel = CheckImage()\nmodel.load_state_dict(torch.load('model.pth', map_location=device))\nmodel.to(device)\nmodel.eval()\n\nmapping = {\n    0: 'T-shirt/top',\n    1: 'Trouser',\n    2: 'Pullover',\n    3: 'Dress',\n    4: 'Coat',\n    5: 'Sandal',\n    6: 'Shirt',\n    7: 'Sneaker',\n    8: 'Bag',\n    9: 'Ankle boot'\n}\n\n\n@check_image_app.post('/predict')\nasync def check_image(file: UploadFile = File(...)):\n    image_data = await file.read()\n    if not image_data:\n        raise HTTPException(status_code=404, detail='Файл не загружен')\n\n    try:\n        img = Image.open(io.BytesIO(image_data))\n        img_tensor = inference_tf(img).unsqueeze(0).to(device)\n\n        with torch.no_grad():\n            y_pred = model(img_tensor)\n            pred = y_pred.argmax(dim=1).item()\n\n        return {'result': mapping[pred]}\n    except Exception as exc:\n        raise HTTPException(status_code=500, detail=str(exc))\n\n\nif __name__ == '__main__':\n    uvicorn.run(check_image_app, host='127.0.0.1', port=8000)\n"
+  },
+  {
+    "slug": "proj-streamlit-client",
+    "type": "code",
+    "module": "llm-streamlit",
+    "practice_only": true,
+    "check_mode": "static",
+    "title": {
+      "ru": "Проект 10. Streamlit-клиент",
+      "kg": "Долбоор 10. Streamlit-клиент"
+    },
+    "prompt": {
+      "ru": "Собери Streamlit-клиент: заголовок, `file_uploader` для png/jpg/jpeg, показ картинки, кнопка «Pred», отправка `requests.post` с files-словарём `(name, getvalue(), type)`, вывод `result['result']` и обработка `ConnectionError`.",
+      "kg": "Streamlit-клиент кура: аталыш, png/jpg/jpeg үчүн `file_uploader`, сүрөттү көрсөтүү, «Pred» баскычы, files-сөздүгү `(name, getvalue(), type)` менен `requests.post` жөнөтүү, `result['result']` чыгаруу жана `ConnectionError` иштетүү."
+    },
+    "difficulty": 2,
+    "points": 10,
+    "starter_code": "import requests\nimport streamlit as st\nfrom PIL import Image\n\nst.title('Распознавание одежды')\napi_url = 'http://127.0.0.1:8000/predict'\n\nuploaded_file = st.file_uploader(...)\n\nif uploaded_file is not None:\n    # показ и кнопка\n    pass\n",
+    "tests": [
+      {
+        "label": "import streamlit as st",
+        "expr": "has('import streamlit as st')",
+        "expected": true
+      },
+      {
+        "label": "st.title",
+        "expr": "has('st.title')",
+        "expected": true
+      },
+      {
+        "label": "file_uploader",
+        "expr": "has('file_uploader')",
+        "expected": true
+      },
+      {
+        "label": "Image.open",
+        "expr": "has('Image.open')",
+        "expected": true
+      },
+      {
+        "label": "st.image",
+        "expr": "has('st.image')",
+        "expected": true
+      },
+      {
+        "label": "st.button",
+        "expr": "has('st.button')",
+        "expected": true
+      },
+      {
+        "label": "requests.post",
+        "expr": "has('requests.post')",
+        "expected": true
+      },
+      {
+        "label": "files=",
+        "expr": "has('files=')",
+        "expected": true
+      },
+      {
+        "label": "uploaded_file.name",
+        "expr": "has('uploaded_file.name')",
+        "expected": true
+      },
+      {
+        "label": "getvalue()",
+        "expr": "has('getvalue()')",
+        "expected": true
+      },
+      {
+        "label": "uploaded_file.type",
+        "expr": "has('uploaded_file.type')",
+        "expected": true
+      },
+      {
+        "label": "status_code == 200",
+        "expr": "has(r'status_code\\s*==\\s*200')",
+        "expected": true
+      },
+      {
+        "label": "st.success",
+        "expr": "has('st.success')",
+        "expected": true
+      },
+      {
+        "label": "st.error",
+        "expr": "has('st.error')",
+        "expected": true
+      },
+      {
+        "label": "ConnectionError",
+        "expr": "has('ConnectionError')",
+        "expected": true
+      }
+    ],
+    "hints": [
+      {
+        "ru": "`st.file_uploader('...', type=['png', 'jpg', 'jpeg'])`.",
+        "kg": "`st.file_uploader('...', type=['png', 'jpg', 'jpeg'])`."
+      },
+      {
+        "ru": "`Image.open(uploaded_file)` и `st.image(image, width=200)`.",
+        "kg": "`Image.open(uploaded_file)` жана `st.image(image, width=200)`."
+      },
+      {
+        "ru": "Кнопка `st.button('Pred')` запускает отправку.",
+        "kg": "`st.button('Pred')` баскычы жөнөтүүнү баштайт."
+      },
+      {
+        "ru": "`files = {'file': (uploaded_file.name, uploaded_file.getvalue(), uploaded_file.type)}`.",
+        "kg": "`files = {'file': (uploaded_file.name, uploaded_file.getvalue(), uploaded_file.type)}`."
+      }
+    ],
+    "explanation": {
+      "ru": "Streamlit перезапускает скрипт при каждом взаимодействии; файл держится в `uploaded_file`, а `getvalue()` отдаёт байты.",
+      "kg": "Streamlit ар бир аракетте скриптти кайра иштетет; файл `uploaded_file` да кармалат, `getvalue()` байттарды берет."
+    },
+    "walkthrough": [
+      {
+        "ru": "1. Заголовок и `file_uploader`.",
+        "kg": "1. Аталыш жана `file_uploader`."
+      },
+      {
+        "ru": "2. Показ картинки и кнопка.",
+        "kg": "2. Сүрөттү көрсөтүү жана баскыч."
+      },
+      {
+        "ru": "3. `requests.post` с files.",
+        "kg": "3. Files менен `requests.post`."
+      },
+      {
+        "ru": "4. Разбор ответа и ошибок.",
+        "kg": "4. Жоопту жана каталарды иштетүү."
+      }
+    ],
+    "pitfalls": {
+      "ru": "Не передавай `UploadFile` напрямую в `requests.post` — нужен кортеж `(имя, байты, mime)`. Не забывай `st.image` и проверку `status_code`.",
+      "kg": "`UploadFile` ды түздөн-түз `requests.post` ко бербе — `(аты, байттары, mime)` кортежи керек. `st.image` жана `status_code` текшерүүсүн унутпа."
+    },
+    "exam_tip": {
+      "ru": "На защите объясни, зачем `getvalue()` вместо `read()`.",
+      "kg": "Коргоодо `read()` ордуна эмне үчүн `getvalue()` экенин түшүндүр."
+    },
+    "solution": "import requests\nimport streamlit as st\nfrom PIL import Image\n\nst.title('Распознавание одежды')\n\napi_url = 'http://127.0.0.1:8000/predict'\n\nuploaded_file = st.file_uploader('Загрузите изображение', type=['png', 'jpg', 'jpeg'])\n\nif uploaded_file is not None:\n    image = Image.open(uploaded_file)\n    st.image(image, caption='Загруженное изображение', width=200)\n\n    if st.button('Pred'):\n        files = {\n            'file': (uploaded_file.name, uploaded_file.getvalue(), uploaded_file.type)\n        }\n\n        try:\n            response = requests.post(api_url, files=files)\n            if response.status_code == 200:\n                result = response.json()\n                st.success(f\"Предсказание: {result['result']}\")\n            else:\n                st.error(f'Ошибка API: {response.text}')\n        except requests.exceptions.ConnectionError:\n            st.error('Не удалось подключиться к FastAPI серверу')\n        except Exception as exc:\n            st.error(f'Произошла ошибка: {exc}')\n"
+  },
+  {
+    "slug": "proj-opencv-preprocess",
+    "type": "code",
+    "module": "computer-vision",
+    "practice_only": true,
+    "title": {
+      "ru": "Проект 11. OpenCV: кадр в тензор",
+      "kg": "Долбоор 11. OpenCV: кадрды тензорго"
+    },
+    "prompt": {
+      "ru": "Напиши `preprocess_frame(frame)` для кадра из OpenCV: BGR→RGB, resize до 128×128, перевод в `float32` и деление на 255, затем HWC→CHW через `np.transpose(..., (2, 0, 1))`. Верни массив, готовый для `unsqueeze(0)`.",
+      "kg": "OpenCV кадры үчүн `preprocess_frame(frame)` жаз: BGR→RGB, 128×128 resize, `float32` га которуу жана 255кө бөлүү, анан `np.transpose(..., (2, 0, 1))` менен HWC→CHW. `unsqueeze(0)` га даяр массив кайтар."
+    },
+    "difficulty": 3,
+    "points": 10,
+    "starter_code": "import cv2\nimport numpy as np\n\n\ndef preprocess_frame(frame):\n    # BGR -> RGB, resize 128x128, /255, HWC -> CHW\n    pass\n",
+    "tests": [
+      {
+        "input": "preprocess_frame(np.zeros((64, 96, 3), dtype=np.uint8)).shape",
+        "expected": [
+          3,
+          128,
+          128
+        ]
+      },
+      {
+        "input": "str(preprocess_frame(np.zeros((10, 10, 3), dtype=np.uint8)).dtype)",
+        "expected": "float32"
+      },
+      {
+        "input": "round(float(preprocess_frame(np.full((4, 4, 3), 255, dtype=np.uint8))[0, 0, 0]), 4)",
+        "expected": 1.0
+      },
+      {
+        "input": "round(float(preprocess_frame(np.full((4, 4, 3), (255, 0, 0), dtype=np.uint8))[0, 0, 0]), 4)",
+        "expected": 0.0
+      },
+      {
+        "input": "round(float(preprocess_frame(np.full((4, 4, 3), (255, 0, 0), dtype=np.uint8))[2, 0, 0]), 4)",
+        "expected": 1.0
+      },
+      {
+        "input": "preprocess_frame(np.zeros((5, 5, 3), dtype=np.uint8)).dtype == np.float32",
+        "expected": true
+      }
+    ],
+    "hints": [
+      {
+        "ru": "`cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)`.",
+        "kg": "`cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)`."
+      },
+      {
+        "ru": "`cv2.resize(rgb, (128, 128))` — сначала ширина, потом высота.",
+        "kg": "`cv2.resize(rgb, (128, 128))` — адегенде туурасы, анан бийиктиги."
+      },
+      {
+        "ru": "`resized.astype(np.float32) / 255.0`.",
+        "kg": "`resized.astype(np.float32) / 255.0`."
+      },
+      {
+        "ru": "`np.transpose(normalized, (2, 0, 1))` переставляет оси.",
+        "kg": "`np.transpose(normalized, (2, 0, 1))` окторду алмаштырат."
+      }
+    ],
+    "explanation": {
+      "ru": "OpenCV читает BGR, PyTorch ждёт RGB CHW float. Поэтому три преобразования: цвет, масштаб, оси.",
+      "kg": "OpenCV BGR окуйт, PyTorch RGB CHW float күтөт. Ошондуктан үч өзгөртүү: түс, масштаб, октор."
+    },
+    "walkthrough": [
+      {
+        "ru": "1. Меняем BGR на RGB.",
+        "kg": "1. BGR ды RGB ге алмаштырабыз."
+      },
+      {
+        "ru": "2. Ресайзим до 128×128.",
+        "kg": "2. 128×128 ге resize кылабыз."
+      },
+      {
+        "ru": "3. Переводим в float и делим на 255.",
+        "kg": "3. Floatка которуп, 255кө бөлөбүз."
+      },
+      {
+        "ru": "4. Переставляем оси в CHW.",
+        "kg": "4. Окторду CHWга алмаштырабыз."
+      }
+    ],
+    "pitfalls": {
+      "ru": "`cv2.resize` принимает `(width, height)`, а не `(height, width)`. Если забыть BGR→RGB, красный и синий поменяются местами. Дели на 255.0, чтобы получить float.",
+      "kg": "`cv2.resize` `(width, height)` кабыл алат, `(height, width)` эмес. BGR→RGB унутсаң, кызыл менен көк ордун алмаштырат. Float алуу үчүн 255.0го бөл."
+    },
+    "exam_tip": {
+      "ru": "На защите перечисли порядок: BGR→RGB → resize → /255 → HWC→CHW.",
+      "kg": "Коргоодо иретти ата: BGR→RGB → resize → /255 → HWC→CHW."
+    },
+    "solution": "import cv2\nimport numpy as np\n\n\ndef preprocess_frame(frame):\n    rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)\n    resized = cv2.resize(rgb, (128, 128))\n    normalized = resized.astype(np.float32) / 255.0\n    chw = np.transpose(normalized, (2, 0, 1))\n    return chw\n"
+  },
+  {
+    "slug": "proj-opencv-webcam",
+    "type": "code",
+    "module": "computer-vision",
+    "practice_only": true,
+    "check_mode": "static",
+    "title": {
+      "ru": "Проект 12. OpenCV: веб-камера",
+      "kg": "Долбоор 12. OpenCV: веб-камера"
+    },
+    "prompt": {
+      "ru": "Собери цикл веб-камеры: `cv2.VideoCapture(0)`, `while True`, `ret, frame = cap.read()`, выход при `not ret`, показ через `cv2.imshow`, выход по `q` (`cv2.waitKey(1) & 0xFF == ord('q')`), затем `release()` и `destroyAllWindows()`.",
+      "kg": "Веб-камера циклиңди кура: `cv2.VideoCapture(0)`, `while True`, `ret, frame = cap.read()`, `not ret` болгондо чыгуу, `cv2.imshow` менен көрсөтүү, `q` боюнча чыгуу (`cv2.waitKey(1) & 0xFF == ord('q')`), анан `release()` жана `destroyAllWindows()`."
+    },
+    "difficulty": 2,
+    "points": 8,
+    "starter_code": "import cv2\n\ncap = cv2.VideoCapture(0)\n\n# цикл: read, imshow, waitKey, выход по q\n\ncap.release()\ncv2.destroyAllWindows()\n",
+    "tests": [
+      {
+        "label": "cv2.VideoCapture(0)",
+        "expr": "has('cv2.VideoCapture')",
+        "expected": true
+      },
+      {
+        "label": "while True",
+        "expr": "has('while True')",
+        "expected": true
+      },
+      {
+        "label": "cap.read()",
+        "expr": "has('cap.read()')",
+        "expected": true
+      },
+      {
+        "label": "cv2.imshow",
+        "expr": "has('cv2.imshow')",
+        "expected": true
+      },
+      {
+        "label": "cv2.waitKey",
+        "expr": "has('cv2.waitKey')",
+        "expected": true
+      },
+      {
+        "label": "waitKey(1)",
+        "expr": "has(r'waitKey\\(1\\)')",
+        "expected": true
+      },
+      {
+        "label": "ord",
+        "expr": "has('ord')",
+        "expected": true
+      },
+      {
+        "label": "cap.release()",
+        "expr": "has('cap.release()')",
+        "expected": true
+      },
+      {
+        "label": "cv2.destroyAllWindows()",
+        "expr": "has('cv2.destroyAllWindows()')",
+        "expected": true
+      }
+    ],
+    "hints": [
+      {
+        "ru": "`ret, frame = cap.read()` возвращает флаг и кадр.",
+        "kg": "`ret, frame = cap.read()` флаг жана кадрды кайтарат."
+      },
+      {
+        "ru": "Выход: `if cv2.waitKey(1) & 0xFF == ord('q'): break`.",
+        "kg": "Чыгуу: `if cv2.waitKey(1) & 0xFF == ord('q'): break`."
+      },
+      {
+        "ru": "После цикла обязательно `release()` и `destroyAllWindows()`.",
+        "kg": "Циклден кийин `release()` жана `destroyAllWindows()` милдеттүү."
+      }
+    ],
+    "explanation": {
+      "ru": "`read()` возвращает флаг и кадр; `waitKey` обрабатывает события окна и возвращает код клавиши.",
+      "kg": "`read()` флаг жана кадрды кайтарат; `waitKey` терезе окуяларын иштеп, баскычтын кодун кайтарат."
+    },
+    "walkthrough": [
+      {
+        "ru": "1. Открываем камеру.",
+        "kg": "1. Камераны ачабыз."
+      },
+      {
+        "ru": "2. В цикле читаем кадр.",
+        "kg": "2. Циклде кадрды окуйбуз."
+      },
+      {
+        "ru": "3. Показываем и ждём `q`.",
+        "kg": "3. Көрсөтүп, `q` күтөбүз."
+      },
+      {
+        "ru": "4. Освобождаем камеру.",
+        "kg": "4. Камераны бошотобуз."
+      }
+    ],
+    "pitfalls": {
+      "ru": "Забыть `release()` — камера останется занятой. `waitKey(0)` заморозит видео до нажатия клавиши.",
+      "kg": "`release()` унутсаң — камера бошобойт. `waitKey(0)` баскыч басылганга чейин видеону тоңдурат."
+    },
+    "exam_tip": {
+      "ru": "На защите скажи, где в цикле будет `preprocess_frame` и вызов модели.",
+      "kg": "Коргоодо циклдин кайсы жеринде `preprocess_frame` жана модель чакырыларын айт."
+    },
+    "solution": "import cv2\n\ncap = cv2.VideoCapture(0)\n\nwhile True:\n    ret, frame = cap.read()\n    if not ret:\n        break\n\n    # здесь будет preprocess_frame + model\n    cv2.imshow('Flowers', frame)\n\n    if cv2.waitKey(1) & 0xFF == ord('q'):\n        break\n\ncap.release()\ncv2.destroyAllWindows()\n"
+  }
+]

@@ -242,5 +242,198 @@
         ]
       }
     ]
+  },
+  {
+    "slug": "exam-project",
+    "title": {
+      "ru": "Проект по частям: Flowers → API → UI",
+      "kg": "Долбоор бөлүк-бөлүгү менен: Flowers → API → UI"
+    },
+    "subtitle": {
+      "ru": "Чистая практика без теории: 12 маленьких шагов по коду экзамена.",
+      "kg": "Теориясыз таза практика: экзамен кодунa 12 кичине кадам."
+    },
+    "description": {
+      "ru": "Пиши каждый шаг сам, по памяти. Сначала данные и честный split, потом модель и обучение, затем FastAPI, Streamlit и OpenCV. Подсказки открываются по одной, готовое решение — только если совсем застрял.",
+      "kg": "Ар бир кадамды өзүң, эсиңден жазып чык. Адегенде маалымат жана таза split, анан модель жана окутуу, кийин FastAPI, Streamlit жана OpenCV. Кеңештер бир-бирден ачылат, даяр чечим — такыр кыстыгып калсаң гана."
+    },
+    "level": "advanced",
+    "icon": "spark",
+    "sections": [
+      {
+        "id": "project-data",
+        "title": {
+          "ru": "1. Данные и transforms",
+          "kg": "1. Маалымат жана transforms"
+        },
+        "goal": {
+          "ru": "Распаковать архив, собрать transform и два DataLoader.",
+          "kg": "Архивди ачып, transform жана эки DataLoader куруу."
+        },
+        "steps": [
+          {
+            "type": "task",
+            "slug": "proj-unzip-flowers",
+            "note": {
+              "ru": "Распакуй Flowers.zip и посмотри структуру папок.",
+              "kg": "Flowers.zip ачып, папкалардын түзүлүшүн кара."
+            }
+          },
+          {
+            "type": "task",
+            "slug": "proj-flowers-transforms",
+            "note": {
+              "ru": "Resize 128, ToTensor, Normalize.",
+              "kg": "Resize 128, ToTensor, Normalize."
+            }
+          },
+          {
+            "type": "task",
+            "slug": "proj-flowers-loaders",
+            "note": {
+              "ru": "ImageFolder и два DataLoader.",
+              "kg": "ImageFolder жана эки DataLoader."
+            }
+          }
+        ]
+      },
+      {
+        "id": "project-split",
+        "title": {
+          "ru": "2. Честный split",
+          "kg": "2. Таза split"
+        },
+        "goal": {
+          "ru": "Разделить одну папку без утечки аугментации.",
+          "kg": "Бир папканы аугментация утечкасыз бөлүү."
+        },
+        "steps": [
+          {
+            "type": "task",
+            "slug": "proj-split-unsplit",
+            "note": {
+              "ru": "Индексы, seed и два Subset-а.",
+              "kg": "Индекстер, seed жана эки Subset."
+            }
+          }
+        ]
+      },
+      {
+        "id": "project-model",
+        "title": {
+          "ru": "3. Модель и обучение",
+          "kg": "3. Модель жана окутуу"
+        },
+        "goal": {
+          "ru": "FlowerCNN, цикл обучения, метрика и model.pth.",
+          "kg": "FlowerCNN, окутуу цикли, метрика жана model.pth."
+        },
+        "steps": [
+          {
+            "type": "task",
+            "slug": "proj-flower-cnn",
+            "note": {
+              "ru": "Три conv-блока и классификатор.",
+              "kg": "Үч conv-блок жана классификатор."
+            }
+          },
+          {
+            "type": "task",
+            "slug": "proj-train-loop",
+            "note": {
+              "ru": "Loss, Adam, StepLR и 25 эпох.",
+              "kg": "Loss, Adam, StepLR жана 25 эпоха."
+            }
+          },
+          {
+            "type": "task",
+            "slug": "proj-eval-save",
+            "note": {
+              "ru": "Точность на test и сохранение весов.",
+              "kg": "Testтеги тактык жана weights сактоо."
+            }
+          }
+        ]
+      },
+      {
+        "id": "project-api",
+        "title": {
+          "ru": "4. FastAPI",
+          "kg": "4. FastAPI"
+        },
+        "goal": {
+          "ru": "Два сервиса: Flowers и MNIST-одежда.",
+          "kg": "Эки сервис: Flowers жана MNIST кийими."
+        },
+        "steps": [
+          {
+            "type": "task",
+            "slug": "proj-fastapi-flowers",
+            "note": {
+              "ru": "POST /predict для Flowers.",
+              "kg": "Flowers үчүн POST /predict."
+            }
+          },
+          {
+            "type": "task",
+            "slug": "proj-fastapi-mnist",
+            "note": {
+              "ru": "CheckImage и 10 классов одежды.",
+              "kg": "CheckImage жана 10 кийим классы."
+            }
+          }
+        ]
+      },
+      {
+        "id": "project-ui",
+        "title": {
+          "ru": "5. Streamlit",
+          "kg": "5. Streamlit"
+        },
+        "goal": {
+          "ru": "Загрузить картинку и показать ответ API.",
+          "kg": "Сүрөт жүктөп, API жообун көрсөтүү."
+        },
+        "steps": [
+          {
+            "type": "task",
+            "slug": "proj-streamlit-client",
+            "note": {
+              "ru": "file_uploader, requests.post и result.",
+              "kg": "file_uploader, requests.post жана result."
+            }
+          }
+        ]
+      },
+      {
+        "id": "project-cv",
+        "title": {
+          "ru": "6. OpenCV",
+          "kg": "6. OpenCV"
+        },
+        "goal": {
+          "ru": "Кадр с камеры превратить в тензор.",
+          "kg": "Камера кадрын тензорго айландыруу."
+        },
+        "steps": [
+          {
+            "type": "task",
+            "slug": "proj-opencv-preprocess",
+            "note": {
+              "ru": "BGR→RGB, resize, /255, CHW.",
+              "kg": "BGR→RGB, resize, /255, CHW."
+            }
+          },
+          {
+            "type": "task",
+            "slug": "proj-opencv-webcam",
+            "note": {
+              "ru": "Цикл камеры и выход по q.",
+              "kg": "Камера цикли жана q боюнча чыгуу."
+            }
+          }
+        ]
+      }
+    ]
   }
 ]
