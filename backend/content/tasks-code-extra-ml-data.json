@@ -198,12 +198,15 @@
       "kg": "ML: precision жана recall"
     },
     "prompt": {
-      "ru": "Напиши `precision_recall(y_true, y_pred)`: верни кортеж `(precision, recall)`. Если знаменатель равен нулю, соответствующая метрика равна `0.0`.",
-      "kg": "`precision_recall(y_true, y_pred)` жаз: `(precision, recall)` кортежин кайтар. Бөлүүчү нөлгө барабар болсо, тиешелүү метрика `0.0` болот."
+      "ru": "Напиши `precision_recall(y_true, y_pred)`: верни кортеж `(precision, recall)`. Если знаменатель равен нулю, соответствующая метрика равна `0.0`. TP, FP и FN посчитай одним ручным циклом, без `sum`.",
+      "kg": "`precision_recall(y_true, y_pred)` жаз: `(precision, recall)` кортежин кайтар. Бөлүүчү нөлгө барабар болсо, тиешелүү метрика `0.0` болот. TP, FP жана FNди `sum` жок, бир кол цикл менен эсепте."
     },
     "difficulty": 3,
     "points": 8,
-    "starter_code": "def precision_recall(y_true, y_pred):\n    # твой код\n    pass",
+    "starter_code": "def precision_recall(y_true, y_pred):\n    # твой код: tp, fp, fn + один цикл\n    pass",
+    "forbidden_patterns": [
+      "\\bsum\\s*\\("
+    ],
     "tests": [
       {
         "input": "precision_recall([1, 1, 0, 0], [1, 0, 0, 1])",
@@ -236,8 +239,8 @@
     ],
     "hints": [
       {
-        "ru": "Сначала посчитай TP, FP и FN.",
-        "kg": "Алгач TP, FP жана FNди эсепте."
+        "ru": "Заведи `tp = fp = fn = 0` и пройди по `zip(y_true, y_pred)`.",
+        "kg": "`tp = fp = fn = 0` ачып, `zip(y_true, y_pred)` боюнча өт."
       },
       {
         "ru": "Precision = TP / (TP + FP).",
@@ -262,15 +265,15 @@
         "kg": "F1 деген эмне жана эмне үчүн керек?"
       }
     ],
-    "solution": "def precision_recall(y_true, y_pred):\n    tp = sum(1 for actual, predicted in zip(y_true, y_pred) if actual == 1 and predicted == 1)\n    fp = sum(1 for actual, predicted in zip(y_true, y_pred) if actual == 0 and predicted == 1)\n    fn = sum(1 for actual, predicted in zip(y_true, y_pred) if actual == 1 and predicted == 0)\n    precision = tp / (tp + fp) if tp + fp else 0.0\n    recall = tp / (tp + fn) if tp + fn else 0.0\n    return precision, recall",
+    "solution": "def precision_recall(y_true, y_pred):\n    tp = 0\n    fp = 0\n    fn = 0\n\n    for actual, predicted in zip(y_true, y_pred):\n        if actual == 1 and predicted == 1:\n            tp += 1\n        elif actual == 0 and predicted == 1:\n            fp += 1\n        elif actual == 1 and predicted == 0:\n            fn += 1\n\n    precision = tp / (tp + fp) if tp + fp else 0.0\n    recall = tp / (tp + fn) if tp + fn else 0.0\n    return precision, recall",
     "explanation": {
       "ru": "Precision отвечает: «если модель сказала 1, насколько ей можно верить?». Recall отвечает: «сколько реальных 1 модель нашла?». При поиске рака важнее recall, при антиспаме — precision.",
       "kg": "Precision: «модель 1 десе, ага канчалык ишенсе болот?». Recall: «канча чыныгы 1ди модель тапты?». Ракты издөөдө recall, антиспамда precision маанилүү."
     },
     "walkthrough": [
       {
-        "ru": "1. Считаем TP, FP и FN одним проходом.",
-        "kg": "1. TP, FP жана FNди бир өтүүдө эсептейбиз."
+        "ru": "1. Считаем TP, FP и FN одним ручным циклом, без `sum`.",
+        "kg": "1. TP, FP жана FNди `sum` жок, бир кол цикл менен эсептейбиз."
       },
       {
         "ru": "2. Делим с защитой от нуля.",

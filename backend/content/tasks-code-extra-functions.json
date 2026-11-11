@@ -326,6 +326,9 @@
     "difficulty": 2,
     "points": 8,
     "starter_code": "def find_max(numbers):\n    # твой код\n    pass",
+  "forbidden_patterns": [
+    "\\bmax\\s*\\("
+  ],
     "tests": [
       {
         "input": "find_max([3, 1, 9, 2])",
