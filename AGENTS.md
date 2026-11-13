@@ -27,6 +27,8 @@ The API runs at `http://127.0.0.1:8000`; Vite proxies `/api` on `:5173`.
 ## Architecture map
 
 - `backend/app/main.py` — API, content loading, code runner, static serving.
+- `backend/app/jarvis.py` — J.A.R.V.I.S. brain: RU/KG intents, progress/next-step context, guarded code review, optional Claude Haiku 4.5 and ElevenLabs.
+- `backend/app/config.py` — settings path resolution and the optional repo `.env` loader.
 - `backend/app/db.py` — SQLite progress store (`backend/data/red_diploma.db`).
 - `backend/content/*.json` — all lessons, tasks, exams, and routes.
 - `backend/content/drills-*.json` — drill question banks (8 categories, 206 questions).
@@ -37,6 +39,8 @@ The API runs at `http://127.0.0.1:8000`; Vite proxies `/api` on `:5173`.
 - `frontend/src/pages/Drills.jsx` / `DrillPage.jsx` — drill catalog and study/exam modes.
 - `frontend/src/pages/StartPage.jsx` — guided route switcher and route page.
 - `frontend/src/components/PathNext.jsx` — next-step card on task pages.
+- `frontend/src/components/jarvis/` — `JarvisOrb.jsx` (canvas reactor), `JarvisPanel.jsx` (three-column HUD), `voice.js` (wake word, TTS/STT, tones), `jarvis.css`.
+- `frontend/src/state/JarvisContext.jsx` — panel state, chat history, page/task context registry, speech playback, wake mode.
 - `frontend/src/theme.css` — dark multi-accent design system.
 
 ## Content rules
@@ -63,14 +67,21 @@ The API runs at `http://127.0.0.1:8000`; Vite proxies `/api` on `:5173`.
   strips `correct`, `explanation`, and `example`.
 - Drill mistakes are reviewed on the drill page and are excluded from the
   global Mistakes list.
+- J.A.R.V.I.S. must never expose a task `solution` or the full hidden `tests`.
+  `_task_brief()` includes only the first two examples and no solution; the LLM
+  system prompt forbids full answers; `_leaks_solution()` rejects a reply that
+  contains the solution. Keep all three guards.
 - `load_content()` is cached with `lru_cache`: restart uvicorn after editing
   content JSON.
 
 ## Verification
 
-- Backend: `py -3.13 -m pytest -q` (currently 21 tests).
+- Backend: `py -3.13 -m pytest -q` (currently 30 tests).
 - Frontend: `npm run build` must pass.
 - UI: check desktop and mobile for horizontal overflow and console errors.
+  Jarvis checks: open via `Ctrl+J`, greeting appears, orb canvas renders,
+  quick commands answer, RU and KG replies work, task context sends
+  `task_slug`/`code`, and no solution leaks.
 - Do not claim a content/API change works from reading code alone; hit the API
   or run the test.
 
@@ -84,4 +95,9 @@ The API runs at `http://127.0.0.1:8000`; Vite proxies `/api` on `:5173`.
 - On Windows, the console may mangle Cyrillic. Use `py -3 -X utf8` for scripts
   or write/read UTF-8 files directly.
 - The repo remote is SSH: `git@github.com:minbaevv/red-diploma.git`.
+- The optional `.env` in the repo root is loaded by `config.py`; `.env` is
+  git-ignored and `.env.example` is the template. Keys are never sent to the
+  frontend.
+- Browser speech recognition needs Chrome/Edge and a localhost/HTTPS origin.
+  Kyrgyz STT is not available in browsers: type Kyrgyz, speak Russian.
 - Preserve user changes; check `git status` before editing or committing.

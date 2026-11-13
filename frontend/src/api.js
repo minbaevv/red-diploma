@@ -60,4 +60,22 @@ export const api = {
       body: JSON.stringify(payload),
     }),
   deleteNote: (id) => request(`/api/notes/${id}`, { method: 'DELETE' }),
+  jarvisConfig: () => request('/api/jarvis/config'),
+  jarvisChat: (payload) =>
+    request('/api/jarvis/chat', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+  jarvisSpeech: async (text, lang = 'ru') => {
+    const response = await fetch('/api/jarvis/speech', {
+      method: 'POST',
+      headers: jsonHeaders,
+      body: JSON.stringify({ text, lang }),
+    })
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}))
+      throw new Error(error.detail || `Speech failed: ${response.status}`)
+    }
+    return response.blob()
+  },
 }

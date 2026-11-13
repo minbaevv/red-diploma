@@ -1,15 +1,15 @@
 from __future__ import annotations
 
 from contextlib import asynccontextmanager
-from typing import Any
+from typing import Any, Literal
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from . import content
+from . import content, jarvis
 from .config import settings
 from .db import (
     best_drill_scores,
@@ -81,6 +81,31 @@ class NoteRequest(BaseModel):
     module_slug: str = ""
     title: str = Field(min_length=1, max_length=120)
     body: str = Field(min_length=1, max_length=8000)
+
+
+class JarvisTurn(BaseModel):
+    role: Literal["user", "assistant"]
+    content: str = Field(min_length=1, max_length=4000)
+
+
+class JarvisContextRequest(BaseModel):
+    page: str = Field(default="", max_length=200)
+    task_slug: str = Field(default="", max_length=100)
+    path_slug: str = Field(default="", max_length=100)
+    language: Literal["ru", "kg"] = "ru"
+    code: str = Field(default="", max_length=40_000)
+    last_result: dict[str, Any] | None = None
+
+
+class JarvisChatRequest(BaseModel):
+    message: str = Field(min_length=1, max_length=4000)
+    history: list[JarvisTurn] = Field(default_factory=list, max_length=12)
+    context: JarvisContextRequest = Field(default_factory=JarvisContextRequest)
+
+
+class JarvisSpeechRequest(BaseModel):
+    text: str = Field(min_length=1, max_length=1500)
+    lang: Literal["ru", "kg"] = "ru"
 
 
 def _task_public(task: dict[str, Any]) -> dict[str, Any]:
@@ -602,6 +627,41 @@ def remove_note(note_id: str) -> dict[str, Any]:
     if not delete_note(note_id):
         raise HTTPException(status_code=404, detail="Note not found")
     return {"ok": True}
+
+
+@app.get("/api/jarvis/config")
+def jarvis_config() -> dict[str, Any]:
+    return jarvis.config()
+
+
+@app.post("/api/jarvis/chat")
+async def jarvis_chat(payload: JarvisChatRequest) -> dict[str, Any]:
+    history = [turn.model_dump() for turn in payload.history]
+    return await jarvis.answer(
+        payload.message,
+        history,
+        payload.context.model_dump(),
+        lang_hint=payload.context.language,
+        student_name=get_setting("student_name", "Student"),
+    )
+
+
+@app.post("/api/jarvis/speech")
+async def jarvis_speech(payload: JarvisSpeechRequest) -> Response:
+    audio = await jarvis.synthesize(payload.text, payload.lang)
+    if audio is None:
+        raise HTTPException(
+            status_code=503,
+            detail=(
+                "ElevenLabs is not configured. Set ELEVENLABS_API_KEY "
+                "or use browser speech."
+            ),
+        )
+    return Response(
+        content=audio,
+        media_type="audio/mpeg",
+        headers={"Cache-Control": "no-store"},
+    )
 
 
 def _mount_frontend() -> None:

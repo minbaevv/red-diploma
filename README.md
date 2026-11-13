@@ -9,6 +9,7 @@ Bilingual (RU/KG) exam cockpit for the Motion Web backend + AI final exam. It co
 - **Guided start**: `/start` switches between a 20-step `ml-capstone` route from Python to a deployed ML service and a 12-step `exam-project` route that rebuilds the exam project in small code chunks. Every completed lesson or task shows a **Continue** button that opens the next step with `?path=<slug>&step=N`.
 - **3 exams**: stage 1 (20 points), stage 2 (30 points), stage 3 (50 points). A total of 80+ is the red-diploma target.
 - **Bilingual UI and content** with RU/KG switching.
+- **J.A.R.V.I.S. command center**: an animated cyan HUD with a canvas arc-reactor orb, voice input on the wake word «Джарвис», spoken replies, RU/KG dialogue, live task context, code review without spoilers, progress telemetry, and a next-step rail.
 - **Local progress** in SQLite: completed lessons/tasks, attempts, best exam scores, notes, settings.
 
 ## Stack
@@ -80,6 +81,29 @@ py -3.11 -m pip install -r requirements-capstone.txt
 ```
 
 The theory tasks contain complete copy-ready code for `train.py`, `app.py`, and `streamlit_app.py`.
+
+## J.A.R.V.I.S. command center
+
+Open it from the cyan **J.A.R.V.I.S.** item in the sidebar, the floating orb button, or `Ctrl+J`. The panel is a three-column command center: system readiness and module status on the left, the orb + dialogue in the center, quick commands, the next route step, and protocol status on the right.
+
+What Jarvis can do:
+
+- **Explain a task** — the core idea, a short plan, pitfalls, and the exam tip, using the live task context.
+- **Give a hint** — one step at a time, without revealing the solution or hidden tests.
+- **Review code** — syntax errors, forbidden constructs, TODO/pass, `except:`, `== None`, and failed tests; the full solution is never returned.
+- **Report progress** — readiness, lessons, tasks, exam points, drills, and the next unfinished route step with a direct link.
+- **Speak RU/KG** — replies follow the language of the message; the toolbar switches the whole app RU/KG.
+
+Voice input uses the Web Speech API. Click the mic for push-to-talk, or enable **«Джарвис» mode** to keep the wake word armed. Chrome/Edge provide speech recognition; browsers without it still support text input. Kyrgyz speech recognition is not available in browsers, so type Kyrgyz questions — Jarvis answers in Kyrgyz.
+
+Replies are spoken with the browser voice by default. For the movie-style voice, copy `.env.example` to `.env` and add `ELEVENLABS_API_KEY`; for free-form conversation add `ANTHROPIC_API_KEY` (Claude Haiku 4.5). Both are optional: without keys the local brain and browser voice keep the feature fully usable. The backend loads `.env` at startup, and the key never reaches the frontend.
+
+```powershell
+Copy-Item .env.example .env
+# fill ANTHROPIC_API_KEY / ELEVENLABS_API_KEY, then restart uvicorn
+```
+
+Jarvis endpoints: `GET /api/jarvis/config`, `POST /api/jarvis/chat`, `POST /api/jarvis/speech`. Speech returns `503` when ElevenLabs is not configured, and the client falls back to the browser voice.
 
 ## Tests
 

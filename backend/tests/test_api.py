@@ -377,3 +377,146 @@ def test_drill_submit_scores_and_keeps_best(client: TestClient):
     attempts = client.get("/api/attempts").json()
     drill_attempts = [attempt for attempt in attempts if attempt["kind"] == "drill"]
     assert len(drill_attempts) == 2
+
+
+def test_jarvis_config_defaults_to_local_browser_mode(monkeypatch, client: TestClient):
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    monkeypatch.delenv("ELEVENLABS_API_KEY", raising=False)
+    response = client.get("/api/jarvis/config")
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["llm"]["enabled"] is False
+    assert payload["tts"]["provider"] == "browser"
+    assert "джарвис" in payload["wake_words"]
+    assert payload["languages"] == ["ru", "kg"]
+
+
+def test_jarvis_config_enables_optional_providers(monkeypatch, client: TestClient):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-anthropic-key")
+    monkeypatch.setenv("ELEVENLABS_API_KEY", "test-elevenlabs-key")
+    payload = client.get("/api/jarvis/config").json()
+    assert payload["llm"]["enabled"] is True
+    assert payload["llm"]["model"] == "claude-haiku-4-5"
+    assert payload["tts"]["provider"] == "elevenlabs"
+    assert payload["tts"]["model"] == "eleven_multilingual_v2"
+
+
+def test_jarvis_greets_in_russian_and_kyrgyz(monkeypatch, client: TestClient):
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+
+    russian = client.post(
+        "/api/jarvis/chat",
+        json={"message": "привет", "context": {"language": "ru"}},
+    )
+    assert russian.status_code == 200
+    assert russian.json()["source"] == "local"
+    assert "сэр" in russian.json()["reply"]
+
+    kyrgyz = client.post(
+        "/api/jarvis/chat",
+        json={"message": "салам", "context": {"language": "kg"}},
+    )
+    assert kyrgyz.status_code == 200
+    assert kyrgyz.json()["language"] == "kg"
+    assert "мырза" in kyrgyz.json()["reply"]
+
+
+def test_jarvis_never_leaks_task_solution(monkeypatch, client: TestClient):
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    task = content.task_by_slug("sum-even")
+    solution = task["solution"].strip()
+
+    for message in ("объясни задачу", "покажи решение", "что дальше"):
+        response = client.post(
+            "/api/jarvis/chat",
+            json={
+                "message": message,
+                "context": {"language": "ru", "task_slug": "sum-even"},
+            },
+        )
+        assert response.status_code == 200
+        assert solution not in response.json()["reply"], message
+
+
+def test_jarvis_reviews_code_without_solution(monkeypatch, client: TestClient):
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    task = content.task_by_slug("sum-even")
+    code = (
+        "def sum_even(numbers):\n"
+        "    try:\n"
+        "        return 0\n"
+        "    except:\n"
+        "        pass\n"
+    )
+    response = client.post(
+        "/api/jarvis/chat",
+        json={
+            "message": "проверь код",
+            "context": {"language": "ru", "task_slug": "sum-even", "code": code},
+        },
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["intent"] == "review"
+    assert "except" in payload["reply"].lower() or "pass" in payload["reply"].lower()
+    assert task["solution"].strip() not in payload["reply"]
+
+
+def test_jarvis_finds_topics_without_llm(monkeypatch, client: TestClient):
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+
+    russian = client.post(
+        "/api/jarvis/chat",
+        json={"message": "расскажи про FastAPI", "context": {"language": "ru"}},
+    )
+    assert russian.status_code == 200
+    payload = russian.json()
+    assert payload["intent"] == "topic"
+    assert "FastAPI" in payload["reply"]
+    assert payload["action"]["to"].startswith("/lesson/")
+
+    kyrgyz = client.post(
+        "/api/jarvis/chat",
+        json={"message": "pydantic деген эмне", "context": {"language": "kg"}},
+    )
+    assert kyrgyz.status_code == 200
+    kg_payload = kyrgyz.json()
+    assert kg_payload["language"] == "kg"
+    assert kg_payload["intent"] == "topic"
+    assert "мырза" in kg_payload["reply"].lower()
+
+
+def test_jarvis_answers_wake_address(monkeypatch, client: TestClient):
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    response = client.post(
+        "/api/jarvis/chat",
+        json={"message": "Джарвис", "context": {"language": "ru"}},
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["intent"] == "address"
+    assert payload["reply"] == "Да, сэр. Слушаю."
+
+    kyrgyz = client.post(
+        "/api/jarvis/chat",
+        json={"message": "Жарвис", "context": {"language": "kg"}},
+    )
+    assert kyrgyz.status_code == 200
+    assert kyrgyz.json()["reply"] == "Ооба, мырза. Угуп жатам."
+
+
+def test_jarvis_speech_requires_elevenlabs(monkeypatch, client: TestClient):
+    monkeypatch.delenv("ELEVENLABS_API_KEY", raising=False)
+    response = client.post(
+        "/api/jarvis/speech",
+        json={"text": "Да, сэр.", "lang": "ru"},
+    )
+    assert response.status_code == 503
+
+
+def test_jarvis_chat_validates_message(client: TestClient):
+    assert client.post("/api/jarvis/chat", json={"message": ""}).status_code == 422
+    assert (
+        client.post("/api/jarvis/chat", json={"message": "x" * 4001}).status_code == 422
+    )
+

@@ -10,11 +10,14 @@ import {
   LayoutDashboard,
   ListChecks,
   Menu,
+  Orbit,
   Settings,
   Trophy,
   X,
 } from 'lucide-react'
 import { useApp, useBi } from '../state/AppContext'
+import { useJarvis } from '../state/JarvisContext'
+import JarvisPanel from './jarvis/JarvisPanel'
 import { api } from '../api'
 import { daysLeft, daysWord, formatDate } from '../lib/format'
 
@@ -50,12 +53,33 @@ function pageTitle(pathname, bi) {
 
 export default function Shell() {
   const { data, loading, error, lang, setLanguage, refresh, settings } = useApp()
+  const { openPanel, togglePanel, updateContext } = useJarvis()
   const bi = useBi()
   const location = useLocation()
   const [open, setOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
 
   useEffect(() => setOpen(false), [location.pathname])
+
+  useEffect(() => {
+    updateContext({ page: location.pathname })
+  }, [location.pathname, updateContext])
+
+  useEffect(() => {
+    const onKey = (event) => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'j') {
+        event.preventDefault()
+        togglePanel()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [togglePanel])
+
+  function launchJarvis() {
+    setOpen(false)
+    openPanel()
+  }
 
   if (loading) {
     return (
@@ -108,6 +132,11 @@ export default function Shell() {
               </NavLink>
             )
           })}
+          <button className="nav-item jarvis-nav" onClick={launchJarvis}>
+            <Orbit size={18} strokeWidth={1.8} />
+            <span>J.A.R.V.I.S.</span>
+            <kbd>Ctrl J</kbd>
+          </button>
         </nav>
 
         <div className="sidebar-foot">
@@ -163,6 +192,21 @@ export default function Shell() {
           onSaved={() => refresh(true)}
         />
       )}
+
+      <button
+        className="jarvis-fab"
+        onClick={launchJarvis}
+        aria-label="Открыть J.A.R.V.I.S."
+      >
+        <span className="jarvis-fab-orb"><Orbit size={16} /></span>
+        <span className="jarvis-fab-label">
+          <strong>J.A.R.V.I.S.</strong>
+          <small>{bi('личный наставник', 'жеке устат')}</small>
+        </span>
+        <kbd>Ctrl J</kbd>
+      </button>
+
+      <JarvisPanel />
     </div>
   )
 }

@@ -21,6 +21,7 @@ import {
 } from 'lucide-react'
 import { api } from '../api'
 import { useApp, useBi } from '../state/AppContext'
+import { useJarvis } from '../state/JarvisContext'
 import { isDone, pick, pluralRu, progressIndex } from '../lib/format'
 import { pathContext } from '../lib/path'
 import PathNext from '../components/PathNext'
@@ -152,6 +153,7 @@ export default function TaskPage() {
   const { slug } = useParams()
   const [params] = useSearchParams()
   const { data, refresh, lang } = useApp()
+  const { updateContext, openWith } = useJarvis()
   const bi = useBi()
   const [task, setTask] = useState(null)
   const [code, setCode] = useState('')
@@ -169,6 +171,29 @@ export default function TaskPage() {
   const module = useMemo(
     () => data?.modules.find((item) => item.slug === task?.module),
     [data?.modules, task?.module],
+  )
+
+  useEffect(() => {
+    updateContext({
+      page: 'task',
+      task_slug: slug,
+      path_slug: pathInfo?.path?.slug || '',
+      code,
+      last_result: result,
+    })
+  }, [slug, code, result, pathInfo?.path?.slug, updateContext])
+
+  useEffect(
+    () => () => {
+      updateContext({
+        page: 'task',
+        task_slug: '',
+        path_slug: '',
+        code: '',
+        last_result: null,
+      })
+    },
+    [updateContext],
   )
 
   useEffect(() => {
@@ -294,6 +319,15 @@ export default function TaskPage() {
                   <Play size={16} />
                   {running ? bi('Проверяем…', 'Текшерип жатабыз…') : bi('Запустить тесты', 'Тесттерди иштетүү')}
                 </button>
+                <button
+                  className="btn btn-ghost jarvis-ask"
+                  onClick={() =>
+                    openWith(lang === 'kg' ? 'түшүндүр' : 'объясни задачу')
+                  }
+                >
+                  <Sparkles size={16} />
+                  {bi('Спросить Джарвиса', 'Жарвистен сура')}
+                </button>
                 <span>{bi('Сервер выполнит код в отдельном процессе.', 'Сервер кодду өзүнчө процессте иштетет.')}</span>
               </div>
               {runError && <p className="form-error">{runError}</p>}
@@ -365,6 +399,14 @@ export default function TaskPage() {
               <div className="theory-actions">
                 <button className="btn btn-primary" onClick={() => setShowModel(true)}>
                   <Lightbulb size={16} /> {bi('Сверить с моделью', 'Модель менен салыштыруу')}
+                </button>
+                <button
+                  className="btn btn-ghost jarvis-ask"
+                  onClick={() =>
+                    openWith(lang === 'kg' ? 'түшүндүр' : 'объясни задачу')
+                  }
+                >
+                  <Sparkles size={16} /> {bi('Спросить Джарвиса', 'Жарвистен сура')}
                 </button>
                 {done && <Badge tone="green"><CheckCircle2 size={14} /> {bi('уже отмечено', 'белгиленген')}</Badge>}
               </div>
