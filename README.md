@@ -92,18 +92,34 @@ What Jarvis can do:
 - **Give a hint** — one step at a time, without revealing the solution or hidden tests.
 - **Review code** — syntax errors, forbidden constructs, TODO/pass, `except:`, `== None`, and failed tests; the full solution is never returned.
 - **Report progress** — readiness, lessons, tasks, exam points, drills, and the next unfinished route step with a direct link.
-- **Speak RU/KG** — replies follow the language of the message; the toolbar switches the whole app RU/KG.
+- **Speak RU/KG** — replies follow the language of the message; the toolbar switches the whole app RU/KG. Jarvis addresses the user as **«сэр»** in both languages, as in the films.
 
 Voice input uses the Web Speech API. Click the mic for push-to-talk, or enable **«Джарвис» mode** to keep the wake word armed. Chrome/Edge provide speech recognition; browsers without it still support text input. Kyrgyz speech recognition is not available in browsers, so type Kyrgyz questions — Jarvis answers in Kyrgyz.
 
-Replies are spoken with the browser voice by default. For the movie-style voice, copy `.env.example` to `.env` and add `ELEVENLABS_API_KEY`; for free-form conversation add `ANTHROPIC_API_KEY` (Claude Haiku 4.5). Both are optional: without keys the local brain and browser voice keep the feature fully usable. The backend loads `.env` at startup, and the key never reaches the frontend.
+Replies are spoken by local **Piper** voices by default: `en_GB-jarvis-high` (the movie-style British JARVIS) for English and `ru_RU-dmitri-medium` for Russian. Kyrgyz has no Piper voice, so the client falls back to browser speech. Speech is generated on the backend, so the browser only receives WAV audio.
+
+Free-form Russian conversation runs on local **Ollama** (`qwen2.5:3b` by default) when the Ollama server is up. Kyrgyz always stays on the deterministic local brain: a 3B model produces pseudo-Kyrgyz, while the hand-written KG replies are correct. Claude Haiku 4.5 and ElevenLabs remain optional cloud fallbacks. Task explanations, hints, and code review stay deterministic and never expose solutions, whichever provider is active.
+
+One-time local setup:
 
 ```powershell
-Copy-Item .env.example .env
-# fill ANTHROPIC_API_KEY / ELEVENLABS_API_KEY, then restart uvicorn
+py -3.13 -m pip install piper-tts
+ollama pull qwen2.5:3b
+
+New-Item -ItemType Directory -Force backend/models/piper
+curl.exe -L -o backend/models/piper/en_GB-jarvis-high.onnx `
+  "https://huggingface.co/jgkawell/jarvis/resolve/main/en/en_GB/jarvis/high/jarvis-high.onnx"
+curl.exe -L -o backend/models/piper/en_GB-jarvis-high.onnx.json `
+  "https://huggingface.co/jgkawell/jarvis/resolve/main/en/en_GB/jarvis/high/jarvis-high.onnx.json"
+curl.exe -L -o backend/models/piper/ru_RU-dmitri-medium.onnx `
+  "https://huggingface.co/rhasspy/piper-voices/resolve/main/ru/ru_RU/dmitri/medium/ru_RU-dmitri-medium.onnx"
+curl.exe -L -o backend/models/piper/ru_RU-dmitri-medium.onnx.json `
+  "https://huggingface.co/rhasspy/piper-voices/resolve/main/ru/ru_RU/dmitri/medium/ru_RU-dmitri-medium.onnx.json"
 ```
 
-Jarvis endpoints: `GET /api/jarvis/config`, `POST /api/jarvis/chat`, `POST /api/jarvis/speech`. Speech returns `503` when ElevenLabs is not configured, and the client falls back to the browser voice.
+Model binaries stay in `backend/models/` and are git-ignored. Copy `.env.example` to `.env` to override providers (`JARVIS_LLM=auto|ollama|anthropic|local`, `JARVIS_TTS=auto|piper|elevenlabs|browser`), voice paths, or to add cloud keys. `PIPER_VOICE` forces a single voice for every language — for example, to hear the English movie-JARVIS read Russian.
+
+Jarvis endpoints: `GET /api/jarvis/config`, `POST /api/jarvis/chat`, `POST /api/jarvis/speech`. Speech returns `503` when no provider supports the requested language, and the client falls back to the browser voice.
 
 ## Tests
 

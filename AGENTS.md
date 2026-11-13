@@ -27,7 +27,7 @@ The API runs at `http://127.0.0.1:8000`; Vite proxies `/api` on `:5173`.
 ## Architecture map
 
 - `backend/app/main.py` — API, content loading, code runner, static serving.
-- `backend/app/jarvis.py` — J.A.R.V.I.S. brain: RU/KG intents, progress/next-step context, guarded code review, optional Claude Haiku 4.5 and ElevenLabs.
+- `backend/app/jarvis.py` — J.A.R.V.I.S. brain: RU/KG intents, progress/next-step context, guarded code review, local Ollama for free-form RU (KG always deterministic), optional Claude Haiku 4.5 fallback, and Piper/ElevenLabs speech.
 - `backend/app/config.py` — settings path resolution and the optional repo `.env` loader.
 - `backend/app/db.py` — SQLite progress store (`backend/data/red_diploma.db`).
 - `backend/content/*.json` — all lessons, tasks, exams, and routes.
@@ -71,12 +71,18 @@ The API runs at `http://127.0.0.1:8000`; Vite proxies `/api` on `:5173`.
   `_task_brief()` includes only the first two examples and no solution; the LLM
   system prompt forbids full answers; `_leaks_solution()` rejects a reply that
   contains the solution. Keep all three guards.
+- Task contexts (`explain`, `hint`, `review`) always use the deterministic
+  local brain, never the LLM. Kyrgyz replies always use the local brain too:
+  small Ollama models produce pseudo-Kyrgyz. `JARVIS_LLM` only affects
+  free-form Russian chat.
+- Jarvis addresses the user as «сэр» in both RU and KG (movie persona).
+  «мырза» stays only in `KYRGYZ_WORDS` for input detection, never in replies.
 - `load_content()` is cached with `lru_cache`: restart uvicorn after editing
   content JSON.
 
 ## Verification
 
-- Backend: `py -3.13 -m pytest -q` (currently 30 tests).
+- Backend: `py -3.13 -m pytest -q` (currently 34 tests).
 - Frontend: `npm run build` must pass.
 - UI: check desktop and mobile for horizontal overflow and console errors.
   Jarvis checks: open via `Ctrl+J`, greeting appears, orb canvas renders,
@@ -100,4 +106,9 @@ The API runs at `http://127.0.0.1:8000`; Vite proxies `/api` on `:5173`.
   frontend.
 - Browser speech recognition needs Chrome/Edge and a localhost/HTTPS origin.
   Kyrgyz STT is not available in browsers: type Kyrgyz, speak Russian.
+- Piper models live in `backend/models/piper/` (git-ignored, ~180 MB) and the
+  backend finds `piper.exe` next to the running Python. `JARVIS_TTS=browser`
+  disables backend speech; `PIPER_VOICE` forces one voice for every language.
+- Ollama is probed once per 30 s. If it is down, free-form RU falls back to the
+  local brain instead of waiting on a long HTTP timeout.
 - Preserve user changes; check `git status` before editing or committing.

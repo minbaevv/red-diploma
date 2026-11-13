@@ -142,18 +142,27 @@ export function JarvisProvider({ children }) {
         }
       }
 
+      const spokenLang = language || langRef.current
+      const provider = configRef.current?.tts?.provider
       const browserFallback = () => {
         if (speechTokenRef.current !== token) return
-        speakBrowser(cleaned, language || langRef.current, { onEnd: finish })
+        speakBrowser(cleaned, spokenLang, { onEnd: finish })
       }
 
-      if (configRef.current?.tts?.provider !== 'elevenlabs') {
+      if (provider === 'browser') {
+        browserFallback()
+        return
+      }
+
+      // Piper has no Kyrgyz voice: go straight to the browser instead of a 503.
+      const voices = configRef.current?.tts?.voices
+      if (provider === 'piper' && voices && !voices[spokenLang]) {
         browserFallback()
         return
       }
 
       try {
-        const blob = await api.jarvisSpeech(cleaned, language || langRef.current)
+        const blob = await api.jarvisSpeech(cleaned, spokenLang)
         if (speechTokenRef.current !== token) return
         const url = URL.createObjectURL(blob)
         urlRef.current = url
@@ -215,7 +224,7 @@ export function JarvisProvider({ children }) {
           role: 'assistant',
           content:
             langRef.current === 'kg'
-              ? `Байланыш үзүлдү, мырза. ${error.message}`
+              ? `Байланыш үзүлдү, сэр. ${error.message}`
               : `Связь с ядром прервана, сэр. ${error.message}`,
           error: true,
           source: 'error',
@@ -318,7 +327,7 @@ export function JarvisProvider({ children }) {
         actionsRef.current.send?.(rest)
       } else {
         actionsRef.current.announce?.(
-          langRef.current === 'kg' ? 'Ооба, мырза. Угуп жатам.' : 'Да, сэр. Слушаю.',
+          langRef.current === 'kg' ? 'Ооба, сэр. Угуп жатам.' : 'Да, сэр. Слушаю.',
         )
       }
     }
@@ -444,7 +453,7 @@ export function JarvisProvider({ children }) {
         const message = hasWake && rest ? rest : heard
         if (message) actionsRef.current.send?.(message)
         else actionsRef.current.announce?.(
-          langRef.current === 'kg' ? 'Ооба, мырза. Угуп жатам.' : 'Да, сэр. Слушаю.',
+          langRef.current === 'kg' ? 'Ооба, сэр. Угуп жатам.' : 'Да, сэр. Слушаю.',
         )
       }
       if (wakeOnRef.current) {

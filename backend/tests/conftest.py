@@ -10,3 +10,7 @@ from pathlib import Path
 
 TEST_DB_DIR = Path(tempfile.mkdtemp(prefix="red-diploma-test-"))
 os.environ["RED_DIPLOMA_DB"] = str(TEST_DB_DIR / "red_diploma.db")
+
+# Tests must not depend on a locally running Ollama or installed Piper voices.
+os.environ["JARVIS_LLM"] = "local"
+os.environ["JARVIS_TTS"] = "browser"

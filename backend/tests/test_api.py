@@ -392,13 +392,29 @@ def test_jarvis_config_defaults_to_local_browser_mode(monkeypatch, client: TestC
 
 
 def test_jarvis_config_enables_optional_providers(monkeypatch, client: TestClient):
+    monkeypatch.setenv("JARVIS_LLM", "anthropic")
+    monkeypatch.setenv("JARVIS_TTS", "elevenlabs")
     monkeypatch.setenv("ANTHROPIC_API_KEY", "test-anthropic-key")
     monkeypatch.setenv("ELEVENLABS_API_KEY", "test-elevenlabs-key")
     payload = client.get("/api/jarvis/config").json()
     assert payload["llm"]["enabled"] is True
+    assert payload["llm"]["provider"] == "anthropic"
     assert payload["llm"]["model"] == "claude-haiku-4-5"
     assert payload["tts"]["provider"] == "elevenlabs"
     assert payload["tts"]["model"] == "eleven_multilingual_v2"
+
+
+def test_jarvis_config_exposes_ollama_and_piper(monkeypatch, client: TestClient):
+    monkeypatch.setenv("JARVIS_LLM", "ollama")
+    monkeypatch.setenv("JARVIS_TTS", "piper")
+    monkeypatch.setenv("OLLAMA_MODEL", "qwen2.5:3b")
+    payload = client.get("/api/jarvis/config").json()
+    assert payload["llm"]["enabled"] is True
+    assert payload["llm"]["provider"] == "ollama"
+    assert payload["llm"]["model"] == "qwen2.5:3b"
+    assert "Ollama" in payload["llm"]["label"]
+    assert payload["tts"]["provider"] == "piper"
+    assert "Piper" in payload["tts"]["label"]
 
 
 def test_jarvis_greets_in_russian_and_kyrgyz(monkeypatch, client: TestClient):
@@ -418,7 +434,54 @@ def test_jarvis_greets_in_russian_and_kyrgyz(monkeypatch, client: TestClient):
     )
     assert kyrgyz.status_code == 200
     assert kyrgyz.json()["language"] == "kg"
-    assert "мырза" in kyrgyz.json()["reply"]
+    assert "сэр" in kyrgyz.json()["reply"]
+
+
+def test_jarvis_keeps_kyrgyz_on_local_brain(monkeypatch, client: TestClient):
+    # Small Ollama models produce pseudo-Kyrgyz, so KG never goes to the LLM.
+    monkeypatch.setenv("JARVIS_LLM", "ollama")
+    response = client.post(
+        "/api/jarvis/chat",
+        json={
+            "message": "эмне үчүн FastAPI колдонулат?",
+            "context": {"language": "kg"},
+        },
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["source"] == "local"
+    assert payload["language"] == "kg"
+    assert "сэр" in payload["reply"].lower()
+
+
+def test_jarvis_keeps_confident_intents_out_of_the_llm(monkeypatch, client: TestClient):
+    # Even with Ollama forced, known intents use the deterministic persona.
+    monkeypatch.setenv("JARVIS_LLM", "ollama")
+    response = client.post(
+        "/api/jarvis/chat",
+        json={"message": "кто ты", "context": {"language": "ru"}},
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["source"] == "local"
+    assert payload["intent"] == "identity"
+    assert "сэр" in payload["reply"]
+    assert "J.A.R.V.I.S." in payload["reply"]
+
+
+def test_jarvis_understands_short_hint_phrase(monkeypatch, client: TestClient):
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    response = client.post(
+        "/api/jarvis/chat",
+        json={
+            "message": "подскажи",
+            "context": {"language": "ru", "task_slug": "sum-even"},
+        },
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["intent"] == "hint"
+    assert payload["source"] == "local"
 
 
 def test_jarvis_never_leaks_task_solution(monkeypatch, client: TestClient):
@@ -483,7 +546,7 @@ def test_jarvis_finds_topics_without_llm(monkeypatch, client: TestClient):
     kg_payload = kyrgyz.json()
     assert kg_payload["language"] == "kg"
     assert kg_payload["intent"] == "topic"
-    assert "мырза" in kg_payload["reply"].lower()
+    assert "сэр" in kg_payload["reply"].lower()
 
 
 def test_jarvis_answers_wake_address(monkeypatch, client: TestClient):
@@ -502,15 +565,26 @@ def test_jarvis_answers_wake_address(monkeypatch, client: TestClient):
         json={"message": "Жарвис", "context": {"language": "kg"}},
     )
     assert kyrgyz.status_code == 200
-    assert kyrgyz.json()["reply"] == "Ооба, мырза. Угуп жатам."
+    assert kyrgyz.json()["reply"] == "Ооба, сэр. Угуп жатам."
 
 
-def test_jarvis_speech_requires_elevenlabs(monkeypatch, client: TestClient):
+def test_jarvis_speech_requires_provider(monkeypatch, client: TestClient):
     monkeypatch.delenv("ELEVENLABS_API_KEY", raising=False)
+    monkeypatch.setenv("JARVIS_TTS", "browser")
     response = client.post(
         "/api/jarvis/speech",
         json={"text": "Да, сэр.", "lang": "ru"},
     )
+    assert response.status_code == 503
+
+
+def test_jarvis_speech_accepts_english_lang(monkeypatch, client: TestClient):
+    monkeypatch.setenv("JARVIS_TTS", "browser")
+    response = client.post(
+        "/api/jarvis/speech",
+        json={"text": "Good evening, sir.", "lang": "en"},
+    )
+    # The language is valid; only the provider is unavailable in tests.
     assert response.status_code == 503
 
 

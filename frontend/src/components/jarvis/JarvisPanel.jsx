@@ -145,6 +145,7 @@ function Message({ message, lang, onAction, onSpeak, studentName }) {
             </button>
           )}
           {message.source === 'claude' && <span className="jarvis-source">claude haiku 4.5</span>}
+          {message.source === 'ollama' && <span className="jarvis-source">ollama</span>}
           {message.source === 'local' && assistant && <span className="jarvis-source">local core</span>}
         </footer>
       </div>
@@ -314,10 +315,10 @@ export default function JarvisPanel() {
 
           <div className="jarvis-statusline">
             <span className={`jarvis-status ${config.llm.enabled ? 'live' : ''}`}>
-              <Cpu size={13} /> {config.llm.enabled ? 'CLAUDE HAIKU 4.5' : 'LOCAL CORE'}
+              <Cpu size={13} /> {(config.llm.label || 'LOCAL CORE').toUpperCase()}
             </span>
-            <span className={`jarvis-status ${config.tts.provider === 'elevenlabs' ? 'live' : ''}`}>
-              <AudioLines size={13} /> {config.tts.provider === 'elevenlabs' ? 'ELEVENLABS' : 'BROWSER VOICE'}
+            <span className={`jarvis-status ${config.tts.provider !== 'browser' ? 'live' : ''}`}>
+              <AudioLines size={13} /> {(config.tts.label || 'BROWSER VOICE').toUpperCase()}
             </span>
             <div className="jarvis-clock">
               <strong>{clock.time}</strong>
@@ -456,7 +457,7 @@ export default function JarvisPanel() {
               </div>
               <JarvisOrb state={orbState} />
               <div className="jarvis-telemetry right" aria-hidden="true">
-                <span>NEURAL</span><strong>{config.llm.enabled ? 'CLOUD' : 'LOCAL'}</strong>
+                <span>NEURAL</span><strong>{config.llm.provider === 'ollama' ? 'OLLAMA' : config.llm.provider === 'anthropic' ? 'CLOUD' : 'LOCAL'}</strong>
                 <span>VOICE</span><strong>{muted ? 'MUTED' : 'ACTIVE'}</strong>
                 <span>WAKE</span><strong>{wakeMode ? 'ARMED' : 'STANDBY'}</strong>
               </div>
@@ -467,7 +468,7 @@ export default function JarvisPanel() {
                   {orbState === 'thinking'
                     ? lang === 'kg' ? 'контекст талданып жатат' : 'анализирую контекст'
                     : orbState === 'listening'
-                      ? lang === 'kg' ? 'сүйлөңүз, мырза' : 'говорите, сэр'
+                      ? lang === 'kg' ? 'сүйлөңүз, сэр' : 'говорите, сэр'
                       : orbState === 'speaking'
                         ? lang === 'kg' ? 'үн синтези' : 'синтез речи'
                         : `${studentName} · v${config.version || '1.0'}`}
@@ -480,7 +481,7 @@ export default function JarvisPanel() {
                 <Sparkles size={15} />
                 <p>
                   {lang === 'kg'
-                    ? 'Мырза, мен даярмын. Суроо бериңиз же тез буйруктардын бирин тандаңыз.'
+                    ? 'Сэр, мен даярмын. Суроо бериңиз же тез буйруктардын бирин тандаңыз.'
                     : 'Сэр, я готов. Задайте вопрос или выберите быструю команду.'}
                 </p>
               </div>
@@ -541,7 +542,7 @@ export default function JarvisPanel() {
                   onKeyDown={onComposerKey}
                   placeholder={
                     lang === 'kg'
-                      ? 'Мырза, сурооңузду жазыңыз…'
+                      ? 'Сэр, сурооңузду жазыңыз…'
                       : 'Сэр, напишите вопрос или скажите «Джарвис»…'
                   }
                   aria-label="Сообщение для Джарвиса"
@@ -630,7 +631,7 @@ export default function JarvisPanel() {
               <Power size={13} />
               <p>
                 {lang === 'kg'
-                  ? '«Мен сиздин окутуучуңузмун, мырза. Даяр чечим эмес — түшүнүү берем.»'
+                  ? '«Мен сиздин окутуучуңузмун, сэр. Даяр чечим эмес — түшүнүү берем.»'
                   : '«Я ваш наставник, сэр. Даю понимание, а не готовое решение.»'}
               </p>
             </div>

@@ -1,9 +1,16 @@
 from __future__ import annotations
 
+import asyncio
 import json
 import os
 import re
+import shutil
+import sys
+import tempfile
+import time
+from dataclasses import dataclass
 from datetime import datetime
+from pathlib import Path
 from typing import Any
 
 import httpx
@@ -17,6 +24,26 @@ DEFAULT_MODEL = os.getenv("JARVIS_MODEL", "claude-haiku-4-5")
 ELEVENLABS_URL = "https://api.elevenlabs.io/v1/text-to-speech"
 DEFAULT_VOICE = os.getenv("ELEVENLABS_VOICE_ID", "JBFqnCBsd6RMkjVDRZzb")
 DEFAULT_TTS_MODEL = os.getenv("ELEVENLABS_MODEL", "eleven_multilingual_v2")
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+PROJECT_DIR = BASE_DIR.parent
+PIPER_DIR = BASE_DIR / "models" / "piper"
+
+OLLAMA_DEFAULT_URL = "http://127.0.0.1:11434"
+OLLAMA_DEFAULT_MODEL = "qwen2.5:3b"
+PIPER_DEFAULT_VOICES = {
+    "en": "en_GB-jarvis-high",
+    "ru": "ru_RU-dmitri-medium",
+}
+
+_ollama_probe: tuple[float, bool] | None = None
+
+
+@dataclass(frozen=True)
+class Speech:
+    audio: bytes
+    media_type: str
+    provider: str
 
 KYRGYZ_LETTERS = set("ңөү")
 KYRGYZ_WORDS = {
@@ -60,7 +87,7 @@ INTENT_RULES: list[tuple[str, tuple[str, ...]]] = [
     ),
     (
         "hint",
-        ("подсказ", "hint", "жардам бер", "кыйын", "застрял", "түрткү"),
+        ("подсказ", "подскаж", "hint", "жардам бер", "кыйын", "застрял", "түрткү"),
     ),
     (
         "explain",
@@ -116,24 +143,161 @@ def detect_language(text: str, hint: str = "ru") -> str:
     return hint if hint in {"ru", "kg"} else "ru"
 
 
+def _ollama_url() -> str:
+    return os.getenv("OLLAMA_URL", OLLAMA_DEFAULT_URL).rstrip("/")
+
+
+def _ollama_model() -> str:
+    return os.getenv("OLLAMA_MODEL", OLLAMA_DEFAULT_MODEL).strip() or OLLAMA_DEFAULT_MODEL
+
+
+def _ollama_reachable(ttl: float = 30.0) -> bool:
+    global _ollama_probe
+    now = time.monotonic()
+    if _ollama_probe and now - _ollama_probe[0] < ttl:
+        return _ollama_probe[1]
+    try:
+        with httpx.Client(timeout=0.8) as client:
+            ok = client.get(f"{_ollama_url()}/api/tags").status_code == 200
+    except httpx.HTTPError:
+        ok = False
+    _ollama_probe = (now, ok)
+    return ok
+
+
+def _llm_provider() -> str:
+    forced = os.getenv("JARVIS_LLM", "auto").strip().lower()
+    if forced in {"ollama", "anthropic", "local"}:
+        return forced
+    if _ollama_reachable():
+        return "ollama"
+    if os.getenv("ANTHROPIC_API_KEY"):
+        return "anthropic"
+    return "local"
+
+
+def _resolve_path(value: str) -> Path:
+    path = Path(value).expanduser()
+    return path if path.is_absolute() else PROJECT_DIR / path
+
+
+def _piper_command() -> list[str] | None:
+    exe = os.getenv("PIPER_EXE", "").strip()
+    if exe:
+        path = _resolve_path(exe)
+        return [str(path)] if path.exists() else None
+    candidate = Path(sys.executable).parent / "Scripts" / "piper.exe"
+    if candidate.exists():
+        return [str(candidate)]
+    found = shutil.which("piper")
+    if found:
+        return [found]
+    try:
+        import piper  # noqa: F401
+
+        return [sys.executable, "-m", "piper"]
+    except ImportError:
+        return None
+
+
+def _piper_voice(lang: str) -> Path | None:
+    override = os.getenv("PIPER_VOICE", "").strip()
+    if override:
+        path = _resolve_path(override)
+        return path if path.exists() else None
+
+    name = PIPER_DEFAULT_VOICES.get(lang)
+    if not name:
+        return None
+    raw = os.getenv(f"PIPER_VOICE_{lang.upper()}", str(PIPER_DIR / f"{name}.onnx"))
+    path = _resolve_path(raw)
+    if not path.exists() or not Path(f"{path}.json").exists():
+        return None
+    return path
+
+
+def _piper_ready() -> bool:
+    if os.getenv("JARVIS_TTS", "auto").strip().lower() == "browser":
+        return False
+    return _piper_command() is not None and any(
+        _piper_voice(lang) for lang in PIPER_DEFAULT_VOICES
+    )
+
+
+def _tts_provider() -> str:
+    forced = os.getenv("JARVIS_TTS", "auto").strip().lower()
+    if forced in {"piper", "elevenlabs", "browser"}:
+        return forced
+    if _piper_ready():
+        return "piper"
+    if os.getenv("ELEVENLABS_API_KEY"):
+        return "elevenlabs"
+    return "browser"
+
+
 def config() -> dict[str, Any]:
-    llm_enabled = bool(os.getenv("ANTHROPIC_API_KEY"))
-    tts_enabled = bool(os.getenv("ELEVENLABS_API_KEY"))
+    provider = _llm_provider()
+    if provider == "ollama":
+        model = _ollama_model()
+        llm = {
+            "enabled": True,
+            "provider": "ollama",
+            "model": model,
+            "label": f"Ollama · {model}",
+        }
+    elif provider == "anthropic":
+        model = DEFAULT_MODEL
+        llm = {
+            "enabled": True,
+            "provider": "anthropic",
+            "model": model,
+            "label": "Claude Haiku 4.5",
+        }
+    else:
+        llm = {
+            "enabled": False,
+            "provider": "local",
+            "model": None,
+            "label": "Local Core",
+        }
+
+    tts_provider = _tts_provider()
+    if tts_provider == "piper":
+        voices = {
+            lang: path.stem
+            for lang in ("en", "ru", "kg")
+            if (path := _piper_voice(lang)) is not None
+        }
+        voice = voices.get("ru") or voices.get("en")
+        tts = {
+            "enabled": True,
+            "provider": "piper",
+            "label": "Piper · J.A.R.V.I.S.",
+            "model": voice,
+            "voices": voices,
+        }
+    elif tts_provider == "elevenlabs":
+        tts = {
+            "enabled": True,
+            "provider": "elevenlabs",
+            "label": "ElevenLabs",
+            "model": DEFAULT_TTS_MODEL,
+            "voices": {},
+        }
+    else:
+        tts = {
+            "enabled": False,
+            "provider": "browser",
+            "label": "Голос браузера",
+            "model": None,
+            "voices": {},
+        }
+
     return {
         "name": "J.A.R.V.I.S.",
         "version": "1.0",
-        "llm": {
-            "enabled": llm_enabled,
-            "provider": "anthropic",
-            "model": DEFAULT_MODEL,
-            "label": "Claude Haiku 4.5",
-        },
-        "tts": {
-            "enabled": tts_enabled,
-            "provider": "elevenlabs" if tts_enabled else "browser",
-            "label": "ElevenLabs" if tts_enabled else "Голос браузера",
-            "model": DEFAULT_TTS_MODEL if tts_enabled else None,
-        },
+        "llm": llm,
+        "tts": tts,
         "stt": {"provider": "browser", "label": "Web Speech API"},
         "languages": ["ru", "kg"],
         "wake_words": ["джарвис", "жарвис", "jarvis"],
@@ -264,12 +428,12 @@ def _time_greeting(lang: str) -> str:
     hour = datetime.now().hour
     if lang == "kg":
         if 5 <= hour < 12:
-            return "Кутмандуу таң, мырза"
+            return "Кутмандуу таң, сэр"
         if 12 <= hour < 18:
-            return "Кутмандуу күн, мырза"
+            return "Кутмандуу күн, сэр"
         if 18 <= hour < 23:
-            return "Кутмандуу кеч, мырза"
-        return "Түнкү убакыт, мырза"
+            return "Кутмандуу кеч, сэр"
+        return "Түнкү убакыт, сэр"
     if 5 <= hour < 12:
         return "Доброе утро, сэр"
     if 12 <= hour < 18:
@@ -284,7 +448,7 @@ def _next_sentence(nxt: dict[str, Any] | None, lang: str) -> str:
         return (
             "Оба маршрута завершены, сэр. Самое время закрепить материал на экзамене."
             if lang == "ru"
-            else "Эки маршрут тең бүттү, мырза. Эми экзаменде билимиңизди бекемдесеңиз болот."
+            else "Эки маршрут тең бүттү, сэр. Эми экзаменде билимиңизди бекемдесеңиз болот."
         )
     if lang == "kg":
         return (
@@ -305,7 +469,7 @@ def _greeting(lang: str, stats: dict[str, Any], nxt: dict[str, Any] | None, name
             f"{name}, даярдыгыңыз **{stats['readiness']}%** · "
             f"тапшырмалар **{stats['tasks_done']}/{stats['tasks_total']}** · "
             f"экзамен **{stats['exam_points']:g}/{stats['exam_max']:g}**.\n\n"
-            f"{line}\n\nЭмнеден баштайбыз, мырза?"
+            f"{line}\n\nЭмнеден баштайбыз, сэр?"
         )
     return (
         f"{_time_greeting(lang)}. Все системы в норме.\n\n"
@@ -320,7 +484,7 @@ def _status(lang: str, stats: dict[str, Any], nxt: dict[str, Any] | None) -> str
     line = _next_sentence(nxt, lang)
     if lang == "kg":
         return (
-            f"Даярдык **{stats['readiness']}%**, мырза.\n\n"
+            f"Даярдык **{stats['readiness']}%**, сэр.\n\n"
             f"- Сабактар: **{stats['lessons_done']}/{stats['lessons_total']}**\n"
             f"- Тапшырмалар: **{stats['tasks_done']}/{stats['tasks_total']}**\n"
             f"- Экзамен: **{stats['exam_points']:g}/{stats['exam_max']:g}** балл\n"
@@ -341,7 +505,7 @@ def _explain(task: dict[str, Any] | None, lang: str) -> str:
     if task is None:
         if lang == "kg":
             return (
-                "Мырза, азырынча тапшырма тандалган жок. "
+                "Сэр, азырынча тапшырма тандалган жок. "
                 "Тапшырма баракчасын ачыңыз да, мени кайра чакырыңыз — ошондо так түшүндүрөм."
             )
         return (
@@ -354,12 +518,16 @@ def _explain(task: dict[str, Any] | None, lang: str) -> str:
     steps = plan if plan else hints
     plan_text = ""
     if steps:
-        items = "\n".join(f"{index + 1}. {step}" for index, step in enumerate(steps[:4]))
-        plan_text = f"\n\n**{'План' if lang == 'ru' else 'План'}.**\n{items}"
+        items = []
+        for index, step in enumerate(steps[:4], start=1):
+            text = str(step)
+            already_numbered = re.match(r"\s*\d+[.)]\s", text)
+            items.append(text if already_numbered else f"{index}. {text}")
+        plan_text = f"\n\n**План.**\n" + "\n".join(items)
 
     if lang == "kg":
         parts = [
-            f"Мырза, **{task['title']}** тапшырмасын талдайлы.",
+            f"Сэр, **{task['title']}** тапшырмасын талдайлы.",
             f"**Негизги идея.** {task['explanation'] or task['prompt']}{plan_text}",
         ]
         if task.get("pitfalls"):
@@ -384,7 +552,7 @@ def _explain(task: dict[str, Any] | None, lang: str) -> str:
 def _hint(task: dict[str, Any] | None, message: str, lang: str) -> str:
     if task is None:
         if lang == "kg":
-            return "Мырза, адегенде тапшырманы ачыңыз — анан так жардам берем."
+            return "Сэр, адегенде тапшырманы ачыңыз — анан так жардам берем."
         return "Сэр, сначала откройте задачу — тогда я смогу дать точную подсказку."
 
     number = 1
@@ -399,7 +567,7 @@ def _hint(task: dict[str, Any] | None, message: str, lang: str) -> str:
         total = len(source)
         if lang == "kg":
             return (
-                f"**Подсказка {number}/{total}, мырза.** {hint}\n\n"
+                f"**Подсказка {number}/{total}, сэр.** {hint}\n\n"
                 "Азырынча ушундан баштаңыз. Кодду жазып, «кодду текшер» деңиз — "
                 "калганын чогуу карайбыз."
             )
@@ -411,7 +579,7 @@ def _hint(task: dict[str, Any] | None, message: str, lang: str) -> str:
 
     if lang == "kg":
         return (
-            "Мырза, бул тапшырмада жашыруун подсказка жок. "
+            "Сэр, бул тапшырмада жашыруун подсказка жок. "
             "Кирүү → иштетүү → чыгуу деп бөлүп, ар бир кадамды өзүнчө текшериңиз."
         )
     return (
@@ -423,13 +591,13 @@ def _hint(task: dict[str, Any] | None, message: str, lang: str) -> str:
 def _review(task: dict[str, Any] | None, context: dict[str, Any], lang: str) -> str:
     if task is None:
         if lang == "kg":
-            return "Мырза, кодду текшерүү үчүн тапшырманы ачыңыз."
+            return "Сэр, кодду текшерүү үчүн тапшырманы ачыңыз."
         return "Сэр, чтобы проверить код, откройте задачу."
 
     code = str(context.get("code") or "")
     if not code.strip():
         if lang == "kg":
-            return "Мырза, код бош. Редакторго чечимиңизди жазып, кайра чакырыңыз."
+            return "Сэр, код бош. Редакторго чечимиңизди жазып, кайра чакырыңыз."
         return "Сэр, код пуст. Напишите решение в редакторе и позовите меня снова."
 
     issues: list[str] = []
@@ -482,7 +650,7 @@ def _review(task: dict[str, Any] | None, context: dict[str, Any], lang: str) -> 
             failed = len([item for item in results if not item.get("ok")])
 
     if lang == "kg":
-        lines = [f"Мырза, **{task['title']}** боюнча кодду карап чыктым."]
+        lines = [f"Сэр, **{task['title']}** боюнча кодду карап чыктым."]
         if syntax_error:
             lines.append(f"**Синтаксис.** `{syntax_error}` — адегенде ушуну оңдоңуз.")
         elif issues:
@@ -490,7 +658,7 @@ def _review(task: dict[str, Any] | None, context: dict[str, Any], lang: str) -> 
         elif warnings:
             lines.append("**Эскертүү.** " + "; ".join(warnings) + ".")
         elif last.get("passed") is True:
-            lines.append("Тесттер өттү. Жакшы иш, мырза. Эми чечимди үн менен түшүндүрүңүз.")
+            lines.append("Тесттер өттү. Жакшы иш, сэр. Эми чечимди үн менен түшүндүрүңүз.")
         else:
             lines.append("Синтаксистик ката көрүнбөйт. Тесттерди иштетип көрүңүз.")
         if total and failed:
@@ -498,7 +666,7 @@ def _review(task: dict[str, Any] | None, context: dict[str, Any], lang: str) -> 
                 f"**Тесттер.** {failed}/{total} кулады. `expected` жана `actual`ды салыштырыңыз — "
                 "болжолдобоңуз."
             )
-        lines.append("Даяр чечимди бербейм, мырза — бирок кийинки кадамды тактай алам.")
+        lines.append("Даяр чечимди бербейм, сэр — бирок кийинки кадамды тактай алам.")
         return "\n\n".join(lines)
 
     lines = [f"Сэр, посмотрел код по задаче **{task['title']}**."]
@@ -524,7 +692,7 @@ def _review(task: dict[str, Any] | None, context: dict[str, Any], lang: str) -> 
 def _exam(stats: dict[str, Any], lang: str) -> str:
     if lang == "kg":
         return (
-            f"Экзаменге даярдык, мырза: **{stats['exam_points']:g}/{stats['exam_max']:g}** балл, "
+            f"Экзаменге даярдык, сэр: **{stats['exam_points']:g}/{stats['exam_max']:g}** балл, "
             f"тренажёр орточо **{stats['drill_average']}%**.\n\n"
             "Ирети: бүтпөгөн тапшырмалар → тренажёр → 1, 2, 3-этап. "
             "Ар бир этаптан кийин каталарды талдаңыз."
@@ -540,7 +708,7 @@ def _exam(stats: dict[str, Any], lang: str) -> str:
 def _identity(lang: str) -> str:
     if lang == "kg":
         return (
-            "Мен **J.A.R.V.I.S.**, сиздин жеке окутуучуңузмун, мырза. "
+            "Мен **J.A.R.V.I.S.**, сиздин жеке окутуучуңузмун, сэр. "
             "Кыргызча жана орусча сүйлөйм. Тапшырманы түшүндүрөм, подсказка берем, "
             "кодду текшерем, прогрести көрсөтөм жана кийинки кадамды айтам. "
             "Даяр чечим бербейм — үйрөнүү сиздин колуңузда."
@@ -555,7 +723,7 @@ def _identity(lang: str) -> str:
 def _help(lang: str) -> str:
     if lang == "kg":
         return (
-            "Кызматыңыздамын, мырза. Эмне кыла алам:\n\n"
+            "Кызматыңыздамын, сэр. Эмне кыла алам:\n\n"
             "- **Түшүндүрүү** — тапшырманын идеясын жана планын айтам.\n"
             "- **Подсказка** — бир кадамдан берем, даяр чечимсиз.\n"
             "- **Код текшерүү** — синтаксис, тыюу салынган конструкциялар, тесттер.\n"
@@ -574,7 +742,7 @@ def _help(lang: str) -> str:
 
 def _language_ack(lang: str) -> str:
     if lang == "kg":
-        return "Ооба, мырза. Кыргызча сүйлөйм. Кандай жардам берейин?"
+        return "Ооба, сэр. Кыргызча сүйлөйм. Кандай жардам берейин?"
     return "Да, сэр. Перехожу на русский. Чем помочь?"
 
 
@@ -712,7 +880,7 @@ def _topic_answer(topic: dict[str, Any], lang: str) -> str:
     if lang == "kg":
         kind = "тапшырма" if topic["kind"] == "task" else "тема"
         return (
-            f"Мырза, **{topic['title']}** — «{module}» модулундагы {kind}.\n\n"
+            f"Сэр, **{topic['title']}** — «{module}» модулундагы {kind}.\n\n"
             f"{summary}\n\n"
             "Идеясын кадам-кадам түшүндүрө алам, подсказка берем же кодду текшерем — "
             "даяр чечимсиз."
@@ -729,7 +897,7 @@ def _topic_answer(topic: dict[str, Any], lang: str) -> str:
 def _fallback(lang: str) -> str:
     if lang == "kg":
         return (
-            "Мырза, так түшүнгөн жокмун. Тактап айта аласызбы: "
+            "Сэр, так түшүнгөн жокмун. Тактап айта аласызбы: "
             "тапшырманы түшүндүрөйүнбү, подсказка берейинби, кодду текшерейинби "
             "же прогрести көрсөтөйүнбү?"
         )
@@ -769,7 +937,7 @@ def local_reply(
     action: dict[str, str] | None = None
 
     if intent == "address":
-        reply = "Да, сэр. Слушаю." if lang == "ru" else "Ооба, мырза. Угуп жатам."
+        reply = "Да, сэр. Слушаю." if lang == "ru" else "Ооба, сэр. Угуп жатам."
     elif intent == "greeting":
         reply = _greeting(lang, stats, nxt, student_name)
     elif intent == "status":
@@ -792,7 +960,7 @@ def local_reply(
         reply = (
             "Всегда к вашим услугам, сэр."
             if lang == "ru"
-            else "Ар дайым кызматыңыздамын, мырза."
+            else "Ар дайым кызматыңыздамын, сэр."
         )
     elif intent == "language":
         reply = _language_ack(lang)
@@ -876,7 +1044,7 @@ def _system_prompt(
     student_name: str,
 ) -> str:
     language = "кыргызском" if lang == "kg" else "русском"
-    address = "мырза" if lang == "kg" else "сэр"
+    address = "сэр"
     return (
         "Ты — J.A.R.V.I.S., персональный ИИ-наставник в учебном приложении Red Diploma "
         "(подготовка к экзамену по backend и AI).\n\n"
@@ -913,22 +1081,9 @@ def _leaks_solution(reply: str, task_slug: str) -> bool:
     return compact_solution in compact_reply
 
 
-async def _llm_reply(
-    message: str,
-    history: list[dict[str, str]],
-    context: dict[str, Any],
-    lang: str,
-    student_name: str,
-) -> str | None:
-    key = os.getenv("ANTHROPIC_API_KEY")
-    if not key:
-        return None
-
-    stats = _stats()
-    nxt = next_step(lang)
-    task = _task_brief(str(context.get("task_slug") or ""), lang)
-    payload = _context_payload(context, lang, stats, nxt, task)
-
+def _build_turns(
+    message: str, history: list[dict[str, str]]
+) -> list[dict[str, str]]:
     turns: list[dict[str, str]] = []
     for turn in history[-8:]:
         role = turn.get("role")
@@ -938,13 +1093,24 @@ async def _llm_reply(
     while turns and turns[0]["role"] != "user":
         turns.pop(0)
     turns.append({"role": "user", "content": message})
+    return turns
+
+
+async def _anthropic_reply(
+    message: str,
+    history: list[dict[str, str]],
+    system: str,
+) -> str | None:
+    key = os.getenv("ANTHROPIC_API_KEY")
+    if not key:
+        return None
 
     body = {
         "model": DEFAULT_MODEL,
         "max_tokens": 700,
         "temperature": 0.55,
-        "system": _system_prompt(lang, payload, student_name),
-        "messages": turns,
+        "system": system,
+        "messages": _build_turns(message, history),
     }
     headers = {
         "x-api-key": key,
@@ -965,12 +1131,65 @@ async def _llm_reply(
         for block in data.get("content", [])
         if isinstance(block, dict) and block.get("type") == "text"
     ]
-    reply = "\n".join(parts).strip()
+    return "\n".join(parts).strip() or None
+
+
+async def _ollama_reply(
+    message: str,
+    history: list[dict[str, str]],
+    system: str,
+) -> str | None:
+    body = {
+        "model": _ollama_model(),
+        "stream": False,
+        "messages": [
+            {"role": "system", "content": system},
+            *_build_turns(message, history),
+        ],
+        "options": {"temperature": 0.55, "num_predict": 700},
+    }
+    try:
+        async with httpx.AsyncClient(timeout=90.0) as client:
+            response = await client.post(f"{_ollama_url()}/api/chat", json=body)
+        if response.status_code >= 400:
+            return None
+        data = response.json()
+    except (httpx.HTTPError, ValueError):
+        return None
+
+    reply = str((data.get("message") or {}).get("content") or "").strip()
+    return reply or None
+
+
+async def _llm_reply(
+    message: str,
+    history: list[dict[str, str]],
+    context: dict[str, Any],
+    lang: str,
+    student_name: str,
+) -> tuple[str, str] | None:
+    provider = _llm_provider()
+    if provider == "local":
+        return None
+
+    stats = _stats()
+    nxt = next_step(lang)
+    task = _task_brief(str(context.get("task_slug") or ""), lang)
+    payload = _context_payload(context, lang, stats, nxt, task)
+    system = _system_prompt(lang, payload, student_name)
+
+    if provider == "ollama":
+        if not _ollama_reachable():
+            return None
+        reply = await _ollama_reply(message, history, system)
+    else:
+        reply = await _anthropic_reply(message, history, system)
+
     if not reply:
         return None
     if _leaks_solution(reply, str(context.get("task_slug") or "")):
         return None
-    return reply
+    return reply, provider
 
 
 async def answer(
@@ -984,21 +1203,26 @@ async def answer(
     lang = detect_language(message, lang_hint)
     local = local_reply(message, context, lang, student_name=student_name)
 
+    # Confident intents stay deterministic: the same JARVIS persona, grounded
+    # stats, and zero dependence on a small model's mood. Only free-form chat
+    # (intent "fallback") goes to Ollama. Kyrgyz never leaves the local brain.
     if (
         message == "__greeting__"
-        or local["intent"] == "review"
-        or not os.getenv("ANTHROPIC_API_KEY")
+        or lang == "kg"
+        or local["intent"] != "fallback"
+        or _llm_provider() == "local"
     ):
         return local
 
-    reply = await _llm_reply(message, history, context, lang, student_name)
-    if reply is None:
+    result = await _llm_reply(message, history, context, lang, student_name)
+    if result is None:
         return local
+    reply, provider = result
 
     return {
         "reply": reply,
         "intent": local["intent"],
-        "source": "claude",
+        "source": provider,
         "language": lang,
         "action": local.get("action"),
     }
@@ -1014,18 +1238,15 @@ def _plain_text(text: str) -> str:
     return text[:1200]
 
 
-async def synthesize(text: str, lang: str = "ru") -> bytes | None:
+async def _elevenlabs_speech(text: str) -> Speech | None:
     key = os.getenv("ELEVENLABS_API_KEY")
     if not key:
         return None
 
-    plain = _plain_text(text)
-    if not plain:
-        return None
     voice = os.getenv("ELEVENLABS_VOICE_ID", DEFAULT_VOICE)
     model = os.getenv("ELEVENLABS_MODEL", DEFAULT_TTS_MODEL)
     body = {
-        "text": plain,
+        "text": text,
         "model_id": model,
         "voice_settings": {
             "stability": 0.38,
@@ -1034,7 +1255,6 @@ async def synthesize(text: str, lang: str = "ru") -> bytes | None:
             "use_speaker_boost": True,
         },
     }
-    body = {key_: value for key_, value in body.items() if value is not None}
     headers = {"xi-api-key": key, "content-type": "application/json"}
     try:
         async with httpx.AsyncClient(timeout=30.0) as client:
@@ -1045,6 +1265,62 @@ async def synthesize(text: str, lang: str = "ru") -> bytes | None:
             )
     except httpx.HTTPError:
         return None
-    if response.status_code >= 400:
+    if response.status_code >= 400 or not response.content:
         return None
-    return response.content
+    return Speech(response.content, "audio/mpeg", "elevenlabs")
+
+
+async def _piper_speech(text: str, lang: str) -> Speech | None:
+    voice = _piper_voice(lang)
+    command = _piper_command()
+    if voice is None or command is None:
+        return None
+
+    with tempfile.TemporaryDirectory(prefix="jarvis-piper-") as tmp:
+        text_path = Path(tmp) / "text.txt"
+        wav_path = Path(tmp) / "voice.wav"
+        text_path.write_text(text, encoding="utf-8")
+        process: asyncio.subprocess.Process | None = None
+        try:
+            process = await asyncio.create_subprocess_exec(
+                *command,
+                "-m",
+                str(voice),
+                "-c",
+                f"{voice}.json",
+                "-i",
+                str(text_path),
+                "-f",
+                str(wav_path),
+                stdout=asyncio.subprocess.DEVNULL,
+                stderr=asyncio.subprocess.DEVNULL,
+            )
+            await asyncio.wait_for(process.wait(), timeout=90)
+        except (OSError, asyncio.TimeoutError):
+            if process is not None:
+                try:
+                    process.kill()
+                    await process.wait()
+                except ProcessLookupError:
+                    pass
+            return None
+        if process.returncode != 0 or not wav_path.exists():
+            return None
+        audio = wav_path.read_bytes()
+
+    if len(audio) < 100:
+        return None
+    return Speech(audio, "audio/wav", "piper")
+
+
+async def synthesize(text: str, lang: str = "ru") -> Speech | None:
+    provider = _tts_provider()
+    if provider == "browser":
+        return None
+
+    plain = _plain_text(text)
+    if not plain:
+        return None
+    if provider == "piper":
+        return await _piper_speech(plain, lang)
+    return await _elevenlabs_speech(plain)

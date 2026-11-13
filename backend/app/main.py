@@ -105,7 +105,7 @@ class JarvisChatRequest(BaseModel):
 
 class JarvisSpeechRequest(BaseModel):
     text: str = Field(min_length=1, max_length=1500)
-    lang: Literal["ru", "kg"] = "ru"
+    lang: Literal["ru", "kg", "en"] = "ru"
 
 
 def _task_public(task: dict[str, Any]) -> dict[str, Any]:
@@ -648,18 +648,19 @@ async def jarvis_chat(payload: JarvisChatRequest) -> dict[str, Any]:
 
 @app.post("/api/jarvis/speech")
 async def jarvis_speech(payload: JarvisSpeechRequest) -> Response:
-    audio = await jarvis.synthesize(payload.text, payload.lang)
-    if audio is None:
+    speech = await jarvis.synthesize(payload.text, payload.lang)
+    if speech is None:
         raise HTTPException(
             status_code=503,
             detail=(
-                "ElevenLabs is not configured. Set ELEVENLABS_API_KEY "
-                "or use browser speech."
+                "No speech provider is available for this language. "
+                "Install Piper voices or set ELEVENLABS_API_KEY; "
+                "the client falls back to browser speech."
             ),
         )
     return Response(
-        content=audio,
-        media_type="audio/mpeg",
+        content=speech.audio,
+        media_type=speech.media_type,
         headers={"Cache-Control": "no-store"},
     )
 
