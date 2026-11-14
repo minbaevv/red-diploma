@@ -94,9 +94,9 @@ What Jarvis can do:
 - **Report progress** — readiness, lessons, tasks, exam points, drills, and the next unfinished route step with a direct link.
 - **Speak RU/KG** — replies follow the language of the message; the toolbar switches the whole app RU/KG. Jarvis addresses the user as **«сэр»** in both languages, as in the films.
 
-Voice input uses the Web Speech API. Click the mic for push-to-talk, or enable **«Джарвис» mode** to keep the wake word armed. Chrome/Edge provide speech recognition; browsers without it still support text input. Kyrgyz speech recognition is not available in browsers, so type Kyrgyz questions — Jarvis answers in Kyrgyz.
+Voice input uses the Web Speech API. Click the mic to start a hands-free voice chat: speak, Jarvis replies, and the mic reopens automatically for the next turn, like ChatGPT voice mode. Enable **«Джарвис» mode** to keep the wake word armed; «Джарвис», «привет, Джарвис», «Джарвис, привет», and «салам, Джарвис» all start the same voice chat. Chrome/Edge provide speech recognition; browsers without it still support text input. Kyrgyz speech recognition is not available in browsers, so type Kyrgyz questions — Jarvis answers in Kyrgyz.
 
-Replies are spoken by local **Piper** voices by default: `en_GB-jarvis-high` (the movie-style British JARVIS) for English and `ru_RU-dmitri-medium` for Russian. Kyrgyz has no Piper voice, so the client falls back to browser speech. Speech is generated on the backend, so the browser only receives WAV audio.
+Replies are spoken by local **Piper** voices by default: `en_GB-jarvis-high` (the movie-style British JARVIS) for English and `ru_RU-dmitri-medium` for Russian. The English voice is English-only: keep `PIPER_VOICE_RU` on the Russian voice, otherwise Russian text is read with English pronunciation. Kyrgyz has no Piper voice, so the client falls back to browser speech. Speech is generated on the backend, so the browser only receives WAV audio.
 
 Free-form Russian conversation runs on local **Ollama** (`qwen2.5:3b` by default) when the Ollama server is up. Kyrgyz always stays on the deterministic local brain: a 3B model produces pseudo-Kyrgyz, while the hand-written KG replies are correct. Claude Haiku 4.5 and ElevenLabs remain optional cloud fallbacks. Task explanations, hints, and code review stay deterministic and never expose solutions, whichever provider is active.
 
@@ -117,7 +117,7 @@ curl.exe -L -o backend/models/piper/ru_RU-dmitri-medium.onnx.json `
   "https://huggingface.co/rhasspy/piper-voices/resolve/main/ru/ru_RU/dmitri/medium/ru_RU-dmitri-medium.onnx.json"
 ```
 
-Model binaries stay in `backend/models/` and are git-ignored. Copy `.env.example` to `.env` to override providers (`JARVIS_LLM=auto|ollama|anthropic|local`, `JARVIS_TTS=auto|piper|elevenlabs|browser`), voice paths, or to add cloud keys. `PIPER_VOICE` forces a single voice for every language — for example, to hear the English movie-JARVIS read Russian.
+Model binaries stay in `backend/models/` and are git-ignored. Copy `.env.example` to `.env` to override providers (`JARVIS_LLM=auto|ollama|anthropic|local`, `JARVIS_TTS=auto|piper|elevenlabs|browser`), voice paths, or to add cloud keys. `PIPER_VOICE` forces one voice for every language; only use it with a voice that matches the language, never to read Russian with the English movie-JARVIS.
 
 Jarvis endpoints: `GET /api/jarvis/config`, `POST /api/jarvis/chat`, `POST /api/jarvis/speech`. Speech returns `503` when no provider supports the requested language, and the client falls back to the browser voice.
 

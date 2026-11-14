@@ -165,6 +165,7 @@ export default function JarvisPanel() {
     transcript,
     muted,
     wakeMode,
+    conversation,
     voiceError,
     config,
     voiceSupported,
@@ -174,7 +175,7 @@ export default function JarvisPanel() {
     greet,
     toggleMute,
     toggleWake,
-    listenOnce,
+    toggleConversation,
     stopSpeaking,
     speak,
   } = useJarvis()
@@ -459,7 +460,7 @@ export default function JarvisPanel() {
               <div className="jarvis-telemetry right" aria-hidden="true">
                 <span>NEURAL</span><strong>{config.llm.provider === 'ollama' ? 'OLLAMA' : config.llm.provider === 'anthropic' ? 'CLOUD' : 'LOCAL'}</strong>
                 <span>VOICE</span><strong>{muted ? 'MUTED' : 'ACTIVE'}</strong>
-                <span>WAKE</span><strong>{wakeMode ? 'ARMED' : 'STANDBY'}</strong>
+                <span>WAKE</span><strong>{conversation ? 'LIVE' : wakeMode ? 'ARMED' : 'STANDBY'}</strong>
               </div>
               <div className="jarvis-stage-meta">
                 <span className={`jarvis-live-dot ${orbState}`} />
@@ -471,7 +472,9 @@ export default function JarvisPanel() {
                       ? lang === 'kg' ? 'сүйлөңүз, сэр' : 'говорите, сэр'
                       : orbState === 'speaking'
                         ? lang === 'kg' ? 'үн синтези' : 'синтез речи'
-                        : `${studentName} · v${config.version || '1.0'}`}
+                        : conversation
+                          ? lang === 'kg' ? 'үн чаты активдүү' : 'голосовой чат активен'
+                          : `${studentName} · v${config.version || '1.0'}`}
                 </small>
               </div>
             </div>
@@ -523,16 +526,20 @@ export default function JarvisPanel() {
               <div className="jarvis-input-wrap">
                 <button
                   type="button"
-                  className={`jarvis-mic ${listening ? 'live' : ''}`}
-                  onClick={listenOnce}
+                  className={`jarvis-mic ${conversation ? 'live' : ''}`}
+                  onClick={toggleConversation}
                   title={
-                    voiceSupported
-                      ? lang === 'kg' ? 'Үн менен айтуу' : 'Сказать голосом'
-                      : lang === 'kg' ? 'STT жок' : 'STT недоступен'
+                    !voiceSupported
+                      ? lang === 'kg' ? 'STT жок' : 'STT недоступен'
+                      : conversation
+                        ? lang === 'kg' ? 'Үн чатын токтотуу' : 'Остановить голосовой чат'
+                        : lang === 'kg' ? 'Үн чаты: басып сүйлөңүз' : 'Голосовой чат: нажмите и говорите'
                   }
-                  aria-label="Голосовой ввод"
+                  aria-label={lang === 'kg' ? 'Үн чаты' : 'Голосовой чат'}
+                  aria-pressed={conversation}
+                  disabled={!voiceSupported}
                 >
-                  {listening ? <Square size={15} /> : <Mic size={17} />}
+                  {conversation ? <Square size={15} /> : <Mic size={17} />}
                 </button>
                 <textarea
                   ref={inputRef}
@@ -574,9 +581,11 @@ export default function JarvisPanel() {
                 </span>
                 <span className={voiceError ? 'jarvis-voice-error' : ''}>
                   {voiceError ||
-                    (wakeMode
-                      ? lang === 'kg' ? '«Джарвис» деп айтыңыз' : 'Скажите «Джарвис»'
-                      : lang === 'kg' ? 'Үн браузер аркылуу' : 'Голос через браузер')}
+                    (conversation
+                      ? lang === 'kg' ? 'Үн чаты: сүйлөңүз — угуп жатам' : 'Голосовой чат: говорите — я слушаю'
+                      : wakeMode
+                        ? lang === 'kg' ? '«Джарвис» деп айтыңыз' : 'Скажите «Джарвис»'
+                        : lang === 'kg' ? 'Үн браузер аркылуу' : 'Голос через браузер')}
                 </span>
               </div>
             </form>

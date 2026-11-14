@@ -48,6 +48,7 @@ export function JarvisProvider({ children }) {
   const [transcript, setTranscript] = useState('')
   const [muted, setMuted] = useState(false)
   const [wakeMode, setWakeMode] = useState(false)
+  const [conversation, setConversation] = useState(false)
   const [voiceError, setVoiceError] = useState('')
   const [config, setConfig] = useState(FALLBACK_CONFIG)
 
@@ -72,6 +73,11 @@ export function JarvisProvider({ children }) {
   const restartRef = useRef(null)
   const handledRef = useRef(false)
   const handledResetRef = useRef(null)
+  const conversationRef = useRef(false)
+  const conversationTimerRef = useRef(null)
+  const emptyTurnsRef = useRef(0)
+  const speakingRef = useRef(false)
+  const conversationResumeRef = useRef(() => {})
   const actionsRef = useRef({})
 
   useEffect(() => {
@@ -105,6 +111,7 @@ export function JarvisProvider({ children }) {
 
   const stopSpeaking = useCallback(() => {
     speechTokenRef.current += 1
+    speakingRef.current = false
     stopBrowserSpeech()
     const audio = audioRef.current
     if (audio) {
@@ -123,23 +130,51 @@ export function JarvisProvider({ children }) {
     setSpeaking(false)
   }, [])
 
+  const stopConversation = useCallback(() => {
+    conversationRef.current = false
+    setConversation(false)
+    clearTimeout(conversationTimerRef.current)
+    const ptt = pttRef.current
+    pttRef.current = null
+    if (ptt) {
+      try {
+        ptt.onend = null
+        ptt.abort()
+      } catch {
+        /* recognition may already be stopped */
+      }
+    }
+    setListening(false)
+    setTranscript('')
+    stopSpeaking()
+    if (wakeOnRef.current) {
+      conversationTimerRef.current = setTimeout(() => actionsRef.current.startWake?.(), 350)
+    }
+  }, [stopSpeaking])
+
   const speak = useCallback(
-    async (text, language) => {
+    async (text, language, options = {}) => {
       const cleaned = cleanForSpeech(text)
-      if (!cleaned || mutedRef.current) return
+      if (!cleaned || mutedRef.current) {
+        options.onEnd?.()
+        return
+      }
       stopSpeaking()
       const token = speechTokenRef.current + 1
       speechTokenRef.current = token
+      speakingRef.current = true
       setSpeaking(true)
       playTone('speak', mutedRef.current)
 
       const finish = () => {
         if (speechTokenRef.current !== token) return
+        speakingRef.current = false
         setSpeaking(false)
         if (urlRef.current) {
           URL.revokeObjectURL(urlRef.current)
           urlRef.current = null
         }
+        options.onEnd?.()
       }
 
       const spokenLang = language || langRef.current
@@ -179,9 +214,10 @@ export function JarvisProvider({ children }) {
   )
 
   const announce = useCallback(
-    (text) => {
+    (text, options = {}) => {
       appendMessage({ role: 'assistant', content: text, intent: 'address', source: 'local' })
-      if (!mutedRef.current) speak(text, langRef.current)
+      if (!mutedRef.current) speak(text, langRef.current, options)
+      else options.onEnd?.()
     },
     [appendMessage, speak],
   )
@@ -218,7 +254,13 @@ export function JarvisProvider({ children }) {
           source: payload.source,
           action: payload.action || null,
         })
-        if (!mutedRef.current) speak(payload.reply, payload.language)
+        if (!mutedRef.current) {
+          speak(payload.reply, payload.language, {
+            onEnd: () => conversationResumeRef.current(),
+          })
+        } else {
+          conversationResumeRef.current()
+        }
       } catch (error) {
         appendMessage({
           role: 'assistant',
@@ -229,12 +271,13 @@ export function JarvisProvider({ children }) {
           error: true,
           source: 'error',
         })
+        stopConversation()
       } finally {
         busyRef.current = false
         setBusy(false)
       }
     },
-    [appendMessage, speak, stopSpeaking],
+    [appendMessage, speak, stopConversation, stopSpeaking],
   )
 
   const greet = useCallback(() => {
@@ -249,18 +292,18 @@ export function JarvisProvider({ children }) {
 
   const closePanel = useCallback(() => {
     setOpen(false)
-    stopSpeaking()
-  }, [stopSpeaking])
+    stopConversation()
+  }, [stopConversation])
 
   const togglePanel = useCallback(() => {
     if (open) {
       setOpen(false)
-      stopSpeaking()
+      stopConversation()
       return
     }
     setOpen(true)
     playTone('open', mutedRef.current)
-  }, [open, stopSpeaking])
+  }, [open, stopConversation])
 
   const stopWake = useCallback(() => {
     wakeOnRef.current = false
@@ -291,6 +334,22 @@ export function JarvisProvider({ children }) {
       )
       return
     }
+    if (conversationRef.current) {
+      conversationRef.current = false
+      setConversation(false)
+      clearTimeout(conversationTimerRef.current)
+      const ptt = pttRef.current
+      pttRef.current = null
+      if (ptt) {
+        try {
+          ptt.onend = null
+          ptt.abort()
+        } catch {
+          /* recognition may already be stopped */
+        }
+      }
+      stopSpeaking()
+    }
     stopWake()
     const recognition = new Ctor()
     recognition.lang = 'ru-RU'
@@ -313,6 +372,8 @@ export function JarvisProvider({ children }) {
       }
       const heard = `${finalText} ${interim}`.replace(/\s+/g, ' ').trim()
       setTranscript(heard)
+      // Never let Jarvis's own voice trigger the wake word.
+      if (speakingRef.current || busyRef.current) return
       if (handledRef.current) return
       const { wake, rest } = detectWakeWord(heard)
       if (!wake) return
@@ -320,16 +381,9 @@ export function JarvisProvider({ children }) {
       clearTimeout(handledResetRef.current)
       handledResetRef.current = setTimeout(() => {
         handledRef.current = false
-      }, 3500)
+      }, 1500)
       playTone('listen', mutedRef.current)
-      actionsRef.current.openPanel?.()
-      if (rest.length > 1) {
-        actionsRef.current.send?.(rest)
-      } else {
-        actionsRef.current.announce?.(
-          langRef.current === 'kg' ? 'Ооба, сэр. Угуп жатам.' : 'Да, сэр. Слушаю.',
-        )
-      }
+      actionsRef.current.startConversation?.(rest)
     }
     recognition.onerror = (event) => {
       if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
@@ -345,7 +399,7 @@ export function JarvisProvider({ children }) {
       setListening(false)
       setTranscript('')
       handledRef.current = false
-      if (wakeOnRef.current) {
+      if (wakeOnRef.current && !conversationRef.current) {
         restartRef.current = setTimeout(() => {
           try {
             recognition.start()
@@ -370,7 +424,7 @@ export function JarvisProvider({ children }) {
           : 'Не удалось запустить распознавание речи.',
       )
     }
-  }, [stopWake])
+  }, [stopSpeaking, stopWake])
 
   const toggleWake = useCallback(() => {
     if (wakeOnRef.current) stopWake()
@@ -381,14 +435,13 @@ export function JarvisProvider({ children }) {
     if (pttRef.current) {
       try {
         pttRef.current.onend = null
-        pttRef.current.stop()
+        pttRef.current.abort()
       } catch {
         /* already stopped */
       }
       pttRef.current = null
-      setListening(false)
-      return
     }
+    if (busyRef.current) return
     const Ctor = getRecognitionCtor()
     if (!Ctor) {
       setVoiceError(
@@ -441,6 +494,7 @@ export function JarvisProvider({ children }) {
             ? 'Микрофонго уруксат берилген жок.'
             : 'Доступ к микрофону не разрешён.',
         )
+        if (conversationRef.current) stopConversation()
       }
     }
     recognition.onend = () => {
@@ -449,14 +503,40 @@ export function JarvisProvider({ children }) {
       pttRef.current = null
       const heard = finalText.replace(/\s+/g, ' ').trim()
       if (heard) {
+        emptyTurnsRef.current = 0
         const { wake: hasWake, rest } = detectWakeWord(heard)
-        const message = hasWake && rest ? rest : heard
-        if (message) actionsRef.current.send?.(message)
-        else actionsRef.current.announce?.(
-          langRef.current === 'kg' ? 'Ооба, сэр. Угуп жатам.' : 'Да, сэр. Слушаю.',
-        )
+        if (hasWake) {
+          if (rest) {
+            actionsRef.current.send?.(rest)
+          } else {
+            actionsRef.current.announce?.(
+              langRef.current === 'kg' ? 'Ооба, сэр. Угуп жатам.' : 'Да, сэр. Слушаю.',
+              { onEnd: () => conversationResumeRef.current() },
+            )
+          }
+        } else {
+          actionsRef.current.send?.(heard)
+        }
+      } else if (conversationRef.current) {
+        emptyTurnsRef.current += 1
+        if (emptyTurnsRef.current <= 2) {
+          setVoiceError(
+            langRef.current === 'kg' ? 'Угуп жатам… сүйлөңүз.' : 'Слушаю… говорите.',
+          )
+          conversationTimerRef.current = setTimeout(() => {
+            if (conversationRef.current) actionsRef.current.listen?.()
+          }, 500)
+        } else {
+          conversationRef.current = false
+          setConversation(false)
+          setVoiceError(
+            langRef.current === 'kg'
+              ? 'Үн угулбады. Микрофонду басып кайра баштаңыз.'
+              : 'Я вас не слышу. Нажмите микрофон, чтобы продолжить.',
+          )
+        }
       }
-      if (wakeOnRef.current) {
+      if (!conversationRef.current && wakeOnRef.current) {
         restartRef.current = setTimeout(() => actionsRef.current.startWake?.(), 550)
       }
     }
@@ -472,7 +552,61 @@ export function JarvisProvider({ children }) {
           : 'Не удалось запустить распознавание речи.',
       )
     }
-  }, [])
+  }, [stopConversation])
+
+  conversationResumeRef.current = () => {
+    if (!conversationRef.current) return
+    clearTimeout(conversationTimerRef.current)
+    conversationTimerRef.current = setTimeout(() => {
+      if (conversationRef.current) actionsRef.current.listen?.()
+    }, 350)
+  }
+
+  const startConversation = useCallback(
+    (initialMessage = '') => {
+      const Ctor = getRecognitionCtor()
+      if (!Ctor) {
+        setVoiceError(
+          langRef.current === 'kg'
+            ? 'Бул браузер үн таанууну колдобойт. Chrome же Edge колдонуп көрүңүз.'
+            : 'Этот браузер не поддерживает распознавание речи. Попробуйте Chrome или Edge.',
+        )
+        return
+      }
+      conversationRef.current = true
+      setConversation(true)
+      emptyTurnsRef.current = 0
+      setVoiceError('')
+      openPanel()
+      stopSpeaking()
+      clearTimeout(conversationTimerRef.current)
+      clearTimeout(restartRef.current)
+      const wake = recognitionRef.current
+      if (wake) {
+        try {
+          wake.onend = null
+          wake.abort()
+        } catch {
+          /* wake recognition may already be stopped */
+        }
+        recognitionRef.current = null
+      }
+      const phrase = String(initialMessage || '').trim()
+      if (phrase) {
+        send(phrase)
+      } else {
+        announce(langRef.current === 'kg' ? 'Ооба, сэр. Угуп жатам.' : 'Да, сэр. Слушаю.', {
+          onEnd: () => conversationResumeRef.current(),
+        })
+      }
+    },
+    [announce, openPanel, send, stopSpeaking],
+  )
+
+  const toggleConversation = useCallback(() => {
+    if (conversationRef.current) stopConversation()
+    else startConversation()
+  }, [startConversation, stopConversation])
 
   const updateContext = useCallback((patch) => {
     contextRef.current = { ...contextRef.current, ...patch }
@@ -500,16 +634,21 @@ export function JarvisProvider({ children }) {
     openPanel,
     greet,
     startWake,
+    listen: listenOnce,
+    startConversation,
+    stopConversation,
   }
 
   useEffect(
     () => () => {
       stopWake()
+      stopConversation()
       stopSpeaking()
       clearTimeout(restartRef.current)
       clearTimeout(handledResetRef.current)
+      clearTimeout(conversationTimerRef.current)
     },
-    [stopSpeaking, stopWake],
+    [stopConversation, stopSpeaking, stopWake],
   )
 
   const value = useMemo(
@@ -522,6 +661,7 @@ export function JarvisProvider({ children }) {
       transcript,
       muted,
       wakeMode,
+      conversation,
       voiceError,
       config,
       voiceSupported: recognitionSupported(),
@@ -535,6 +675,7 @@ export function JarvisProvider({ children }) {
       toggleMute: () => setMuted((current) => !current),
       toggleWake,
       listenOnce,
+      toggleConversation,
       stopSpeaking,
       updateContext,
     }),
@@ -547,6 +688,7 @@ export function JarvisProvider({ children }) {
       transcript,
       muted,
       wakeMode,
+      conversation,
       voiceError,
       config,
       openPanel,
@@ -558,6 +700,7 @@ export function JarvisProvider({ children }) {
       greet,
       toggleWake,
       listenOnce,
+      toggleConversation,
       stopSpeaking,
       updateContext,
     ],

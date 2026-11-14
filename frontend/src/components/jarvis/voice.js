@@ -13,17 +13,46 @@ export function speechSupported() {
   return typeof window !== 'undefined' && 'speechSynthesis' in window
 }
 
+function editDistance(a, b) {
+  const rows = a.length + 1
+  const cols = b.length + 1
+  let previous = Array.from({ length: cols }, (_, index) => index)
+  for (let i = 1; i < rows; i += 1) {
+    const current = [i]
+    for (let j = 1; j < cols; j += 1) {
+      current[j] = Math.min(
+        previous[j] + 1,
+        current[j - 1] + 1,
+        previous[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1),
+      )
+    }
+    previous = current
+  }
+  return previous[cols - 1]
+}
+
 export function detectWakeWord(text) {
   const value = String(text || '').trim()
   if (!value) return { wake: false, rest: '' }
-  const pattern = /(^|[\s,.;:!?—–-])(джарвис|жарвис|jarvis)(?=$|[\s,.;:!?—–-])/i
-  const match = value.match(pattern)
-  if (!match) return { wake: false, rest: '' }
-  const end = match.index + match[0].length
-  return {
-    wake: true,
-    rest: value.slice(end).replace(/^[\s,.;:!?—–-]+/, '').trim(),
-  }
+  const words = value.split(/[\s,.;:!?—–-]+/).filter(Boolean)
+  const bases = ['джарвис', 'жарвис', 'jarvis']
+  const index = words.findIndex((word) => {
+    const candidate = word.toLowerCase().replace(/ё/g, 'е')
+    return bases.some(
+      (base) =>
+        candidate === base ||
+        (candidate.length >= 5 &&
+          Math.abs(candidate.length - base.length) <= 1 &&
+          editDistance(candidate, base) <= 1),
+    )
+  })
+  if (index === -1) return { wake: false, rest: '' }
+  // Keep words on both sides: "привет, Джарвис" and "Джарвис, привет" both work.
+  const rest = words
+    .filter((_, wordIndex) => wordIndex !== index)
+    .join(' ')
+    .trim()
+  return { wake: true, rest }
 }
 
 export function cleanForSpeech(markdown = '') {

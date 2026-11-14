@@ -77,17 +77,25 @@ The API runs at `http://127.0.0.1:8000`; Vite proxies `/api` on `:5173`.
   free-form Russian chat.
 - Jarvis addresses the user as «сэр» in both RU and KG (movie persona).
   «мырза» stays only in `KYRGYZ_WORDS` for input detection, never in replies.
+- Voice chat is hands-free: the mic starts listen → reply → listen again.
+  Wake phrases «Джарвис», «привет, Джарвис», and «салам, Джарвис» start the
+  same loop. Wake recognition must ignore results while Jarvis is speaking or
+  busy, otherwise its own voice can trigger it.
+- Piper voices are per-language: `en_GB-jarvis-high` for English and
+  `ru_RU-dmitri-medium` for Russian. Never point `PIPER_VOICE_RU` at the
+  English voice; Kyrgyz falls back to browser speech.
 - `load_content()` is cached with `lru_cache`: restart uvicorn after editing
   content JSON.
 
 ## Verification
 
-- Backend: `py -3.13 -m pytest -q` (currently 34 tests).
+- Backend: `py -3.13 -m pytest -q` (currently 35 tests).
 - Frontend: `npm run build` must pass.
 - UI: check desktop and mobile for horizontal overflow and console errors.
   Jarvis checks: open via `Ctrl+J`, greeting appears, orb canvas renders,
   quick commands answer, RU and KG replies work, task context sends
-  `task_slug`/`code`, and no solution leaks.
+  `task_slug`/`code`, no solution leaks, the mic enters a repeated
+  listen → reply → listen loop, and wake phrases start that loop.
 - Do not claim a content/API change works from reading code alone; hit the API
   or run the test.
 
