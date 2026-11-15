@@ -913,11 +913,13 @@ def _classify(message: str) -> str:
         return "greeting"
     if re.fullmatch(r"\s*(джарвис|жарвис|jarvis)[.!]?\s*", lowered):
         return "address"
-    if re.search(r"\b(привет|здравствуй|салам|саламсыз|hello|hi)\b", lowered):
-        return "greeting"
     for intent, phrases in INTENT_RULES:
         if any(phrase in lowered for phrase in phrases):
             return intent
+    # A greeting prefix must not swallow a real request: "привет, Джарвис,
+    # дай подсказку" is a hint, not a greeting.
+    if re.search(r"\b(привет|здравствуй|салам|саламсыз|hello|hi)\b", lowered):
+        return "greeting"
     if any(word in lowered for word in ("помоги", "help", "жардам")):
         return "help"
     return "fallback"

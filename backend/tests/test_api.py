@@ -484,6 +484,28 @@ def test_jarvis_understands_short_hint_phrase(monkeypatch, client: TestClient):
     assert payload["source"] == "local"
 
 
+def test_jarvis_greeting_prefix_does_not_swallow_hint(monkeypatch, client: TestClient):
+    # "привет, Джарвис, дай подсказку" is a hint request, not a greeting.
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    for message in (
+        "привет джарвис дай мне подсказку на эту задачу",
+        "привет джарвис дай мне подсказку на текущую задачу",
+        "салам джарвис подсказка",
+    ):
+        response = client.post(
+            "/api/jarvis/chat",
+            json={
+                "message": message,
+                "context": {"language": "ru", "task_slug": "def-add"},
+            },
+        )
+        assert response.status_code == 200
+        payload = response.json()
+        assert payload["intent"] == "hint", message
+        assert payload["source"] == "local", message
+        assert "Подсказка" in payload["reply"], message
+
+
 def test_jarvis_never_leaks_task_solution(monkeypatch, client: TestClient):
     monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
     task = content.task_by_slug("sum-even")

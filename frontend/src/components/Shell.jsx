@@ -53,7 +53,7 @@ function pageTitle(pathname, bi) {
 
 export default function Shell() {
   const { data, loading, error, lang, setLanguage, refresh, settings } = useApp()
-  const { openPanel, togglePanel, updateContext } = useJarvis()
+  const { openPanel, togglePanel, updateContext, wakeMode } = useJarvis()
   const bi = useBi()
   const location = useLocation()
   const [open, setOpen] = useState(false)
@@ -194,14 +194,22 @@ export default function Shell() {
       )}
 
       <button
-        className="jarvis-fab"
+        className={`jarvis-fab ${wakeMode ? 'is-armed' : ''}`}
         onClick={launchJarvis}
         aria-label="Открыть J.A.R.V.I.S."
+        title={wakeMode ? bi('Скажите «Джарвис»', '«Джарвис» деп айтыңыз') : undefined}
       >
-        <span className="jarvis-fab-orb"><Orbit size={16} /></span>
+        <span className="jarvis-fab-orb">
+          <Orbit size={16} />
+          {wakeMode && <i className="jarvis-fab-wake" aria-hidden="true" />}
+        </span>
         <span className="jarvis-fab-label">
           <strong>J.A.R.V.I.S.</strong>
-          <small>{bi('личный наставник', 'жеке устат')}</small>
+          <small>
+            {wakeMode
+              ? bi('слушаю «Джарвис»', '«Джарвис» угуп жатам')
+              : bi('личный наставник', 'жеке устат')}
+          </small>
         </span>
         <kbd>Ctrl J</kbd>
       </button>

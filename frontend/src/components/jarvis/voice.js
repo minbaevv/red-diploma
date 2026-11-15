@@ -55,6 +55,27 @@ export function detectWakeWord(text) {
   return { wake: true, rest }
 }
 
+export function detectStopPhrase(text) {
+  // JavaScript `\b` only understands ASCII, so Cyrillic commands are matched
+  // as words instead of with word-boundary regexes.
+  const value = String(text || '')
+    .toLowerCase()
+    .replace(/ё/g, 'е')
+    .replace(/\s+/g, ' ')
+    .trim()
+  if (!value) return false
+  const words = value.split(/[\s,.;:!?—–-]+/).filter(Boolean)
+  // "пока" alone is ambiguous ("покажи"), so it only counts with the wake word.
+  const { wake } = detectWakeWord(value)
+  if (wake && words.includes('пока')) return true
+  if (words.some((word) => ['отключись', 'отключайся', 'выключись', 'выключайся'].includes(word))) {
+    return true
+  }
+  if (words.includes('заверши') && words.includes('работу')) return true
+  if (words.includes('до') && words.includes('свидания')) return true
+  return words.includes('кош') && (words.includes('бол') || words.includes('болуңуз'))
+}
+
 export function cleanForSpeech(markdown = '') {
   let text = String(markdown || '')
   text = text.replace(/```[\s\S]*?```/g, ' ')

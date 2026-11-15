@@ -1557,6 +1557,28 @@
   animation: jarvis-spin 12s linear infinite;
 }
 
+.jarvis-fab.is-armed {
+  border-color: rgba(74, 222, 128, 0.4);
+}
+
+.jarvis-fab.is-armed .jarvis-fab-orb {
+  border-color: rgba(74, 222, 128, 0.55);
+  box-shadow: 0 0 20px rgba(74, 222, 128, 0.32);
+}
+
+.jarvis-fab-wake {
+  position: absolute;
+  right: -1px;
+  bottom: -1px;
+  width: 7px;
+  height: 7px;
+  background: #4ade80;
+  border: 1px solid rgba(4, 9, 18, 0.9);
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(74, 222, 128, 0.85);
+  animation: jarvis-blink 1.4s ease-in-out infinite;
+}
+
 .jarvis-fab-label {
   display: flex;
   flex-direction: column;

@@ -79,8 +79,19 @@ The API runs at `http://127.0.0.1:8000`; Vite proxies `/api` on `:5173`.
   «мырза» stays only in `KYRGYZ_WORDS` for input detection, never in replies.
 - Voice chat is hands-free: the mic starts listen → reply → listen again.
   Wake phrases «Джарвис», «привет, Джарвис», and «салам, Джарвис» start the
-  same loop. Wake recognition must ignore results while Jarvis is speaking or
-  busy, otherwise its own voice can trigger it.
+  same loop. Wake mode auto-arms after the first click/keypress when the mic
+  permission is granted (or immediately if it is already granted), so solving
+  a task does not require pressing the mic. Wake recognition must ignore
+  results while Jarvis is speaking or busy, otherwise its own voice can
+  trigger it.
+- Speech capture commits on silence (about 1.4 s), not on Chrome's first
+  final result, so a full request is never cut off. A wake request waits
+  about 1.5 s for its tail before starting the conversation.
+- «пока, Джарвис», «до свидания», «отключись», and «выключись» end the voice
+  chat and disarm wake mode with a short farewell. JavaScript `\b` is
+  ASCII-only, so match Cyrillic commands as words, not with `\b` regexes.
+- «привет, Джарвис, дай подсказку» must classify as `hint`, not `greeting`:
+  `_classify()` checks `INTENT_RULES` before the greeting fallback.
 - Piper voices are per-language: `en_GB-jarvis-high` for English and
   `ru_RU-dmitri-medium` for Russian. Never point `PIPER_VOICE_RU` at the
   English voice; Kyrgyz falls back to browser speech.
@@ -89,13 +100,14 @@ The API runs at `http://127.0.0.1:8000`; Vite proxies `/api` on `:5173`.
 
 ## Verification
 
-- Backend: `py -3.13 -m pytest -q` (currently 35 tests).
+- Backend: `py -3.13 -m pytest -q` (currently 36 tests).
 - Frontend: `npm run build` must pass.
 - UI: check desktop and mobile for horizontal overflow and console errors.
   Jarvis checks: open via `Ctrl+J`, greeting appears, orb canvas renders,
   quick commands answer, RU and KG replies work, task context sends
   `task_slug`/`code`, no solution leaks, the mic enters a repeated
-  listen → reply → listen loop, and wake phrases start that loop.
+  listen → reply → listen loop, wake phrases start that loop without cutting
+  the request off, and «пока, Джарвис» returns to standby.
 - Do not claim a content/API change works from reading code alone; hit the API
   or run the test.
 
