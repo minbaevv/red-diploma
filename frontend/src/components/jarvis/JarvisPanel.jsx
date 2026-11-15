@@ -165,6 +165,7 @@ export default function JarvisPanel() {
     transcript,
     muted,
     wakeMode,
+    wakeStarting,
     conversation,
     voiceError,
     config,
@@ -585,9 +586,11 @@ export default function JarvisPanel() {
                       ? lang === 'kg'
                         ? 'Үн чаты: сүйлөңүз — «кош болуңуз, Джарвис» десеңиз токтойм'
                         : 'Голосовой чат: говорите — «пока, Джарвис» отключит'
-                      : wakeMode
-                        ? lang === 'kg' ? '«Джарвис» деп айтыңыз — угуп жатам' : 'Скажите «Джарвис» — я слушаю'
-                        : lang === 'kg' ? 'Үн браузер аркылуу' : 'Голос через браузер')}
+                      : wakeStarting
+                        ? lang === 'kg' ? 'Микрофон күйүп жатат…' : 'Включаю микрофон…'
+                        : wakeMode
+                          ? lang === 'kg' ? '«Джарвис» деп айтыңыз — угуп жатам' : 'Скажите «Джарвис» — я слушаю'
+                          : lang === 'kg' ? 'Үн үчүн бетти басыңыз' : 'Нажмите в любом месте, чтобы включить голос')}
                 </span>
               </div>
             </form>

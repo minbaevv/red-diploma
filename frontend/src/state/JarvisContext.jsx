@@ -13,6 +13,7 @@ import {
   cleanForSpeech,
   detectStopPhrase,
   detectWakeWord,
+  ensureMicrophoneAccess,
   getRecognitionCtor,
   playTone,
   recognitionSupported,
@@ -49,6 +50,7 @@ export function JarvisProvider({ children }) {
   const [transcript, setTranscript] = useState('')
   const [muted, setMuted] = useState(false)
   const [wakeMode, setWakeMode] = useState(false)
+  const [wakeStarting, setWakeStarting] = useState(false)
   const [conversation, setConversation] = useState(false)
   const [voiceError, setVoiceError] = useState('')
   const [config, setConfig] = useState(FALLBACK_CONFIG)
@@ -83,7 +85,13 @@ export function JarvisProvider({ children }) {
   const listenCommitRef = useRef(null)
   const listenLimitRef = useRef(null)
   const noSpeechRef = useRef(null)
-  const autoWakeRef = useRef(false)
+  const autoWakeRef = useRef(true)
+  const wakeStartingRef = useRef(false)
+  const wakeTokenRef = useRef(0)
+  const listenTokenRef = useRef(0)
+  const micDeniedRef = useRef(false)
+  const permissionRef = useRef(null)
+  const wakeFailuresRef = useRef(0)
 
   useEffect(() => {
     langRef.current = lang
@@ -138,6 +146,7 @@ export function JarvisProvider({ children }) {
   const stopConversation = useCallback(() => {
     conversationRef.current = false
     setConversation(false)
+    listenTokenRef.current += 1
     clearTimeout(conversationTimerRef.current)
     clearTimeout(listenCommitRef.current)
     clearTimeout(listenLimitRef.current)
@@ -155,7 +164,9 @@ export function JarvisProvider({ children }) {
     setListening(false)
     setTranscript('')
     stopSpeaking()
-    if (wakeOnRef.current) {
+    // Return to wake standby whenever hands-free mode is on, even after a
+    // manual mic turn. Disabling wake (the ear button) sets autoWake false.
+    if (autoWakeRef.current && !micDeniedRef.current) {
       conversationTimerRef.current = setTimeout(() => actionsRef.current.startWake?.(), 350)
     }
   }, [stopSpeaking])
@@ -319,7 +330,10 @@ export function JarvisProvider({ children }) {
 
   const stopWake = useCallback(() => {
     wakeOnRef.current = false
+    wakeStartingRef.current = false
+    wakeTokenRef.current += 1
     setWakeMode(false)
+    setWakeStarting(false)
     clearTimeout(restartRef.current)
     clearTimeout(wakeCommitRef.current)
     wakeCommitRef.current = null
@@ -327,9 +341,11 @@ export function JarvisProvider({ children }) {
     recognitionRef.current = null
     if (recognition) {
       try {
+        recognition.onstart = null
+        recognition.onresult = null
         recognition.onend = null
         recognition.onerror = null
-        recognition.stop()
+        recognition.abort()
       } catch {
         /* recognition may already be stopped */
       }
@@ -338,7 +354,7 @@ export function JarvisProvider({ children }) {
     setTranscript('')
   }, [])
 
-  const startWake = useCallback(() => {
+  const startWake = useCallback(async () => {
     const Ctor = getRecognitionCtor()
     if (!Ctor) {
       setVoiceError(
@@ -348,23 +364,45 @@ export function JarvisProvider({ children }) {
       )
       return
     }
-    if (conversationRef.current) {
-      conversationRef.current = false
-      setConversation(false)
-      clearTimeout(conversationTimerRef.current)
-      const ptt = pttRef.current
-      pttRef.current = null
-      if (ptt) {
-        try {
-          ptt.onend = null
-          ptt.abort()
-        } catch {
-          /* recognition may already be stopped */
-        }
-      }
-      stopSpeaking()
-    }
+    if (wakeStartingRef.current || wakeOnRef.current || conversationRef.current) return
     stopWake()
+    const token = wakeTokenRef.current
+    wakeStartingRef.current = true
+    setWakeStarting(true)
+    setVoiceError('')
+
+    // Chrome's SpeechRecognition can fail with `not-allowed` while its own
+    // permission prompt is still open. Ask through getUserMedia first, then
+    // start recognition only after the microphone is actually granted.
+    const access = await ensureMicrophoneAccess()
+    if (token !== wakeTokenRef.current || conversationRef.current) return
+    if (!access.ok) {
+      wakeStartingRef.current = false
+      setWakeStarting(false)
+      if (access.reason === 'NotAllowedError' || access.reason === 'SecurityError') {
+        micDeniedRef.current = true
+        setVoiceError(
+          langRef.current === 'kg'
+            ? 'Микрофонго уруксат берилген жок. Браузердин сайт жөндөөлөрүнөн уруксат бериңиз.'
+            : 'Доступ к микрофону запрещён. Разрешите микрофон в настройках сайта.',
+        )
+      } else if (access.reason === 'NotFoundError' || access.reason === 'DevicesNotFoundError') {
+        setVoiceError(
+          langRef.current === 'kg'
+            ? 'Микрофон табылбады. Аны туташтырып, кайра аракет кылыңыз.'
+            : 'Микрофон не найден. Подключите его и попробуйте снова.',
+        )
+      } else {
+        setVoiceError(
+          langRef.current === 'kg'
+            ? 'Микрофонду ачуу мүмкүн болбоду.'
+            : 'Не удалось получить доступ к микрофону.',
+        )
+      }
+      return
+    }
+    micDeniedRef.current = false
+
     const recognition = new Ctor()
     let rest = ''
     recognition.lang = 'ru-RU'
@@ -391,10 +429,17 @@ export function JarvisProvider({ children }) {
     }
 
     recognition.onstart = () => {
+      if (token !== wakeTokenRef.current) return
+      wakeFailuresRef.current = 0
+      wakeOnRef.current = true
+      wakeStartingRef.current = false
+      setWakeStarting(false)
+      setWakeMode(true)
       setVoiceError('')
       setListening(true)
     }
     recognition.onresult = (event) => {
+      if (token !== wakeTokenRef.current) return
       let all = ''
       for (let index = 0; index < event.results.length; index += 1) {
         all += ` ${event.results[index][0]?.transcript || ''}`
@@ -422,65 +467,139 @@ export function JarvisProvider({ children }) {
       wakeCommitRef.current = setTimeout(commitWake, 1500)
     }
     recognition.onerror = (event) => {
-      if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+      if (token !== wakeTokenRef.current) return
+      const error = event.error || 'unknown'
+      if (error === 'aborted') return
+      setListening(false)
+      setTranscript('')
+      if (error === 'not-allowed' || error === 'service-not-allowed') {
+        micDeniedRef.current = true
+        wakeOnRef.current = false
+        wakeStartingRef.current = false
+        setWakeStarting(false)
+        setWakeMode(false)
         setVoiceError(
           langRef.current === 'kg'
-            ? 'Микрофонго уруксат берилген жок.'
-            : 'Доступ к микрофону не разрешён.',
+            ? 'Микрофонго уруксат берилген жок. Браузердин сайт жөндөөлөрүнөн уруксат бериңиз.'
+            : 'Доступ к микрофону запрещён. Разрешите микрофон в настройках сайта.',
         )
-        stopWake()
+        return
+      }
+      if (error === 'audio-capture') {
+        wakeOnRef.current = false
+        wakeStartingRef.current = false
+        setWakeStarting(false)
+        setWakeMode(false)
+        setVoiceError(
+          langRef.current === 'kg'
+            ? 'Микрофон табылбады. Аны туташтырып, кайра аракет кылыңыз.'
+            : 'Микрофон не найден. Подключите его и попробуйте снова.',
+        )
+        return
+      }
+      if (error === 'network') {
+        wakeFailuresRef.current += 1
+        setVoiceError(
+          langRef.current === 'kg'
+            ? 'Үн таануу кызматына байланыш жок. Интернетти текшериңиз.'
+            : 'Нет связи с сервисом распознавания речи. Проверьте интернет.',
+        )
+        if (wakeFailuresRef.current >= 3) {
+          wakeOnRef.current = false
+          wakeStartingRef.current = false
+          setWakeStarting(false)
+          setWakeMode(false)
+          autoWakeRef.current = false
+          setVoiceError(
+            langRef.current === 'kg'
+              ? 'Үн таануу иштебей жатат. Кулак баскычын басып, кайра аракет кылыңыз.'
+              : 'Распознавание речи недоступно. Нажмите кнопку уха, чтобы попробовать снова.',
+          )
+        }
+        return
+      }
+      if (error !== 'no-speech') {
+        setVoiceError(
+          langRef.current === 'kg' ? `Үн катасы: ${error}` : `Ошибка микрофона: ${error}`,
+        )
       }
     }
     recognition.onend = () => {
+      if (token !== wakeTokenRef.current) return
       setListening(false)
       setTranscript('')
       if (wakeCommitRef.current) {
         commitWake()
         return
       }
-      if (wakeOnRef.current && !conversationRef.current) {
-        restartRef.current = setTimeout(() => {
-          try {
-            recognition.start()
-          } catch {
-            /* restart can race with the browser shutting the stream down */
-          }
-        }, 500)
+      wakeStartingRef.current = false
+      setWakeStarting(false)
+      if (!wakeOnRef.current || conversationRef.current) return
+      wakeOnRef.current = false
+      setWakeMode(false)
+      recognitionRef.current = null
+      try {
+        recognition.onstart = null
+        recognition.onresult = null
+        recognition.onend = null
+        recognition.onerror = null
+      } catch {
+        /* handlers may already be detached */
+      }
+      if (autoWakeRef.current && !micDeniedRef.current) {
+        restartRef.current = setTimeout(
+          () => {
+            if (autoWakeRef.current && !conversationRef.current && !micDeniedRef.current) {
+              actionsRef.current.startWake?.()
+            }
+          },
+          wakeFailuresRef.current ? 1500 : 450,
+        )
       }
     }
 
     recognitionRef.current = recognition
     wakeOnRef.current = true
-    setWakeMode(true)
-    setVoiceError('')
     try {
       recognition.start()
     } catch {
-      stopWake()
+      if (token !== wakeTokenRef.current) return
+      wakeOnRef.current = false
+      wakeStartingRef.current = false
+      setWakeStarting(false)
+      setWakeMode(false)
       setVoiceError(
         langRef.current === 'kg'
           ? 'Үн таанууну баштоо мүмкүн болбоду.'
           : 'Не удалось запустить распознавание речи.',
       )
     }
-  }, [stopSpeaking, stopWake])
+  }, [stopWake])
 
   const endConversation = useCallback(() => {
     const farewell = langRef.current === 'kg' ? 'Кош болуңуз, сэр.' : 'До связи, сэр.'
-    stopWake()
+    // "пока, Джарвис" ends the current conversation but keeps wake standby:
+    // saying "привет, Джарвис" later must work without reloading the page.
     stopConversation()
     setVoiceError('')
     appendMessage({ role: 'assistant', content: farewell, intent: 'farewell', source: 'local' })
     if (!mutedRef.current) speak(farewell, langRef.current, { browser: true })
-  }, [appendMessage, speak, stopConversation, stopWake])
+  }, [appendMessage, speak, stopConversation])
 
   const toggleWake = useCallback(() => {
+    if (wakeOnRef.current || wakeStartingRef.current) {
+      autoWakeRef.current = false
+      micDeniedRef.current = false
+      stopWake()
+      setVoiceError('')
+      return
+    }
     autoWakeRef.current = true
-    if (wakeOnRef.current) stopWake()
-    else startWake()
+    micDeniedRef.current = false
+    startWake()
   }, [startWake, stopWake])
 
-  const listenOnce = useCallback(() => {
+  const listenOnce = useCallback(async () => {
     clearTimeout(listenCommitRef.current)
     clearTimeout(listenLimitRef.current)
     clearTimeout(noSpeechRef.current)
@@ -505,17 +624,45 @@ export function JarvisProvider({ children }) {
       return
     }
 
+    const token = listenTokenRef.current + 1
+    listenTokenRef.current = token
     const wake = recognitionRef.current
     if (wake) {
       try {
+        wake.onstart = null
+        wake.onresult = null
         wake.onend = null
+        wake.onerror = null
         wake.abort()
       } catch {
         /* ignore */
       }
       recognitionRef.current = null
     }
+    wakeTokenRef.current += 1
+    wakeOnRef.current = false
+    wakeStartingRef.current = false
+    setWakeMode(false)
+    setWakeStarting(false)
     clearTimeout(restartRef.current)
+    clearTimeout(wakeCommitRef.current)
+    wakeCommitRef.current = null
+
+    const access = await ensureMicrophoneAccess()
+    if (token !== listenTokenRef.current) return
+    if (!access.ok) {
+      setVoiceError(
+        access.reason === 'NotAllowedError' || access.reason === 'SecurityError'
+          ? langRef.current === 'kg'
+            ? 'Микрофонго уруксат берилген жок. Браузердин сайт жөндөөлөрүнөн уруксат бериңиз.'
+            : 'Доступ к микрофону запрещён. Разрешите микрофон в настройках сайта.'
+          : langRef.current === 'kg'
+            ? 'Микрофонду ачуу мүмкүн болбоду.'
+            : 'Не удалось получить доступ к микрофону.',
+      )
+      if (conversationRef.current) stopConversation()
+      return
+    }
 
     const recognition = new Ctor()
     let finalText = ''
@@ -565,7 +712,7 @@ export function JarvisProvider({ children }) {
             ? 'Үн угулбады. Микрофонду басып кайра баштаңыз.'
             : 'Я вас не слышу. Нажмите микрофон, чтобы продолжить.',
         )
-        if (wakeOnRef.current) {
+        if (autoWakeRef.current && !micDeniedRef.current) {
           restartRef.current = setTimeout(() => actionsRef.current.startWake?.(), 350)
         }
       }
@@ -697,13 +844,23 @@ export function JarvisProvider({ children }) {
       const wake = recognitionRef.current
       if (wake) {
         try {
+          wake.onstart = null
+          wake.onresult = null
           wake.onend = null
+          wake.onerror = null
           wake.abort()
         } catch {
           /* wake recognition may already be stopped */
         }
         recognitionRef.current = null
       }
+      wakeTokenRef.current += 1
+      wakeOnRef.current = false
+      wakeStartingRef.current = false
+      setWakeMode(false)
+      setWakeStarting(false)
+      clearTimeout(wakeCommitRef.current)
+      wakeCommitRef.current = null
       const phrase = String(initialMessage || '').trim()
       if (phrase) {
         send(phrase)
@@ -765,51 +922,79 @@ export function JarvisProvider({ children }) {
     openPanel,
     greet,
     startWake,
+    stopWake,
     listen: listenOnce,
     startConversation,
     stopConversation,
     endConversation,
   }
 
-  // Hands-free by default: after the first click/keypress (or immediately when
-  // the microphone permission is already granted) arm "Джарвис" across the app,
-  // so solving a task does not require pressing the mic button.
+  // Hands-free by default. Wake arms itself immediately when the microphone is
+  // already granted, otherwise on the first click/keypress (browsers refuse a
+  // permission prompt without a gesture). The listeners stay attached for the
+  // page lifetime so a failed start can be retried by clicking again.
   useEffect(() => {
-    if (!recognitionSupported()) return undefined
+    if (!recognitionSupported()) {
+      setVoiceError(
+        langRef.current === 'kg'
+          ? 'Бул браузер үн таанууну колдобойт. Chrome же Edge колдонуп көрүңүз.'
+          : 'Этот браузер не поддерживает распознавание речи. Попробуйте Chrome или Edge.',
+      )
+      return undefined
+    }
+    autoWakeRef.current = true
     let cancelled = false
     let timer = null
-    let permissionState = 'prompt'
-    const detach = () => {
-      window.removeEventListener('pointerdown', arm, true)
-      window.removeEventListener('keydown', arm, true)
-      clearTimeout(timer)
+    const maybeArm = () => {
+      if (cancelled || !autoWakeRef.current || micDeniedRef.current) return
+      if (wakeOnRef.current || wakeStartingRef.current || conversationRef.current) return
+      actionsRef.current.startWake?.()
     }
-    const arm = () => {
-      if (cancelled || autoWakeRef.current || permissionState === 'denied') return
-      autoWakeRef.current = true
-      detach()
-      if (!wakeOnRef.current && !conversationRef.current) {
-        actionsRef.current.startWake?.()
+    const onPermissionChange = () => {
+      const status = permissionRef.current
+      if (cancelled || !status) return
+      if (status.state === 'granted') {
+        micDeniedRef.current = false
+        setVoiceError('')
+        clearTimeout(timer)
+        timer = setTimeout(maybeArm, 500)
+        return
+      }
+      if (status.state === 'denied') {
+        micDeniedRef.current = true
+        actionsRef.current.stopWake?.()
+        setVoiceError(
+          langRef.current === 'kg'
+            ? 'Микрофонго уруксат берилген жок. Браузердин сайт жөндөөлөрүнөн уруксат бериңиз.'
+            : 'Доступ к микрофону запрещён. Разрешите микрофон в настройках сайта.',
+        )
       }
     }
     try {
       navigator.permissions
         ?.query?.({ name: 'microphone' })
         .then((status) => {
-          permissionState = status.state || 'prompt'
-          if (permissionState === 'granted' && !cancelled) {
-            timer = setTimeout(arm, 1200)
+          if (cancelled) return
+          permissionRef.current = status
+          status.onchange = onPermissionChange
+          if (status.state === 'granted') {
+            timer = setTimeout(maybeArm, 700)
+          } else if (status.state === 'denied') {
+            onPermissionChange()
           }
         })
         .catch(() => {})
     } catch {
       /* Permissions API is unavailable in some browsers */
     }
-    window.addEventListener('pointerdown', arm, true)
-    window.addEventListener('keydown', arm, true)
+    window.addEventListener('pointerdown', maybeArm, true)
+    window.addEventListener('keydown', maybeArm, true)
     return () => {
       cancelled = true
-      detach()
+      window.removeEventListener('pointerdown', maybeArm, true)
+      window.removeEventListener('keydown', maybeArm, true)
+      clearTimeout(timer)
+      if (permissionRef.current) permissionRef.current.onchange = null
     }
   }, [])
 
@@ -838,6 +1023,7 @@ export function JarvisProvider({ children }) {
       transcript,
       muted,
       wakeMode,
+      wakeStarting,
       conversation,
       voiceError,
       config,
@@ -865,6 +1051,7 @@ export function JarvisProvider({ children }) {
       transcript,
       muted,
       wakeMode,
+      wakeStarting,
       conversation,
       voiceError,
       config,

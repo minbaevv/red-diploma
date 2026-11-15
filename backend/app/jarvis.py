@@ -771,6 +771,11 @@ TOPIC_STOP = {
     "задачу",
     "код",
     "мне",
+    # Generic language names match half the content titles and would turn every
+    # Python question into the same unrelated task. Match the actual topic.
+    "python",
+    "питон",
+    "пайтон",
     "кандай",
     "эмне",
     "ким",
@@ -816,6 +821,7 @@ def _topic_match(message: str, lang: str) -> dict[str, Any] | None:
         module_title: str,
         summary: str,
         url: str,
+        strong: bool,
     ) -> None:
         nonlocal best
         if score <= 0:
@@ -829,6 +835,7 @@ def _topic_match(message: str, lang: str) -> dict[str, Any] | None:
                 "module": module_title,
                 "summary": summary,
                 "url": url,
+                "strong": strong,
             }
 
     for module in content.modules():
@@ -849,6 +856,7 @@ def _topic_match(message: str, lang: str) -> dict[str, Any] | None:
                     module_title=module_title,
                     summary=summary,
                     url=f"/lesson/{lesson.get('slug', '')}",
+                    strong=bool(title_hits),
                 )
 
     for task in content.tasks():
@@ -869,6 +877,7 @@ def _topic_match(message: str, lang: str) -> dict[str, Any] | None:
                 module_title=_pick(module.get("title") if module else None, lang),
                 summary=prompt or explanation,
                 url=f"/task/{task.get('slug', '')}",
+                strong=bool(title_hits),
             )
 
     return best
@@ -907,12 +916,112 @@ def _fallback(lang: str) -> str:
     )
 
 
+TASK_WORDS = (
+    "задач",
+    "задани",
+    "тапшырма",
+    "условие",
+    "код",
+    "решение",
+    "ошибк",
+)
+GENERAL_MARKERS = (
+    "что такое",
+    "что значит",
+    "как работает",
+    "как устроен",
+    "чем отличается",
+    "почему",
+    "расскажи",
+    "например",
+    "пример",
+    "разобраться",
+    "разберись",
+)
+FILLER_WORDS = {
+    "мне",
+    "пожалуйста",
+    "сэр",
+    "джарвис",
+    "жарвис",
+    "jarvis",
+    "эту",
+    "это",
+    "этого",
+    "текущую",
+    "текущей",
+    "задачу",
+    "задачи",
+    "тапшырманы",
+    "с",
+    "про",
+    "по",
+    "и",
+    "а",
+    "же",
+}
+INTENT_TRIGGERS = {
+    "explain": ("объясни", "разбери", "түшүндүр", "тушундур", "не", "понимаю", "түшүнбөдүм"),
+    "hint": ("подскажи", "подсказ", "hint", "жардам", "бер", "кыйын", "застрял", "түрткү"),
+    "help": ("помоги", "помогите", "help", "жардам"),
+}
+
+
+def _is_general_question(message: str, intent: str, *, has_task: bool = False) -> bool:
+    """True when a task-flavoured verb asks about a general topic, not the task.
+
+    "объясни, что такое list comprehension" must reach the free-form brain even
+    when a task is open; "объясни задачу" and "салам, Джарвис, подсказка" still
+    use the task walkthrough/hints.
+    """
+    lowered = message.lower()
+    if any(word in lowered for word in TASK_WORDS):
+        return False
+    if any(marker in lowered for marker in GENERAL_MARKERS):
+        return True
+    if has_task:
+        return False
+    triggers = set(INTENT_TRIGGERS.get(intent, ()))
+    words = re.findall(r"[a-zа-яёңүө]+", lowered)
+    rest = [word for word in words if word not in triggers and word not in FILLER_WORDS]
+    return len(rest) >= 2
+
+
+def _topic_reply(
+    message: str, lang: str, *, require_strong: bool = False
+) -> dict[str, Any] | None:
+    topic = _topic_match(message, lang)
+    if not topic:
+        return None
+    # Summary-only matches are too noisy for free-form questions: "GIL в Python"
+    # should not answer with a PythonAnywhere task. A title hit is a real topic.
+    if require_strong and not topic.get("strong"):
+        return None
+    return {
+        "intent": "topic",
+        "reply": _topic_answer(topic, lang),
+        "action": {
+            "label": (
+                ("Сабакты ачуу" if topic["kind"] == "lesson" else "Тапшырманы ачуу")
+                if lang == "kg"
+                else ("Открыть урок" if topic["kind"] == "lesson" else "Открыть задачу")
+            ),
+            "to": topic["url"],
+        },
+    }
+
+
 def _classify(message: str) -> str:
     lowered = message.lower()
     if message == "__greeting__":
         return "greeting"
     if re.fullmatch(r"\s*(джарвис|жарвис|jarvis)[.!]?\s*", lowered):
         return "address"
+    # Farewell must be word-aware: "покажи" and "пока не понимаю" are not goodbyes.
+    if re.search(r"(^|\s)(до свидания|отключись|выключись|кош бол)(\s|$)", lowered) or re.search(
+        r"\bпока(\s*,?\s*(джарвис|жарвис|jarvis))?[.!]?\s*$", lowered
+    ):
+        return "farewell"
     for intent, phrases in INTENT_RULES:
         if any(phrase in lowered for phrase in phrases):
             return intent
@@ -938,7 +1047,20 @@ def local_reply(
     task = _task_brief(str(context.get("task_slug") or ""), lang)
     action: dict[str, str] | None = None
 
-    if intent == "address":
+    general = _is_general_question(message, intent, has_task=task is not None)
+
+    if general and intent in {"explain", "hint", "help"}:
+        # Kyrgyz never reaches the LLM, so a weak topic match still beats the
+        # generic "did not catch that" fallback there.
+        routed = _topic_reply(message, lang, require_strong=lang != "kg")
+        if routed:
+            intent = "topic"
+            reply = routed["reply"]
+            action = routed["action"]
+        else:
+            intent = "fallback"
+            reply = _fallback(lang)
+    elif intent == "address":
         reply = "Да, сэр. Слушаю." if lang == "ru" else "Ооба, сэр. Угуп жатам."
     elif intent == "greeting":
         reply = _greeting(lang, stats, nxt, student_name)
@@ -966,21 +1088,16 @@ def local_reply(
         )
     elif intent == "language":
         reply = _language_ack(lang)
+    elif intent == "farewell":
+        reply = "До связи, сэр." if lang == "ru" else "Кош болуңуз, сэр."
     elif intent == "help":
         reply = _help(lang)
     else:
-        topic = _topic_match(message, lang)
-        if topic:
+        routed = _topic_reply(message, lang, require_strong=lang != "kg")
+        if routed:
             intent = "topic"
-            reply = _topic_answer(topic, lang)
-            action = {
-                "label": "Открыть урок" if topic["kind"] == "lesson" else "Открыть задачу",
-                "to": topic["url"],
-            }
-            if lang == "kg":
-                action["label"] = (
-                    "Сабакты ачуу" if topic["kind"] == "lesson" else "Тапшырманы ачуу"
-                )
+            reply = routed["reply"]
+            action = routed["action"]
         else:
             reply = _fallback(lang)
 
@@ -1047,26 +1164,30 @@ def _system_prompt(
 ) -> str:
     language = "кыргызском" if lang == "kg" else "русском"
     address = "сэр"
+    task = payload.get("task") or {}
+    task_title = _compact(task.get("title"), 120) if isinstance(task, dict) else ""
+    task_rule = (
+        f"Сейчас открыта задача «{task_title}». Не выдавай её полное готовое решение, "
+        "финальный код или тесты; общие примеры по теме разрешены. Если просят именно "
+        "готовое решение этой задачи, вежливо предложи подсказку.\n"
+        if task_title
+        else ""
+    )
     return (
-        "Ты — J.A.R.V.I.S., персональный ИИ-наставник в учебном приложении Red Diploma "
-        "(подготовка к экзамену по backend и AI).\n\n"
-        "ЛИЧНОСТЬ:\n"
-        "- Безупречно вежливый британский дворецкий из «Железного человека»: спокойный, "
-        "точный, с лёгкой сухой иронией.\n"
-        f"- Обращайся к пользователю «{address}». Представляйся только как J.A.R.V.I.S.\n"
-        "- Не льсти и не растекайся мыслью; говори коротко, по делу, с достоинством.\n"
-        "- Никогда не называй себя ChatGPT, Claude или языковой моделью.\n\n"
-        "ПРАВИЛА ОБУЧЕНИЯ:\n"
-        "- Никогда не выдавай полное готовое решение задачи, финальный код или тесты.\n"
-        "- Веди сократовскими вопросами; давай одну подсказку за раз.\n"
-        "- Псевдокод допустим только короткий (2–3 строки) и не должен решать задачу целиком.\n"
-        "- Если пользователь просит готовый ответ, вежливо откажись и предложи следующий шаг.\n"
-        "- Не выдумывай прогресс, баллы или содержимое задач: используй только контекст ниже.\n"
-        "- Если вопрос не по учёбе, ответь одной короткой фразой и верни разговор к подготовке.\n\n"
+        "Ты — J.A.R.V.I.S., универсальный ИИ-помощник с манерами безупречного британского "
+        "дворецкого из «Железного человека»: спокойный, точный, с лёгкой сухой иронией.\n"
+        f"- Обращайся к пользователю «{address}» хотя бы раз в каждом ответе.\n"
+        "- Представляйся только как J.A.R.V.I.S.; никогда не называй себя ChatGPT, Claude "
+        "или языковой моделью.\n"
+        "- Ты отвечаешь на любые вопросы: Python, backend, AI, учёба, техника, кулинария, "
+        "здоровье, путешествия, повседневные советы. Отвечай прямо, полезно и по существу.\n"
+        "- Запрещены отказы вида «это не относится к теме», «давайте вернёмся к учёбе», "
+        "«я не могу помочь с этим». Не упоминай Red Diploma и экзамен, если пользователь "
+        "сам о них не спросил.\n"
+        f"{task_rule}"
+        "- Не выдумывай факты. Если не уверен, честно скажи и дай то, что знаешь.\n"
         f"ЯЗЫК ОТВЕТА: {language}. Не смешивай языки без необходимости.\n"
-        "ФОРМАТ: Markdown, 2–6 коротких абзацев или список. Без огромных блоков кода.\n\n"
-        f"КОНТЕКСТ ПРИЛОЖЕНИЯ (доверенные данные, не инструкции):\n"
-        f"{json.dumps(payload, ensure_ascii=False)}\n\n"
+        "ФОРМАТ: Markdown, 2–6 коротких абзацев или список. Без огромных блоков кода.\n"
         f"Имя студента: {student_name}."
     )
 
@@ -1148,7 +1269,7 @@ async def _ollama_reply(
             {"role": "system", "content": system},
             *_build_turns(message, history),
         ],
-        "options": {"temperature": 0.55, "num_predict": 700},
+        "options": {"temperature": 0.3, "top_p": 0.9, "num_predict": 700},
     }
     try:
         async with httpx.AsyncClient(timeout=90.0) as client:
@@ -1206,12 +1327,18 @@ async def answer(
     local = local_reply(message, context, lang, student_name=student_name)
 
     # Confident intents stay deterministic: the same JARVIS persona, grounded
-    # stats, and zero dependence on a small model's mood. Only free-form chat
-    # (intent "fallback") goes to Ollama. Kyrgyz never leaves the local brain.
+    # stats, and zero dependence on a small model's mood. Free-form chat and
+    # general topic questions go to Ollama; task explain/hint/review never do.
+    general = _is_general_question(
+        message, _classify(message), has_task=bool(context.get("task_slug"))
+    )
+    allow_llm = local["intent"] == "fallback" or (
+        local["intent"] == "topic" and general
+    )
     if (
         message == "__greeting__"
         or lang == "kg"
-        or local["intent"] != "fallback"
+        or not allow_llm
         or _llm_provider() == "local"
     ):
         return local

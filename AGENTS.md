@@ -75,21 +75,40 @@ The API runs at `http://127.0.0.1:8000`; Vite proxies `/api` on `:5173`.
   local brain, never the LLM. Kyrgyz replies always use the local brain too:
   small Ollama models produce pseudo-Kyrgyz. `JARVIS_LLM` only affects
   free-form Russian chat.
+- General questions must not hit the task prompts. `_is_general_question()`
+  routes «объясни, что такое list comprehension», «подскажи как работает dict»
+  and other off-topic asks to topic lookup or free-form Ollama even when a task
+  is open; `TASK_WORDS` keep «объясни задачу», «проверь код» and short
+  «подсказка» on the task path. `_topic_reply(require_strong=True)` only uses a
+  title match for RU free-form questions, so a generic word like «Python» does
+  not turn into a random PythonAnywhere task. A strong topic match still adds
+  an «Открыть урок/задачу» action next to the LLM answer.
+- Jarvis is a full conversational assistant, not only a study bot: the LLM
+  system prompt allows everyday and general questions, forbids «это не относится
+  к теме» refusals, and keeps the «сэр» address. It must not leak the open
+  task's solution or hidden tests.
 - Jarvis addresses the user as «сэр» in both RU and KG (movie persona).
   «мырза» stays only in `KYRGYZ_WORDS` for input detection, never in replies.
 - Voice chat is hands-free: the mic starts listen → reply → listen again.
   Wake phrases «Джарвис», «привет, Джарвис», and «салам, Джарвис» start the
-  same loop. Wake mode auto-arms after the first click/keypress when the mic
-  permission is granted (or immediately if it is already granted), so solving
-  a task does not require pressing the mic. Wake recognition must ignore
-  results while Jarvis is speaking or busy, otherwise its own voice can
-  trigger it.
+  same loop. Wake mode preflights the microphone with `getUserMedia` before
+  starting SpeechRecognition: Chrome can emit `not-allowed` while its own
+  permission prompt is open and otherwise kill wake until reload. The first
+  click/keypress arms it; later visits arm immediately when permission is
+  already granted, and pointer/key listeners stay attached for retries.
+  `wakeStarting` drives the «включаю микрофон…» indicator. A denied mic shows
+  a settings error and does not auto-retry until permission changes. Wake
+  recognition must ignore results while Jarvis is speaking or busy, otherwise
+  its own voice can trigger it.
 - Speech capture commits on silence (about 1.4 s), not on Chrome's first
   final result, so a full request is never cut off. A wake request waits
   about 1.5 s for its tail before starting the conversation.
 - «пока, Джарвис», «до свидания», «отключись», and «выключись» end the voice
-  chat and disarm wake mode with a short farewell. JavaScript `\b` is
-  ASCII-only, so match Cyrillic commands as words, not with `\b` regexes.
+  chat with a short farewell and return to wake standby, so a later «привет,
+  Джарвис» works without a reload. The backend also classifies farewells as
+  `farewell` for typed chat. JavaScript `\b` is ASCII-only, so match Cyrillic
+  commands as words, not with `\b` regexes; Python `_classify()` uses
+  Unicode-aware word checks so «покажи» is not «пока».
 - «привет, Джарвис, дай подсказку» must classify as `hint`, not `greeting`:
   `_classify()` checks `INTENT_RULES` before the greeting fallback.
 - Piper voices are per-language: `en_GB-jarvis-high` for English and
@@ -100,14 +119,16 @@ The API runs at `http://127.0.0.1:8000`; Vite proxies `/api` on `:5173`.
 
 ## Verification
 
-- Backend: `py -3.13 -m pytest -q` (currently 36 tests).
+- Backend: `py -3.13 -m pytest -q` (currently 42 tests).
 - Frontend: `npm run build` must pass.
 - UI: check desktop and mobile for horizontal overflow and console errors.
   Jarvis checks: open via `Ctrl+J`, greeting appears, orb canvas renders,
   quick commands answer, RU and KG replies work, task context sends
   `task_slug`/`code`, no solution leaks, the mic enters a repeated
   listen → reply → listen loop, wake phrases start that loop without cutting
-  the request off, and «пока, Джарвис» returns to standby.
+  the request off, «пока, Джарвис» returns to standby and re-arms wake, and a
+  general «что такое …» question gets a free-form answer without the
+  «задача пока не выбрана» reply.
 - Do not claim a content/API change works from reading code alone; hit the API
   or run the test.
 

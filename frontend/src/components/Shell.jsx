@@ -53,7 +53,15 @@ function pageTitle(pathname, bi) {
 
 export default function Shell() {
   const { data, loading, error, lang, setLanguage, refresh, settings } = useApp()
-  const { openPanel, togglePanel, updateContext, wakeMode } = useJarvis()
+  const {
+    openPanel,
+    togglePanel,
+    updateContext,
+    wakeMode,
+    wakeStarting,
+    conversation,
+    voiceError,
+  } = useJarvis()
   const bi = useBi()
   const location = useLocation()
   const [open, setOpen] = useState(false)
@@ -194,10 +202,16 @@ export default function Shell() {
       )}
 
       <button
-        className={`jarvis-fab ${wakeMode ? 'is-armed' : ''}`}
+        className={`jarvis-fab ${wakeMode ? 'is-armed' : ''} ${
+          voiceError && !wakeMode && !conversation && !wakeStarting ? 'is-error' : ''
+        }`}
         onClick={launchJarvis}
         aria-label="Открыть J.A.R.V.I.S."
-        title={wakeMode ? bi('Скажите «Джарвис»', '«Джарвис» деп айтыңыз') : undefined}
+        title={
+          wakeMode
+            ? bi('Скажите «Джарвис»', '«Джарвис» деп айтыңыз')
+            : voiceError || bi('Нажмите, чтобы включить микрофон', 'Микрофонду күйгүзүү үчүн басыңыз')
+        }
       >
         <span className="jarvis-fab-orb">
           <Orbit size={16} />
@@ -206,9 +220,15 @@ export default function Shell() {
         <span className="jarvis-fab-label">
           <strong>J.A.R.V.I.S.</strong>
           <small>
-            {wakeMode
-              ? bi('слушаю «Джарвис»', '«Джарвис» угуп жатам')
-              : bi('личный наставник', 'жеке устат')}
+            {wakeStarting
+              ? bi('включаю микрофон…', 'микрофон күйүп жатат…')
+              : conversation
+                ? bi('слушаю вас', 'сизди угуп жатам')
+                : wakeMode
+                  ? bi('слушаю «Джарвис»', '«Джарвис» угуп жатам')
+                  : voiceError
+                    ? bi('микрофон выключен', 'микрофон өчүк')
+                    : bi('нажмите для голоса', 'үн үчүн басыңыз')}
           </small>
         </span>
         <kbd>Ctrl J</kbd>

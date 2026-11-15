@@ -13,6 +13,31 @@ export function speechSupported() {
   return typeof window !== 'undefined' && 'speechSynthesis' in window
 }
 
+// Ask for the microphone through getUserMedia before SpeechRecognition.
+// Chrome's recognition can fail while its own permission prompt is open:
+// the first start() errors with `not-allowed`, and without this preflight the
+// wake word stays dead until the page is reloaded. A successful request is
+// cached for the page lifetime; failures are retried on the next gesture.
+let micAccessPromise = null
+
+export async function ensureMicrophoneAccess() {
+  if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
+    return { ok: true, reason: 'unsupported' }
+  }
+  if (micAccessPromise) return micAccessPromise
+  micAccessPromise = navigator.mediaDevices
+    .getUserMedia({ audio: true })
+    .then((stream) => {
+      stream.getTracks().forEach((track) => track.stop())
+      return { ok: true }
+    })
+    .catch((error) => {
+      micAccessPromise = null
+      return { ok: false, reason: error?.name || 'unknown' }
+    })
+  return micAccessPromise
+}
+
 function editDistance(a, b) {
   const rows = a.length + 1
   const cols = b.length + 1

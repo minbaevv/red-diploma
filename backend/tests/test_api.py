@@ -5,7 +5,7 @@ from contextlib import closing
 import pytest
 from fastapi.testclient import TestClient
 
-from app import content
+from app import content, jarvis
 from app.db import connect, init_db
 from app.main import app
 from app.runner import run_code
@@ -549,6 +549,7 @@ def test_jarvis_reviews_code_without_solution(monkeypatch, client: TestClient):
 
 def test_jarvis_finds_topics_without_llm(monkeypatch, client: TestClient):
     monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    monkeypatch.setenv("JARVIS_LLM", "local")
 
     russian = client.post(
         "/api/jarvis/chat",
@@ -569,6 +570,150 @@ def test_jarvis_finds_topics_without_llm(monkeypatch, client: TestClient):
     assert kg_payload["language"] == "kg"
     assert kg_payload["intent"] == "topic"
     assert "сэр" in kg_payload["reply"].lower()
+
+
+def test_jarvis_general_question_does_not_ask_for_a_task(monkeypatch, client: TestClient):
+    # A general "explain X" must never fall back to "задача пока не выбрана",
+    # even when no task is open. Without a matching lesson it goes free-form.
+    monkeypatch.setenv("JARVIS_LLM", "local")
+    for message in (
+        "объясни что такое list comprehension",
+        "подскажи как работает dict",
+        "помоги разобраться с генераторами",
+    ):
+        response = client.post(
+            "/api/jarvis/chat",
+            json={"message": message, "context": {"language": "ru"}},
+        )
+        assert response.status_code == 200
+        payload = response.json()
+        assert payload["intent"] in {"fallback", "topic"}, message
+        assert "задача пока не выбрана" not in payload["reply"], message
+        assert "Откройте задачу" not in payload["reply"], message
+
+
+def test_jarvis_general_question_reaches_free_form_brain(monkeypatch, client: TestClient):
+    # The free-form path is what actually answers arbitrary questions. Stub the
+    # provider so the test proves routing, not Ollama's availability.
+    monkeypatch.setenv("JARVIS_LLM", "ollama")
+    monkeypatch.setattr(jarvis, "_llm_provider", lambda: "ollama")
+
+    seen: dict[str, str] = {}
+
+    async def fake_llm(message, history, context, lang, student_name):
+        seen["message"] = message
+        seen["lang"] = lang
+        return "Сэр, GIL — это глобальная блокировка интерпретатора CPython.", "ollama"
+
+    monkeypatch.setattr(jarvis, "_llm_reply", fake_llm)
+    response = client.post(
+        "/api/jarvis/chat",
+        json={"message": "объясни что такое GIL в Python", "context": {"language": "ru"}},
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["source"] == "ollama"
+    assert "GIL" in payload["reply"]
+    assert seen["message"] == "объясни что такое GIL в Python"
+    assert seen["lang"] == "ru"
+
+
+def test_jarvis_general_topic_gets_llm_answer_with_lesson_action(monkeypatch, client: TestClient):
+    # A general "what is X" question should get a real explanation, not just a
+    # one-line lesson summary — but the lesson action must stay available.
+    monkeypatch.setenv("JARVIS_LLM", "ollama")
+    monkeypatch.setattr(jarvis, "_llm_provider", lambda: "ollama")
+
+    async def fake_llm(message, history, context, lang, student_name):
+        return "Сэр, FastAPI — это асинхронный веб-фреймворк на Python.", "ollama"
+
+    monkeypatch.setattr(jarvis, "_llm_reply", fake_llm)
+    response = client.post(
+        "/api/jarvis/chat",
+        json={"message": "объясни что такое FastAPI", "context": {"language": "ru"}},
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["intent"] == "topic"
+    assert payload["source"] == "ollama"
+    assert "FastAPI" in payload["reply"]
+    assert payload["action"]["to"].startswith("/lesson/")
+
+
+def test_jarvis_recognizes_goodbye_and_not_show_requests(monkeypatch, client: TestClient):
+    monkeypatch.setenv("JARVIS_LLM", "ollama")
+    for message, language, expected in (
+        ("пока джарвис", "ru", "До связи"),
+        ("до свидания", "ru", "До связи"),
+        ("отключись", "ru", "До связи"),
+        ("кош бол", "kg", "Кош болуңуз"),
+    ):
+        response = client.post(
+            "/api/jarvis/chat",
+            json={"message": message, "context": {"language": language}},
+        )
+        assert response.status_code == 200
+        payload = response.json()
+        assert payload["intent"] == "farewell", message
+        assert payload["source"] == "local", message
+        assert expected in payload["reply"], message
+
+    # "покажи решение" starts with "пока" but is not a goodbye.
+    response = client.post(
+        "/api/jarvis/chat",
+        json={
+            "message": "покажи решение",
+            "context": {"language": "ru", "task_slug": "sum-even"},
+        },
+    )
+    assert response.status_code == 200
+    assert response.json()["intent"] != "farewell"
+
+
+def test_jarvis_task_context_keeps_explain_and_review_local(monkeypatch, client: TestClient):
+    # General-question routing must not steal task-specific requests.
+    monkeypatch.setenv("JARVIS_LLM", "ollama")
+    explain = client.post(
+        "/api/jarvis/chat",
+        json={
+            "message": "объясни задачу",
+            "context": {"language": "ru", "task_slug": "sum-even"},
+        },
+    )
+    assert explain.status_code == 200
+    explain_payload = explain.json()
+    assert explain_payload["intent"] == "explain"
+    assert explain_payload["source"] == "local"
+    assert "План" in explain_payload["reply"]
+
+    review = client.post(
+        "/api/jarvis/chat",
+        json={
+            "message": "проверь код",
+            "context": {
+                "language": "ru",
+                "task_slug": "sum-even",
+                "code": "def sum_even(numbers):\n    return 0\n",
+            },
+        },
+    )
+    assert review.status_code == 200
+    review_payload = review.json()
+    assert review_payload["intent"] == "review"
+    assert review_payload["source"] == "local"
+
+
+def test_jarvis_kyrgyz_general_question_stays_local(monkeypatch, client: TestClient):
+    monkeypatch.setenv("JARVIS_LLM", "ollama")
+    response = client.post(
+        "/api/jarvis/chat",
+        json={"message": "түшүндүр list comprehension деген эмне", "context": {"language": "kg"}},
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["language"] == "kg"
+    assert payload["source"] == "local"
+    assert "тапшырма тандалган жок" not in payload["reply"]
 
 
 def test_jarvis_answers_wake_address(monkeypatch, client: TestClient):
